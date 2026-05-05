@@ -7,6 +7,7 @@
     AllowsTransparency="True"
     Background="Transparent"
     WindowStyle="None">
+    <!--  MainWindow  -->
     <Window.Resources>
         <Style x:Key="SidebarButtonRound" TargetType="Button">
             <Setter Property="Width" Value="36" />
@@ -56,6 +57,8 @@
                 <ColumnDefinition Width="68" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+
+            <!--  Heder  -->
             <Grid
                 Grid.Row="0"
                 Grid.ColumnSpan="2"
@@ -198,6 +201,7 @@
                 </StackPanel>
             </Grid>
 
+            <!--  SideBar  -->
             <Grid
                 Grid.Row="1"
                 Grid.Column="0"
@@ -244,6 +248,7 @@
                 </Button>
             </Grid>
 
+            <!--  MainContent  -->
             <Border
                 Grid.Row="1"
                 Grid.Column="1"
@@ -251,8 +256,16 @@
                 BorderBrush="#1E1E1E"
                 BorderThickness="1,1,0,0"
                 CornerRadius="16,0,0,0">
-                <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!--  CallContent — висота за контентом  -->
+                        <RowDefinition Height="*" />
+                        <!--  LastCallContent — вся решта  -->
+                    </Grid.RowDefinitions>
+                    <!--  CallContent  -->
                     <Border
+                        Grid.Row="0"
                         Margin="0,0,0,12"
                         Padding="16"
                         Background="#111111"
@@ -318,13 +331,112 @@
                             </Button>
                         </StackPanel>
                     </Border>
+
+                    <!--  LastCallContent  -->
                     <Border
+                        Grid.Row="1"
                         Padding="16,16,16,16"
                         Background="#111111"
                         BorderBrush="#1E1E1E"
                         BorderThickness="1"
-                        CornerRadius="16" />
-                </StackPanel>
+                        CornerRadius="16">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                Foreground="#555555">
+                                Останні записи
+                            </TextBlock>
+                            <StackPanel
+                                Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Grid Width="60" Height="60">
+                                    <Ellipse Fill="#161616" Stroke="#1E1E1E" />
+                                    <Path
+                                        Width="30"
+                                        Height="30"
+                                        Data="m14 7v-6.54a6.977 6.977 0 0 1 2.465 1.59l3.484 3.486a6.954 6.954 0 0 1 1.591 2.464h-6.54a1 1 0 0 1 -1-1zm8 3.485v8.515a5.006 5.006 0 0 1 -5 5h-10a5.006 5.006 0 0 1 -5-5v-14a5.006 5.006 0 0 1 5-5h4.515c.163 0 .324.013.485.024v6.976a3 3 0 0 0 3 3h6.976c.011.161.024.322.024.485zm-6 6.515a1 1 0 0 0 -1-1h-2v-2a1 1 0 0 0 -2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 1-1z"
+                                        Fill="#555555"
+                                        Stretch="Uniform" />
+                                </Grid>
+                                <TextBlock
+                                    Margin="0,8,0,4"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Bold"
+                                    Foreground="#555555">
+                                    Записів не знайдено
+                                </TextBlock>
+                                <TextBlock
+                                    Width="300"
+                                    Margin="0,0,0,8"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="#2D2D2D"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap">
+                                    Коли відбудеться дзвінок у WhatsApp, Telegram, Viber або інші програми - запис з'явиться тут
+                                </TextBlock>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <Border
+                                        Width="30"
+                                        Height="30"
+                                        Background="#1A3A5C"
+                                        CornerRadius="8,8,8,8">
+                                        <Image
+                                            Width="16"
+                                            Height="16"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Source="/Assets/Icons/telegram.png" />
+                                    </Border>
+                                    <Border
+                                        Width="30"
+                                        Height="30"
+                                        Margin="6,0,6,0"
+                                        Background="#3A1A4A"
+                                        CornerRadius="8,8,8,8">
+                                        <Image
+                                            Width="16"
+                                            Height="16"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Source="/Assets/Icons/viber.png" />
+                                    </Border>
+                                    <Border
+                                        Width="30"
+                                        Height="30"
+                                        Background="#1B4A2E"
+                                        CornerRadius="8,8,8,8">
+                                        <Image
+                                            Width="16"
+                                            Height="16"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Source="/Assets/Icons/whatsapp.png" />
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
         </Grid>
     </Border>

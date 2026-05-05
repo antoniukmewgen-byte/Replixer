@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Project\\EchoVault_New\\EchoVault\\",
+  "WorkspaceRootPath": "D:\\GitHub\\EchoVault\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\project\\echovault_new\\echovault\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\project\\echovault_new\\echovault\\echovault.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\echovault.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:echovault.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
@@ -28,23 +28,22 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "EchoVault.csproj",
-              "DocumentMoniker": "D:\\Project\\EchoVault_New\\EchoVault\\EchoVault.csproj",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\EchoVault.csproj",
               "RelativeDocumentMoniker": "EchoVault.csproj",
-              "ToolTip": "D:\\Project\\EchoVault_New\\EchoVault\\EchoVault.csproj",
+              "ToolTip": "D:\\GitHub\\EchoVault\\EchoVault.csproj",
               "RelativeToolTip": "EchoVault.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-05-04T22:25:19.701Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-04T22:25:19.701Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
-              "DocumentMoniker": "D:\\Project\\EchoVault_New\\EchoVault\\MainWindow.xaml",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
-              "ToolTip": "D:\\Project\\EchoVault_New\\EchoVault\\MainWindow.xaml*",
-              "RelativeToolTip": "MainWindow.xaml*",
+              "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
+              "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-04T19:59:31.581Z",
               "EditorCaption": ""

@@ -8,23 +8,23 @@
     "net10.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\reeditor\\.nuget\\packages\\": {},
+    "C:\\Users\\Saiken\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\reeditor\\source\\repos\\EchoVault\\EchoVault.csproj",
+      "projectUniqueName": "D:\\GitHub\\EchoVault\\EchoVault.csproj",
       "projectName": "EchoVault",
-      "projectPath": "C:\\Users\\reeditor\\source\\repos\\EchoVault\\EchoVault.csproj",
-      "packagesPath": "C:\\Users\\reeditor\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\reeditor\\source\\repos\\EchoVault\\obj\\",
+      "projectPath": "D:\\GitHub\\EchoVault\\EchoVault.csproj",
+      "packagesPath": "C:\\Users\\Saiken\\.nuget\\packages\\",
+      "outputPath": "D:\\GitHub\\EchoVault\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\reeditor\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Saiken\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

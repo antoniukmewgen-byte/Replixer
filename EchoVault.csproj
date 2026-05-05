@@ -9,6 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Icons\telegram.png" />
+    <None Remove="Assets\Icons\viber.png" />
+    <None Remove="Assets\Icons\whatsapp.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Icons\telegram.png" />
+    <Resource Include="Assets\Icons\viber.png" />
+    <Resource Include="Assets\Icons\whatsapp.png" />
     <Resource Include="Fonts\Inter-Thin.ttf" />
     <Resource Include="Fonts\Inter-ExtraLight.ttf" />
     <Resource Include="Fonts\Inter-Light.ttf" />
@@ -19,10 +28,6 @@
     <Resource Include="Fonts\Inter-ExtraBold.ttf" />
     <Resource Include="Fonts\Inter-Black.ttf" />
     <Resource Include="Fonts\InterVariable.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\" />
   </ItemGroup>
 
 </Project>
