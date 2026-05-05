@@ -202,6 +202,7 @@
 
             <!--  SideBar  -->
             <Grid
+                x:Name="SidebarGrid"
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="0,17,0,16">
@@ -244,6 +245,21 @@
                             Stretch="Uniform" />
                     </Button>
                 </StackPanel>
+
+                <!--  Active page indicator  -->
+                <Border
+                    x:Name="ActiveIndicator"
+                    Width="4"
+                    Height="36"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Background="{StaticResource BrushIcon}"
+                    CornerRadius="0,4,4,0">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="IndicatorTranslate" />
+                    </Border.RenderTransform>
+                </Border>
+
                 <Button
                     x:Name="ProfileButton"
                     Padding="0"

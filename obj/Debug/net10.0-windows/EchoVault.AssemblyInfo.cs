@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EchoVault")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dde60a30c0c7082788f6a792e150de163780a238")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+73be09a5ee8b016d9fda76cd51845fee335a2b71")]
 [assembly: System.Reflection.AssemblyProductAttribute("EchoVault")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EchoVault")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
