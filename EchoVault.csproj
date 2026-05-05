@@ -9,12 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Icons\IconApp.png" />
     <None Remove="Assets\Icons\telegram.png" />
     <None Remove="Assets\Icons\viber.png" />
     <None Remove="Assets\Icons\whatsapp.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Icons\IconApp.png" />
     <Resource Include="Assets\Icons\telegram.png" />
     <Resource Include="Assets\Icons\viber.png" />
     <Resource Include="Assets\Icons\whatsapp.png" />
