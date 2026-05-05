@@ -15,6 +15,66 @@
             Width="60"
             Height="60"
             Margin="0,12">
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard RepeatBehavior="Forever">
+                            <!--  Wave 1  -->
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave1Scale"
+                                Storyboard.TargetProperty="ScaleX"
+                                BeginTime="0:0:0" From="1" To="1.8"
+                                Duration="0:0:0.8" />
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave1Scale"
+                                Storyboard.TargetProperty="ScaleY"
+                                BeginTime="0:0:0" From="1" To="1.8"
+                                Duration="0:0:0.8" />
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave1"
+                                Storyboard.TargetProperty="Opacity"
+                                BeginTime="0:0:0" From="0.6" To="0"
+                                Duration="0:0:0.8" />
+                            <!--  Wave 2  -->
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave2Scale"
+                                Storyboard.TargetProperty="ScaleX"
+                                BeginTime="0:0:0.4" From="1" To="1.8"
+                                Duration="0:0:0.8" />
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave2Scale"
+                                Storyboard.TargetProperty="ScaleY"
+                                BeginTime="0:0:0.4" From="1" To="1.8"
+                                Duration="0:0:0.8" />
+                            <DoubleAnimation
+                                Storyboard.TargetName="Wave2"
+                                Storyboard.TargetProperty="Opacity"
+                                BeginTime="0:0:0.4" From="0.6" To="0"
+                                Duration="0:0:0.8" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Grid.Triggers>
+            <Ellipse
+                x:Name="Wave1"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5"
+                Stroke="#CC5555"
+                StrokeThickness="1">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform x:Name="Wave1Scale" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse
+                x:Name="Wave2"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5"
+                Stroke="#CC5555"
+                StrokeThickness="1">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform x:Name="Wave2Scale" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
             <Ellipse Fill="#2A0F0F" Stroke="#481919" />
             <Path
                 Width="30"
