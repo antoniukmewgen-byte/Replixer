@@ -18,5 +18,7 @@
         <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
         <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />
         <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />
+        <SolidColorBrush x:Key="BrushDanger" Color="#C0392B" />
+        <SolidColorBrush x:Key="BrushHover" Color="#2A2A2A" />
     </Application.Resources>
 </Application>

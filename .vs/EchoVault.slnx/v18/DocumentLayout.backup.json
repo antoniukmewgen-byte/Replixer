@@ -7,22 +7,6 @@
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\recordingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\recordingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
@@ -38,84 +22,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "MainWindow.xaml.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml.cs",
-              "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAkwC0AAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-05T17:55:46.002Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "SettingsPage.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\SettingsPage.xaml",
-              "RelativeDocumentMoniker": "Views\\SettingsPage.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\SettingsPage.xaml",
-              "RelativeToolTip": "Views\\SettingsPage.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T17:33:58.708Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "RecordingsPage.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\RecordingsPage.xaml",
-              "RelativeDocumentMoniker": "Views\\RecordingsPage.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\RecordingsPage.xaml",
-              "RelativeToolTip": "Views\\RecordingsPage.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T17:33:56.834Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "HomePage.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
-              "RelativeDocumentMoniker": "Views\\HomePage.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
-              "RelativeToolTip": "Views\\HomePage.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T17:33:17.547Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ProfilePage.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\ProfilePage.xaml",
-              "RelativeDocumentMoniker": "Views\\ProfilePage.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\ProfilePage.xaml",
-              "RelativeToolTip": "Views\\ProfilePage.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T17:33:14.869Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "App.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\App.xaml",
-              "RelativeDocumentMoniker": "App.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\App.xaml",
-              "RelativeToolTip": "App.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T17:33:07.194Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -126,8 +37,31 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-04T19:59:31.581Z",
+              "WhenOpened": "2026-05-05T20:15:09.452Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "App.xaml",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\App.xaml",
+              "RelativeDocumentMoniker": "App.xaml",
+              "ToolTip": "D:\\GitHub\\EchoVault\\App.xaml",
+              "RelativeToolTip": "App.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-05-05T20:12:28.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HomePage.xaml",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
+              "RelativeDocumentMoniker": "Views\\HomePage.xaml",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
+              "RelativeToolTip": "Views\\HomePage.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-05-05T18:34:24.678Z"
             }
           ]
         }

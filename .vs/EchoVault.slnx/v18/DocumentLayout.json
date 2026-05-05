@@ -34,8 +34,8 @@
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml*",
-              "RelativeToolTip": "MainWindow.xaml*",
+              "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
+              "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-05T20:15:09.452Z",
               "EditorCaption": ""
@@ -61,8 +61,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeToolTip": "Views\\HomePage.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T18:34:24.678Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T18:34:24.678Z"
             }
           ]
         }
