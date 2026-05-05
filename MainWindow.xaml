@@ -2,6 +2,8 @@
     x:Class="EchoVault.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:views="clr-namespace:EchoVault.Views"
+    xmlns:vm="clr-namespace:EchoVault.ViewModels"
     Width="836"
     Height="562"
     AllowsTransparency="True"
@@ -10,6 +12,20 @@
     WindowStyle="None">
 
     <Window.Resources>
+        <!--  DataTemplates: ViewModel → View  -->
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+            <views:HomePage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RecordingsViewModel}">
+            <views:RecordingsPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ProfileViewModel}">
+            <views:ProfilePage />
+        </DataTemplate>
+
         <Style x:Key="HeaderButton" TargetType="Button">
             <Setter Property="Width" Value="30" />
             <Setter Property="Height" Value="30" />
@@ -193,7 +209,7 @@
                     <Button
                         x:Name="HomeButton"
                         Padding="0"
-                        Click="HomeButton_Click"
+                        Command="{Binding NavigateHomeCommand}"
                         Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
@@ -206,7 +222,7 @@
                         x:Name="RecordingsButton"
                         Margin="0,12"
                         Padding="0"
-                        Click="RecordingsButton_Click"
+                        Command="{Binding NavigateRecordingsCommand}"
                         Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
@@ -218,7 +234,7 @@
                     <Button
                         x:Name="SettingsButton"
                         Padding="0"
-                        Click="SettingsButton_Click"
+                        Command="{Binding NavigateSettingsCommand}"
                         Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
@@ -232,7 +248,7 @@
                     x:Name="ProfileButton"
                     Padding="0"
                     VerticalAlignment="Bottom"
-                    Click="ProfileButton_Click"
+                    Command="{Binding NavigateProfileCommand}"
                     Style="{StaticResource SidebarButtonRound}">
                     <Path
                         Width="16"
@@ -251,7 +267,7 @@
                 BorderBrush="{StaticResource BrushBorder}"
                 BorderThickness="1,1,0,0"
                 CornerRadius="16,0,0,0">
-                <ContentControl x:Name="PageContent" />
+                <ContentControl Content="{Binding CurrentViewModel}" />
             </Border>
         </Grid>
     </Border>

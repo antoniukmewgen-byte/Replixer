@@ -49,3 +49,4 @@ D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\HomePage.g.cs
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\ProfilePage.g.cs
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\RecordingsPage.g.cs
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\SettingsPage.g.cs
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs

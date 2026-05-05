@@ -7,20 +7,20 @@
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\recordingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\recordingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\profilepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -42,7 +42,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "SettingsPage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\SettingsPage.xaml",
               "RelativeDocumentMoniker": "Views\\SettingsPage.xaml",
@@ -54,7 +54,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "RecordingsPage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\RecordingsPage.xaml",
               "RelativeDocumentMoniker": "Views\\RecordingsPage.xaml",
@@ -66,7 +66,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "HomePage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeDocumentMoniker": "Views\\HomePage.xaml",
@@ -78,7 +78,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "ProfilePage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\ProfilePage.xaml",
               "RelativeDocumentMoniker": "Views\\ProfilePage.xaml",
