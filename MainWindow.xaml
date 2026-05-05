@@ -1,35 +1,30 @@
-﻿<Window
+<Window
     x:Class="EchoVault.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Width="736"
-    Height="462"
+    Width="836"
+    Height="562"
     AllowsTransparency="True"
     Background="Transparent"
+    MouseDown="Window_MouseDown"
     WindowStyle="None">
-    <!--  MainWindow  -->
+
     <Window.Resources>
-        <Style x:Key="SidebarButtonRound" TargetType="Button">
-            <Setter Property="Width" Value="36" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Background" Value="#1E1E1E" />
+        <Style x:Key="HeaderButton" TargetType="Button">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{x:Null}" />
+            <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{x:Null}" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="50">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style x:Key="SidebarButton" TargetType="Button">
             <Setter Property="Width" Value="36" />
             <Setter Property="Height" Value="36" />
-            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="Background" Value="{StaticResource BrushBorder}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
@@ -42,11 +37,26 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style
+            x:Key="SidebarButtonRound"
+            BasedOn="{StaticResource SidebarButton}"
+            TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="50">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border
         x:Name="RootBorder"
-        Background="#0E0E0E"
+        Background="{StaticResource BrushWindowBackground}"
         CornerRadius="12">
         <Grid>
             <Grid.RowDefinitions>
@@ -58,7 +68,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!--  Heder  -->
+            <!--  Header  -->
             <Grid
                 Grid.Row="0"
                 Grid.ColumnSpan="2"
@@ -68,32 +78,32 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <Border
                         Width="16"
                         Height="16"
                         Margin="0,0,6,0"
-                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Background="#1E1E1E"
+                        Background="{StaticResource BrushBorder}"
                         CornerRadius="4">
                         <Path
                             Width="8"
                             Height="8"
                             Data="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm0,22c-5.514,0-10-4.486-10-10S6.486,2,12,2s10,4.486,10,10-4.486,10-10,10Zm4-10c0,2.209-1.791,4-4,4s-4-1.791-4-4,1.791-4,4-4,4,1.791,4,4Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Border>
                     <TextBlock
-                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontFamily="{StaticResource InterFont}"
                         FontSize="12"
                         FontWeight="Bold"
-                        Foreground="#555555">
+                        Foreground="{StaticResource BrushIcon}">
                         EchoVault
                     </TextBlock>
                 </StackPanel>
+
                 <StackPanel
                     Grid.Column="1"
                     HorizontalAlignment="Center"
@@ -102,100 +112,73 @@
                         Width="8"
                         Height="8"
                         Margin="0,0,6,0"
-                        Fill="#306932" />
+                        VerticalAlignment="Center"
+                        Fill="{StaticResource BrushIndicatorActive}" />
                     <TextBlock
-                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontFamily="{StaticResource InterFont}"
                         FontSize="10"
                         FontWeight="Medium"
-                        Foreground="#555555">
+                        Foreground="{StaticResource BrushIcon}">
                         Моніторинг активний
                     </TextBlock>
                 </StackPanel>
+
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button
-                        Width="30"
-                        Height="30"
-                        Padding="0,0,0,0"
-                        Background="{x:Null}"
-                        BorderBrush="{x:Null}"
-                        BorderThickness="0"
-                        Foreground="{x:Null}">
+                    <Button x:Name="EmailButton" Style="{StaticResource HeaderButton}">
                         <Path
                             Width="10"
                             Height="10"
                             Data="M23.954,5.542,15.536,13.96a5.007,5.007,0,0,1-7.072,0L.046,5.542C.032,5.7,0,5.843,0,6V18a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V6C24,5.843,23.968,5.7,23.954,5.542Z     M14.122,12.546l9.134-9.135A4.986,4.986,0,0,0,19,1H5A4.986,4.986,0,0,0,.744,3.411l9.134,9.135A3.007,3.007,0,0,0,14.122,12.546Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
-                    <Path
+                    <Rectangle
+                        Width="1"
                         Height="24"
-                        Margin="6,0,6,0"
-                        Data="M0.458333 22C0.205333 22 0 21.7947 0 21.5417V0.458333C0 0.205333 0.205333 0 0.458333 0C0.711333 0 0.916667 0.205333 0.916667 0.458333V21.5417C0.916667 21.7947 0.711333 22 0.458333 22Z"
-                        Fill="#1E1E1E"
-                        Stretch="Uniform" />
-                    <Button
-                        Width="30"
-                        Height="30"
-                        Padding="0,0,0,0"
-                        Background="{x:Null}"
-                        BorderBrush="{x:Null}"
-                        BorderThickness="0"
-                        Foreground="{x:Null}">
+                        Margin="6,0"
+                        Fill="{StaticResource BrushBorder}" />
+                    <Button x:Name="CollapseButton" Style="{StaticResource HeaderButton}">
                         <Path
                             Width="10"
                             Height="10"
                             Data="M18.71,8.21a1,1,0,0,0-1.42,0l-4.58,4.58a1,1,0,0,1-1.42,0L6.71,8.21a1,1,0,0,0-1.42,0,1,1,0,0,0,0,1.41l4.59,4.59a3,3,0,0,0,4.24,0l4.59-4.59A1,1,0,0,0,18.71,8.21Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                     <Button
-                        Width="30"
-                        Height="30"
+                        x:Name="MinimizeButton"
                         Margin="4,0,0,0"
-                        Padding="0,0,0,0"
-                        Background="{x:Null}"
-                        BorderBrush="{x:Null}"
-                        BorderThickness="0"
-                        Foreground="{x:Null}">
+                        Click="MinimizeButton_Click"
+                        Style="{StaticResource HeaderButton}">
                         <Path
                             Width="10"
                             Height="10"
                             Data="M22.5,14H1.5c-.83,0-1.5-.67-1.5-1.5s.67-1.5,1.5-1.5H22.5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                     <Button
-                        Width="30"
-                        Height="30"
+                        x:Name="FullscreenButton"
                         Margin="4,0,0,0"
-                        Padding="0,0,0,0"
-                        Background="{x:Null}"
-                        BorderBrush="{x:Null}"
-                        BorderThickness="0"
-                        Foreground="{x:Null}">
+                        Style="{StaticResource HeaderButton}">
                         <Path
                             Width="10"
                             Height="10"
                             Data="M22.5,15.5A1.5,1.5,0,0,0,21,17v1.5A2.5,2.5,0,0,1,18.5,21H17a1.5,1.5,0,0,0,0,3h1.5A5.506,5.506,0,0,0,24,18.5V17A1.5,1.5,0,0,0,22.5,15.5Z     M7,0H5.5A5.506,5.506,0,0,0,0,5.5V7A1.5,1.5,0,0,0,3,7V5.5A2.5,2.5,0,0,1,5.5,3H7A1.5,1.5,0,0,0,7,0Z     M7,21H5.5A2.5,2.5,0,0,1,3,18.5V17a1.5,1.5,0,0,0-3,0v1.5A5.506,5.506,0,0,0,5.5,24H7a1.5,1.5,0,0,0,0-3Z     M18.5,0H17a1.5,1.5,0,0,0,0,3h1.5A2.5,2.5,0,0,1,21,5.5V7a1.5,1.5,0,0,0,3,0V5.5A5.506,5.506,0,0,0,18.5,0Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                     <Button
-                        Width="30"
-                        Height="30"
+                        x:Name="CloseButton"
                         Margin="4,0,0,0"
-                        Padding="0,0,0,0"
-                        Background="{x:Null}"
-                        BorderBrush="{x:Null}"
-                        BorderThickness="0"
-                        Foreground="{x:Null}">
+                        Click="CloseButton_Click"
+                        Style="{StaticResource HeaderButton}">
                         <Path
                             Width="10"
                             Height="10"
                             Data="M301.258,256.01L502.645,54.645c12.501-12.501,12.501-32.769,0-45.269c-12.501-12.501-32.769-12.501-45.269,0l0,0   L256.01,210.762L54.645,9.376c-12.501-12.501-32.769-12.501-45.269,0s-12.501,32.769,0,45.269L210.762,256.01L9.376,457.376   c-12.501,12.501-12.501,32.769,0,45.269s32.769,12.501,45.269,0L256.01,301.258l201.365,201.387   c12.501,12.501,32.769,12.501,45.269,0c12.501-12.501,12.501-32.769,0-45.269L301.258,256.01z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                 </StackPanel>
@@ -207,43 +190,55 @@
                 Grid.Column="0"
                 Margin="0,17,0,16">
                 <StackPanel VerticalAlignment="Top">
-                    <Button Padding="0,0,0,0" Style="{StaticResource SidebarButton}">
+                    <Button
+                        x:Name="HomeButton"
+                        Padding="0"
+                        Click="HomeButton_Click"
+                        Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
                             Height="16"
                             Data="M362.667,383.841v128H448c35.346,0,64-28.654,64-64V253.26c0.005-11.083-4.302-21.733-12.011-29.696l-181.29-195.99c-31.988-34.61-85.976-36.735-120.586-4.747c-1.644,1.52-3.228,3.103-4.747,4.747L12.395,223.5C4.453,231.496-0.003,242.31,0,253.58v194.261c0,35.346,28.654,64,64,64h85.333v-128c0.399-58.172,47.366-105.676,104.073-107.044C312.01,275.383,362.22,323.696,362.667,383.841Z     M256,319.841c-35.346,0-64,28.654-64,64v128h128v-128C320,348.495,291.346,319.841,256,319.841Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                     <Button
-                        Margin="0,12,0,12"
-                        Padding="0,0,0,0"
+                        x:Name="RecordingsButton"
+                        Margin="0,12"
+                        Padding="0"
+                        Click="RecordingsButton_Click"
                         Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
                             Height="16"
                             Data="M10,12a1,1,0,0,1-1,1H4.069a7.993,7.993,0,0,0,15.862,0H15a1,1,0,0,1,0-2h5V9H15a1,1,0,0,1,0-2h4.931A7.993,7.993,0,0,0,4.069,7H9A1,1,0,0,1,9,9H4v2H9A1,1,0,0,1,10,12Z                             M23,12a1,1,0,0,0-1,1,9.01,9.01,0,0,1-9,9H11a9.011,9.011,0,0,1-9-9,1,1,0,0,0-2,0A11.013,11.013,0,0,0,11,24h2A11.013,11.013,0,0,0,24,13,1,1,0,0,0,23,12Z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
-                    <Button Padding="0,0,0,0" Style="{StaticResource SidebarButton}">
+                    <Button
+                        x:Name="SettingsButton"
+                        Padding="0"
+                        Click="SettingsButton_Click"
+                        Style="{StaticResource SidebarButton}">
                         <Path
                             Width="16"
                             Height="16"
                             Data="M34.283,384c17.646,30.626,56.779,41.148,87.405,23.502c0.021-0.012,0.041-0.024,0.062-0.036l9.493-5.483   c17.92,15.332,38.518,27.222,60.757,35.072V448c0,35.346,28.654,64,64,64s64-28.654,64-64v-10.944   c22.242-7.863,42.841-19.767,60.757-35.115l9.536,5.504c30.633,17.673,69.794,7.167,87.467-23.467   c17.673-30.633,7.167-69.794-23.467-87.467l0,0l-9.472-5.461c4.264-23.201,4.264-46.985,0-70.187l9.472-5.461   c30.633-17.673,41.14-56.833,23.467-87.467c-17.673-30.633-56.833-41.14-87.467-23.467l-9.493,5.483   C362.862,94.638,342.25,82.77,320,74.944V64c0-35.346-28.654-64-64-64s-64,28.654-64,64v10.944   c-22.242,7.863-42.841,19.767-60.757,35.115l-9.536-5.525C91.073,86.86,51.913,97.367,34.24,128s-7.167,69.794,23.467,87.467l0,0   l9.472,5.461c-4.264,23.201-4.264,46.985,0,70.187l-9.472,5.461C27.158,314.296,16.686,353.38,34.283,384z M256,170.667   c47.128,0,85.333,38.205,85.333,85.333S303.128,341.333,256,341.333S170.667,303.128,170.667,256S208.872,170.667,256,170.667z"
-                            Fill="#555555"
+                            Fill="{StaticResource BrushIcon}"
                             Stretch="Uniform" />
                     </Button>
                 </StackPanel>
                 <Button
-                    Padding="0,0,0,0"
+                    x:Name="ProfileButton"
+                    Padding="0"
                     VerticalAlignment="Bottom"
+                    Click="ProfileButton_Click"
                     Style="{StaticResource SidebarButtonRound}">
                     <Path
                         Width="16"
                         Height="16"
                         Data="M384,128A128,128,0,1,1,256,0A128,128,0,0,1,384,128Z     M256,298.667c-105.99,0.118-191.882,86.01-192,192C64,502.449,73.551,512,85.333,512h341.333c11.782,0,21.333-9.551,21.333-21.333C447.882,384.677,361.99,298.784,256,298.667Z"
-                        Fill="#555555"
+                        Fill="{StaticResource BrushIcon}"
                         Stretch="Uniform" />
                 </Button>
             </Grid>
@@ -253,192 +248,11 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 Padding="16"
-                BorderBrush="#1E1E1E"
+                BorderBrush="{StaticResource BrushBorder}"
                 BorderThickness="1,1,0,0"
                 CornerRadius="16,0,0,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <!--  CallContent — висота за контентом  -->
-                        <RowDefinition Height="*" />
-                        <!--  LastCallContent — вся решта  -->
-                    </Grid.RowDefinitions>
-                    <!--  CallContent  -->
-                    <Border
-                        Grid.Row="0"
-                        Margin="0,0,0,12"
-                        Padding="16"
-                        Background="#111111"
-                        BorderBrush="#1E1E1E"
-                        BorderThickness="1"
-                        CornerRadius="16">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="#555555">
-                                Зараз не йде жодного дзвінка
-                            </TextBlock>
-                            <Grid
-                                Width="60"
-                                Height="60"
-                                Margin="0,12,0,12">
-                                <Ellipse Fill="#161616" Stroke="#1E1E1E" />
-                                <Path
-                                    Width="30"
-                                    Height="30"
-                                    Data="M22.183,22.164l.91-1.049a3.1,3.1,0,0,0,0-4.377c-.031-.031-2.437-1.882-2.437-1.882a3.1,3.1,0,0,0-4.281.006l-1.906,1.606A12.784,12.784,0,0,1,7.537,9.524l1.6-1.9a3.1,3.1,0,0,0,.007-4.282S7.291.939,7.26.908A3.082,3.082,0,0,0,2.934.862l-1.15,1C-5.01,9.744,9.62,24.261,17.762,24A6.155,6.155,0,0,0,22.183,22.164Z"
-                                    Fill="#555555"
-                                    Stretch="Uniform" />
-                            </Grid>
-                            <Button
-                                Padding="8,4,8,4"
-                                HorizontalAlignment="Center"
-                                Background="#1E1E1E"
-                                BorderThickness="0"
-                                Cursor="Hand">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border
-                                            Padding="{TemplateBinding Padding}"
-                                            Background="#161616"
-                                            BorderBrush="#1E1E1E"
-                                            BorderThickness="1"
-                                            CornerRadius="12">
-                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                <Path
-                                                    Width="10"
-                                                    Height="10"
-                                                    Margin="0,0,6,0"
-                                                    Data="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm0,22c-5.514,0-10-4.486-10-10S6.486,2,12,2s10,4.486,10,10-4.486,10-10,10Zm4-10c0,2.209-1.791,4-4,4s-4-1.791-4-4,1.791-4,4-4,4,1.791,4,4Z"
-                                                    Fill="#555555"
-                                                    Stretch="Uniform" />
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="12"
-                                                    FontWeight="Medium"
-                                                    Foreground="#555555">
-                                                    Записати вручну
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>
-                    </Border>
-
-                    <!--  LastCallContent  -->
-                    <Border
-                        Grid.Row="1"
-                        Padding="16,16,16,16"
-                        Background="#111111"
-                        BorderBrush="#1E1E1E"
-                        BorderThickness="1"
-                        CornerRadius="16">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock
-                                Grid.Row="0"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="10"
-                                FontWeight="Bold"
-                                Foreground="#555555">
-                                Останні записи
-                            </TextBlock>
-                            <StackPanel
-                                Grid.Row="1"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Grid Width="60" Height="60">
-                                    <Ellipse Fill="#161616" Stroke="#1E1E1E" />
-                                    <Path
-                                        Width="30"
-                                        Height="30"
-                                        Data="m14 7v-6.54a6.977 6.977 0 0 1 2.465 1.59l3.484 3.486a6.954 6.954 0 0 1 1.591 2.464h-6.54a1 1 0 0 1 -1-1zm8 3.485v8.515a5.006 5.006 0 0 1 -5 5h-10a5.006 5.006 0 0 1 -5-5v-14a5.006 5.006 0 0 1 5-5h4.515c.163 0 .324.013.485.024v6.976a3 3 0 0 0 3 3h6.976c.011.161.024.322.024.485zm-6 6.515a1 1 0 0 0 -1-1h-2v-2a1 1 0 0 0 -2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 1-1z"
-                                        Fill="#555555"
-                                        Stretch="Uniform" />
-                                </Grid>
-                                <TextBlock
-                                    Margin="0,8,0,4"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Foreground="#555555">
-                                    Записів не знайдено
-                                </TextBlock>
-                                <TextBlock
-                                    Width="300"
-                                    Margin="0,0,0,8"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="10"
-                                    FontWeight="Medium"
-                                    Foreground="#2D2D2D"
-                                    TextAlignment="Center"
-                                    TextWrapping="Wrap">
-                                    Коли відбудеться дзвінок у WhatsApp, Telegram, Viber або інші програми - запис з'явиться тут
-                                </TextBlock>
-                                <StackPanel
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Orientation="Horizontal">
-                                    <Border
-                                        Width="30"
-                                        Height="30"
-                                        Background="#1A3A5C"
-                                        CornerRadius="8,8,8,8">
-                                        <Image
-                                            Width="16"
-                                            Height="16"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Source="/Assets/Icons/telegram.png" />
-                                    </Border>
-                                    <Border
-                                        Width="30"
-                                        Height="30"
-                                        Margin="6,0,6,0"
-                                        Background="#3A1A4A"
-                                        CornerRadius="8,8,8,8">
-                                        <Image
-                                            Width="16"
-                                            Height="16"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Source="/Assets/Icons/viber.png" />
-                                    </Border>
-                                    <Border
-                                        Width="30"
-                                        Height="30"
-                                        Background="#1B4A2E"
-                                        CornerRadius="8,8,8,8">
-                                        <Image
-                                            Width="16"
-                                            Height="16"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Source="/Assets/Icons/whatsapp.png" />
-                                    </Border>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-                </Grid>
+                <ContentControl x:Name="PageContent" />
             </Border>
         </Grid>
     </Border>
 </Window>
-

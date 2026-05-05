@@ -41,3 +41,11 @@ D:\GitHub\EchoVault\obj\Debug\net10.0-windows\refint\EchoVault.dll
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.pdb
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.genruntimeconfig.cache
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\ref\EchoVault.dll
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\HomePage.baml
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\ProfilePage.baml
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\RecordingsPage.baml
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\SettingsPage.baml
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\HomePage.g.cs
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\ProfilePage.g.cs
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\RecordingsPage.g.cs
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\SettingsPage.g.cs
