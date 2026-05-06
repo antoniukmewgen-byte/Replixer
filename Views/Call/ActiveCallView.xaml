@@ -8,9 +8,8 @@
             FontFamily="{StaticResource InterFont}"
             FontSize="12"
             FontWeight="Bold"
-            Foreground="#CC5555">
-            00:00:00
-        </TextBlock>
+            Foreground="#CC5555"
+            Text="{Binding ElapsedTime}" />
         <Grid
             Width="60"
             Height="60"

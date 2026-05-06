@@ -70,3 +70,6 @@ D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Midi.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Wasapi.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.WinForms.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.WinMM.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\libmp3lame.32.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\libmp3lame.64.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Lame.dll

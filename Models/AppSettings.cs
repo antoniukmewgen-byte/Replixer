@@ -34,6 +34,22 @@ public class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private string _recordingsFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        "EchoVault", "Recordings");
+
+    public string RecordingsFolder
+    {
+        get => _recordingsFolder;
+        set
+        {
+            if (_recordingsFolder == value) return;
+            _recordingsFolder = value;
+            OnPropertyChanged();
+            Save();
+        }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()
