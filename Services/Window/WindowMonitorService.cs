@@ -1,9 +1,9 @@
-using EchoVault.Services.CallDetectors;
+using EchoVault.Services.Window.Detectors;
 using FlaUI.UIA3;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace EchoVault.Services;
+namespace EchoVault.Services.Window;
 
 public class WindowMonitorService : IMonitorService
 {
@@ -33,18 +33,17 @@ public class WindowMonitorService : IMonitorService
     public void Start()
     {
         _automation = new UIA3Automation();
-        _pollTimer = new Timer(Poll, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        _pollTimer  = new Timer(Poll, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
     private void Poll(object? state)
     {
-        // Snapshot the reference — Stop() may null the field while we're running
         var automation = _automation;
         if (automation is null) return;
 
         foreach (var detector in _detectors)
         {
-            bool isActive = IsCallActive(detector, automation);
+            bool isActive  = IsCallActive(detector, automation);
             bool wasActive = _callState[detector.ProcessName];
 
             if (isActive && !wasActive)

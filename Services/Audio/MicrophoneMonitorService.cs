@@ -3,7 +3,7 @@ using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using System.Diagnostics;
 
-namespace EchoVault.Services;
+namespace EchoVault.Services.Audio;
 
 public class MicrophoneMonitorService : IMonitorService
 {
@@ -55,7 +55,7 @@ public class MicrophoneMonitorService : IMonitorService
         }
     }
 
-    // ── Microphone (registry) ────────────────────────────────────────────────
+    // ── Microphone (registry) ─────────────────────────────────────────────────
 
     private string? GetMicrophoneActiveApp()
     {
@@ -65,7 +65,6 @@ public class MicrophoneMonitorService : IMonitorService
         using var rootKey = Registry.CurrentUser.OpenSubKey(rootPath);
         if (rootKey == null) return null;
 
-        // Win32 / non-packaged apps
         using var nonPackagedKey = rootKey.OpenSubKey("NonPackaged");
         if (nonPackagedKey != null)
         {
@@ -79,7 +78,6 @@ public class MicrophoneMonitorService : IMonitorService
             }
         }
 
-        // UWP / packaged apps
         foreach (var subKeyName in rootKey.GetSubKeyNames())
         {
             if (subKeyName == "NonPackaged") continue;
@@ -104,14 +102,14 @@ public class MicrophoneMonitorService : IMonitorService
         }
     }
 
-    // ── Audio output / speaker (WASAPI) ──────────────────────────────────────
+    // ── Audio output / speaker (WASAPI) ───────────────────────────────────────
 
     private string? GetAudioOutputActiveApp()
     {
         try
         {
             using var enumerator = new MMDeviceEnumerator();
-            using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            using var device     = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
             var sessions = device.AudioSessionManager.Sessions;
 

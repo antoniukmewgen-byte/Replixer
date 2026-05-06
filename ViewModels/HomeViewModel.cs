@@ -1,6 +1,8 @@
 using EchoVault.Models;
 using EchoVault.Services;
-using EchoVault.Services.CallDetectors;
+using EchoVault.Services.Audio;
+using EchoVault.Services.Window;
+using EchoVault.Services.Window.Detectors;
 using EchoVault.ViewModels.Call;
 using EchoVault.ViewModels.Dialogs;
 using System.ComponentModel;
