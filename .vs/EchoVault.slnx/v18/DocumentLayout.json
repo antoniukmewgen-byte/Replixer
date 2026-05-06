@@ -1,42 +1,42 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\GitHub\\EchoVault\\",
+  "WorkspaceRootPath": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\converters\\nulltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\converters\\nulltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:converters\\nulltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\call\\idlecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\call\\idlecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\call\\activecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\views\\call\\activecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\call\\activecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\views\\call\\idlecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\call\\idlecallview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|c:\\users\\reeditor\\source\\repos\\antoniukmewgen-byte\\echovault\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -56,11 +56,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MicrophoneMonitorService.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
               "RelativeDocumentMoniker": "Services\\Audio\\MicrophoneMonitorService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
               "RelativeToolTip": "Services\\Audio\\MicrophoneMonitorService.cs",
-              "ViewState": "AgIAAHkAAAAAAAAAAAAcwBAAAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAcwBAAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-06T07:59:26.104Z",
               "EditorCaption": ""
@@ -69,34 +69,32 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "AudioRecordingService.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
               "RelativeDocumentMoniker": "Services\\Recording\\AudioRecordingService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
               "RelativeToolTip": "Services\\Recording\\AudioRecordingService.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAAKoAAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T07:45:25.201Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T07:45:25.201Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "CallDialogView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
               "RelativeDocumentMoniker": "Views\\Dialogs\\CallDialogView.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
               "RelativeToolTip": "Views\\Dialogs\\CallDialogView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-06T07:06:05.294Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T07:06:05.294Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "NullToVisibilityConverter.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
               "RelativeDocumentMoniker": "Converters\\NullToVisibilityConverter.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
               "RelativeToolTip": "Converters\\NullToVisibilityConverter.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -104,11 +102,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "ActiveCallView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\ActiveCallView.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeToolTip": "Views\\Call\\ActiveCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-05T22:47:59.881Z"
@@ -117,43 +115,42 @@
               "$type": "Document",
               "DocumentIndex": 5,
               "Title": "IdleCallView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\IdleCallView.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeToolTip": "Views\\Call\\IdleCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-05T22:47:40.957Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "MainWindow.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-05T20:15:09.452Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "App.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\App.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\App.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\App.xaml",
               "RelativeToolTip": "App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T20:12:28.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T20:12:28.856Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "HomePage.xaml",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
+              "DocumentMoniker": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\HomePage.xaml",
               "RelativeDocumentMoniker": "Views\\HomePage.xaml",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
+              "ToolTip": "C:\\Users\\reeditor\\source\\repos\\antoniukmewgen-byte\\EchoVault\\Views\\HomePage.xaml",
               "RelativeToolTip": "Views\\HomePage.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-05T18:34:24.678Z"
