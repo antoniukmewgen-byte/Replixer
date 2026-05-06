@@ -61,3 +61,5 @@ D:\GitHub\EchoVault\bin\Debug\net10.0-windows\System.Management.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\runtimes\win\lib\netcoreapp2.0\System.Management.dll
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.AssemblyReference.cache
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.Up2Date
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\Dialogs\CallDialogView.baml
+D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\Dialogs\CallDialogView.g.cs

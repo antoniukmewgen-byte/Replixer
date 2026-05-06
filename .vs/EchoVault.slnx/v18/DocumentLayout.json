@@ -50,9 +50,9 @@
               "Title": "WindowMonitorService.cs",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
               "RelativeDocumentMoniker": "Services\\WindowMonitorService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs*",
-              "RelativeToolTip": "Services\\WindowMonitorService.cs*",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAuwHcAAAABAAAAAAAAAA==",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
+              "RelativeToolTip": "Services\\WindowMonitorService.cs",
+              "ViewState": "AgIAAGYAAAAAAAAAAAAuwHcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-06T00:05:00.009Z",
               "EditorCaption": ""
@@ -67,8 +67,7 @@
               "RelativeToolTip": "Converters\\NullToVisibilityConverter.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-05T23:55:01.966Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T23:55:01.966Z"
             },
             {
               "$type": "Document",
@@ -79,8 +78,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeToolTip": "Views\\Call\\ActiveCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T22:47:59.881Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T22:47:59.881Z"
             },
             {
               "$type": "Document",
@@ -91,8 +89,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeToolTip": "Views\\Call\\IdleCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T22:47:40.957Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T22:47:40.957Z"
             },
             {
               "$type": "Document",
@@ -103,8 +100,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T20:15:09.452Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T20:15:09.452Z"
             },
             {
               "$type": "Document",
@@ -115,8 +111,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\App.xaml",
               "RelativeToolTip": "App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T20:12:28.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T20:12:28.856Z"
             },
             {
               "$type": "Document",
@@ -127,8 +122,7 @@
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeToolTip": "Views\\HomePage.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T18:34:24.678Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T18:34:24.678Z"
             }
           ]
         }

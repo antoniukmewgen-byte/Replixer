@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\GitHub\EchoVault\App.xaml
-7-2097926790
+8-1701141578
 
-27773558298
+281118831856
 2171358506878
-MainWindow.xaml;Views\Call\ActiveCallView.xaml;Views\Call\IdleCallView.xaml;Views\HomePage.xaml;Views\ProfilePage.xaml;Views\RecordingsPage.xaml;Views\SettingsPage.xaml;
+MainWindow.xaml;Views\Call\ActiveCallView.xaml;Views\Call\IdleCallView.xaml;Views\Dialogs\CallDialogView.xaml;Views\HomePage.xaml;Views\ProfilePage.xaml;Views\RecordingsPage.xaml;Views\SettingsPage.xaml;
 
 False
 

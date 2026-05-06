@@ -1,0 +1,90 @@
+<UserControl
+    x:Class="EchoVault.Views.Dialogs.CallDialogView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border
+        Width="300"
+        Padding="20"
+        Background="{StaticResource BrushCardDeep}"
+        BorderBrush="{StaticResource BrushHover}"
+        BorderThickness="1"
+        CornerRadius="16">
+        <StackPanel>
+
+            <!--  Title  -->
+            <TextBlock
+                FontFamily="{StaticResource InterFont}"
+                FontSize="13"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="{Binding Title}" />
+
+            <!--  Message  -->
+            <TextBlock
+                Margin="0,8,0,20"
+                FontFamily="{StaticResource InterFont}"
+                FontSize="10"
+                FontWeight="Medium"
+                Foreground="{StaticResource BrushIcon}"
+                Text="{Binding Message}"
+                TextWrapping="Wrap" />
+
+            <!--  Buttons  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Secondary — Skip / Continue  -->
+                <Button Grid.Column="0" Height="32" Command="{Binding SecondaryCommand}" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" Background="{StaticResource BrushBorder}" CornerRadius="8">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource BrushIcon}"
+                                    Text="{Binding SecondaryLabel}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushHover}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!--  Primary — Start / Stop recording  -->
+                <Button Grid.Column="2" Height="32" Command="{Binding PrimaryCommand}" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" Background="{StaticResource BrushIndicatorActive}" CornerRadius="8">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="{Binding PrimaryLabel}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="#3D8B40" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>
