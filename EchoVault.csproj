@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FlaUI.UIA3" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\Icons\IconApp.png" />
     <None Remove="Assets\Icons\telegram.png" />
     <None Remove="Assets\Icons\viber.png" />
