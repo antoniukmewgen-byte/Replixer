@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "D:\\GitHub\\EchoVault\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\windowmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\windowmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\converters\\nulltovisibilityconverter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -47,19 +55,44 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "MicrophoneMonitorService.cs",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\MicrophoneMonitorService.cs",
+              "RelativeDocumentMoniker": "Services\\MicrophoneMonitorService.cs",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\MicrophoneMonitorService.cs",
+              "RelativeToolTip": "Services\\MicrophoneMonitorService.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T07:06:51.2Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CallDialogView.xaml",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
+              "RelativeDocumentMoniker": "Views\\Dialogs\\CallDialogView.xaml",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
+              "RelativeToolTip": "Views\\Dialogs\\CallDialogView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-05-06T07:06:05.294Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "WindowMonitorService.cs",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
               "RelativeDocumentMoniker": "Services\\WindowMonitorService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs*",
-              "RelativeToolTip": "Services\\WindowMonitorService.cs*",
-              "ViewState": "AgIAADgAAAAAAAAAAAAuwFUAAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
+              "RelativeToolTip": "Services\\WindowMonitorService.cs",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAiwFgAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-06T00:05:00.009Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "NullToVisibilityConverter.cs",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
               "RelativeDocumentMoniker": "Converters\\NullToVisibilityConverter.cs",
@@ -67,48 +100,44 @@
               "RelativeToolTip": "Converters\\NullToVisibilityConverter.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-05T23:55:01.966Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T23:55:01.966Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "ActiveCallView.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\ActiveCallView.xaml",
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeToolTip": "Views\\Call\\ActiveCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T22:47:59.881Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T22:47:59.881Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "IdleCallView.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\IdleCallView.xaml",
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeToolTip": "Views\\Call\\IdleCallView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T22:47:40.957Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T22:47:40.957Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
               "ToolTip": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T20:15:09.452Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T20:15:09.452Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
@@ -120,15 +149,14 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "HomePage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeDocumentMoniker": "Views\\HomePage.xaml",
               "ToolTip": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeToolTip": "Views\\HomePage.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-05T18:34:24.678Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T18:34:24.678Z"
             }
           ]
         }

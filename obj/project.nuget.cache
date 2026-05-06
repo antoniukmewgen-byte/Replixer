@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "f9/2ALxlY4M=",
+  "dgSpecHash": "2aqW5IC3sdE=",
   "success": true,
   "projectFilePath": "D:\\GitHub\\EchoVault\\EchoVault.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,13 @@
     "C:\\Users\\Saiken\\.nuget\\packages\\flaui.uia3\\4.0.0\\flaui.uia3.4.0.0.nupkg.sha512",
     "C:\\Users\\Saiken\\.nuget\\packages\\interop.uiautomationclient\\10.19041.0\\interop.uiautomationclient.10.19041.0.nupkg.sha512",
     "C:\\Users\\Saiken\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio\\2.2.1\\naudio.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.asio\\2.2.1\\naudio.asio.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.core\\2.2.1\\naudio.core.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.midi\\2.2.1\\naudio.midi.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.wasapi\\2.2.1\\naudio.wasapi.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.winforms\\2.2.1\\naudio.winforms.2.2.1.nupkg.sha512",
+    "C:\\Users\\Saiken\\.nuget\\packages\\naudio.winmm\\2.2.1\\naudio.winmm.2.2.1.nupkg.sha512",
     "C:\\Users\\Saiken\\.nuget\\packages\\system.management\\5.0.0\\system.management.5.0.0.nupkg.sha512"
   ],
   "logs": []

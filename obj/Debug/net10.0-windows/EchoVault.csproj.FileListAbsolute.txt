@@ -63,3 +63,10 @@ D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.AssemblyReference
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.Up2Date
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\Dialogs\CallDialogView.baml
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\Dialogs\CallDialogView.g.cs
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Asio.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Core.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Midi.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Wasapi.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.WinForms.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.WinMM.dll

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace EchoVault.Services;
 
-public class WindowMonitorService : IDisposable
+public class WindowMonitorService : IMonitorService
 {
     private readonly IReadOnlyList<ICallDetector> _detectors;
     private readonly Dictionary<string, bool> _callState = new();
@@ -38,11 +38,13 @@ public class WindowMonitorService : IDisposable
 
     private void Poll(object? state)
     {
-        if (_automation is null) return;
+        // Snapshot the reference — Stop() may null the field while we're running
+        var automation = _automation;
+        if (automation is null) return;
 
         foreach (var detector in _detectors)
         {
-            bool isActive = IsCallActive(detector);
+            bool isActive = IsCallActive(detector, automation);
             bool wasActive = _callState[detector.ProcessName];
 
             if (isActive && !wasActive)
@@ -58,7 +60,7 @@ public class WindowMonitorService : IDisposable
         }
     }
 
-    private bool IsCallActive(ICallDetector detector)
+    private bool IsCallActive(ICallDetector detector, UIA3Automation automation)
     {
         Process[] processes;
         try
@@ -84,7 +86,7 @@ public class WindowMonitorService : IDisposable
 
                     try
                     {
-                        var element = _automation!.FromHandle(hWnd);
+                        var element = automation.FromHandle(hWnd);
                         if (element != null && detector.IsCallWindow(element))
                         {
                             Debug.WriteLine($"[WindowMonitor] [{detector.ProcessName}] Call window found!");

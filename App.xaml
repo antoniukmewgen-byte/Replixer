@@ -20,5 +20,87 @@
         <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />
         <SolidColorBrush x:Key="BrushDanger" Color="#C0392B" />
         <SolidColorBrush x:Key="BrushHover" Color="#2A2A2A" />
+
+        <!--  Toggle Switch  -->
+        <Style x:Key="ToggleSwitch" TargetType="ToggleButton">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Border x:Name="Track" CornerRadius="11">
+                                <Border.Background>
+                                    <SolidColorBrush x:Name="TrackColor" Color="#1E1E1E" />
+                                </Border.Background>
+                            </Border>
+                            <Border
+                                x:Name="Thumb"
+                                Width="16"
+                                Height="16"
+                                Margin="3,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                CornerRadius="8">
+                                <Border.Background>
+                                    <SolidColorBrush x:Name="ThumbColor" Color="#555555" />
+                                </Border.Background>
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="ThumbSlide" />
+                                </Border.RenderTransform>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ThumbSlide"
+                                                Storyboard.TargetProperty="X"
+                                                To="18"
+                                                Duration="0:0:0.15" />
+                                            <ColorAnimation
+                                                Storyboard.TargetName="TrackColor"
+                                                Storyboard.TargetProperty="Color"
+                                                To="#306932"
+                                                Duration="0:0:0.15" />
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ThumbColor"
+                                                Storyboard.TargetProperty="Color"
+                                                To="#FFFFFF"
+                                                Duration="0:0:0.15" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ThumbSlide"
+                                                Storyboard.TargetProperty="X"
+                                                To="0"
+                                                Duration="0:0:0.15" />
+                                            <ColorAnimation
+                                                Storyboard.TargetName="TrackColor"
+                                                Storyboard.TargetProperty="Color"
+                                                To="#1E1E1E"
+                                                Duration="0:0:0.15" />
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ThumbColor"
+                                                Storyboard.TargetProperty="Color"
+                                                To="#555555"
+                                                Duration="0:0:0.15" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

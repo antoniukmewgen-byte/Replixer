@@ -1,15 +1,21 @@
+using EchoVault.Models;
 using EchoVault.Services;
 using EchoVault.Services.CallDetectors;
 using EchoVault.ViewModels.Call;
 using EchoVault.ViewModels.Dialogs;
+using System.ComponentModel;
 using System.Windows;
 
 namespace EchoVault.ViewModels;
 
 public class HomeViewModel : ViewModelBase
 {
-    private readonly WindowMonitorService _monitor;
     private readonly Action<CallDialogViewModel?> _setDialog;
+    private readonly AppSettings _settings;
+    private readonly IMonitorService _windowMonitor;
+    private readonly IMonitorService _micMonitor;
+    private IMonitorService _activeMonitor;
+
     private bool _isRecording;
     private bool _hasActiveDialog;
 
@@ -20,21 +26,55 @@ public class HomeViewModel : ViewModelBase
         private set => SetField(ref _callContent, value);
     }
 
-    public HomeViewModel(Action<CallDialogViewModel?> setDialog)
+    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings)
     {
         _setDialog = setDialog;
+        _settings = settings;
         _callContent = new IdleCallViewModel(StartRecording);
 
-        _monitor = new WindowMonitorService(new ICallDetector[]
+        _windowMonitor = new WindowMonitorService(new ICallDetector[]
         {
             new TelegramCallDetector(),
             new WhatsAppCallDetector(),
             new ViberCallDetector(),
         });
+        _micMonitor = new MicrophoneMonitorService();
 
-        _monitor.CallDetected += OnCallDetected;
-        _monitor.CallEnded += OnCallEnded;
-        _monitor.Start();
+        _activeMonitor = GetMonitorForMode(_settings.MonitorMode);
+        Subscribe(_activeMonitor);
+        _activeMonitor.Start();
+
+        _settings.PropertyChanged += OnSettingsChanged;
+    }
+
+    private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(AppSettings.MonitorMode)) return;
+
+        var next = GetMonitorForMode(_settings.MonitorMode);
+        if (next == _activeMonitor) return;
+
+        Unsubscribe(_activeMonitor);
+        _activeMonitor.Stop();
+
+        _activeMonitor = next;
+        Subscribe(_activeMonitor);
+        _activeMonitor.Start();
+    }
+
+    private IMonitorService GetMonitorForMode(MonitorMode mode)
+        => mode == MonitorMode.Microphone ? _micMonitor : _windowMonitor;
+
+    private void Subscribe(IMonitorService monitor)
+    {
+        monitor.CallDetected += OnCallDetected;
+        monitor.CallEnded   += OnCallEnded;
+    }
+
+    private void Unsubscribe(IMonitorService monitor)
+    {
+        monitor.CallDetected -= OnCallDetected;
+        monitor.CallEnded   -= OnCallEnded;
     }
 
     private void OnCallDetected(string app)

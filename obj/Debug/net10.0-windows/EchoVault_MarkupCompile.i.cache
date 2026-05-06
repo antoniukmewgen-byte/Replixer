@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_O
 D:\GitHub\EchoVault\App.xaml
 8-1701141578
 
-30-435208073
-2171358506878
+33-1644586118
+2241558250209
 MainWindow.xaml;Views\Call\ActiveCallView.xaml;Views\Call\IdleCallView.xaml;Views\Dialogs\CallDialogView.xaml;Views\HomePage.xaml;Views\ProfilePage.xaml;Views\RecordingsPage.xaml;Views\SettingsPage.xaml;
 
-False
+True
 

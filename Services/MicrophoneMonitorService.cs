@@ -1,83 +1,147 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
+using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 using System.Diagnostics;
 
-namespace reRecorder.Services;
+namespace EchoVault.Services;
 
-public class MicrophoneMonitorService : IDisposable
+public class MicrophoneMonitorService : IMonitorService
 {
-    private System.Threading.Timer? _pollTimer;
+    private Timer? _pollTimer;
     private bool _isCallActive = false;
+    private string _activeApp = string.Empty;
 
-    public event Action? CallStarted;
-    public event Action? CallEnded;
+    public event Action<string>? CallDetected;
+    public event Action<string>? CallEnded;
 
     private readonly string[] _targetProcesses = { "Telegram", "WhatsApp", "Viber" };
 
     public void Start()
     {
-        _pollTimer = new System.Threading.Timer(PollCallback, null,
-            TimeSpan.Zero, TimeSpan.FromMilliseconds(1000));
+        _pollTimer = new Timer(PollCallback, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(1000));
     }
 
     private void PollCallback(object? state)
     {
-        bool isTargetUsingMic = IsTargetProcessUsingMicrophone();
+        string? micApp   = GetMicrophoneActiveApp();
+        string? audioApp = GetAudioOutputActiveApp();
 
-        if (isTargetUsingMic && !_isCallActive)
+        if (!_isCallActive)
         {
-            _isCallActive = true;
-            Debug.WriteLine("[MicMonitor] Target messenger started using microphone");
-            CallStarted?.Invoke();
+            // START: both mic AND speaker must be active for the same app
+            if (micApp != null && audioApp != null &&
+                string.Equals(micApp, audioApp, StringComparison.OrdinalIgnoreCase))
+            {
+                _isCallActive = true;
+                _activeApp    = micApp;
+                Debug.WriteLine($"[AudioMonitor] {micApp} — call started (mic + speaker)");
+                CallDetected?.Invoke(micApp);
+            }
         }
-        else if (!isTargetUsingMic && _isCallActive)
+        else
         {
-            _isCallActive = false;
-            Debug.WriteLine("[MicMonitor] Target messenger stopped using microphone");
-            CallEnded?.Invoke();
+            // END: BOTH mic AND speaker must be gone for the app that started the call.
+            // Muting the mic while speaker is still active → call continues.
+            bool micActive   = string.Equals(micApp,   _activeApp, StringComparison.OrdinalIgnoreCase);
+            bool audioActive = string.Equals(audioApp, _activeApp, StringComparison.OrdinalIgnoreCase);
+
+            if (!micActive && !audioActive)
+            {
+                _isCallActive = false;
+                Debug.WriteLine($"[AudioMonitor] {_activeApp} — call ended (mic + speaker both gone)");
+                CallEnded?.Invoke(_activeApp);
+                _activeApp = string.Empty;
+            }
         }
     }
 
-    private bool IsTargetProcessUsingMicrophone()
-    {
-        string rootPath = @"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone";
-        using var rootKey = Registry.CurrentUser.OpenSubKey(rootPath);
-        if (rootKey == null) return false;
+    // ── Microphone (registry) ────────────────────────────────────────────────
 
+    private string? GetMicrophoneActiveApp()
+    {
+        const string rootPath =
+            @"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone";
+
+        using var rootKey = Registry.CurrentUser.OpenSubKey(rootPath);
+        if (rootKey == null) return null;
+
+        // Win32 / non-packaged apps
         using var nonPackagedKey = rootKey.OpenSubKey("NonPackaged");
         if (nonPackagedKey != null)
         {
             foreach (var keyName in nonPackagedKey.GetSubKeyNames())
             {
-                if (_targetProcesses.Any(p => keyName.Contains(p, StringComparison.OrdinalIgnoreCase)))
-                {
-                    if (IsMicActiveInSubKey(nonPackagedKey.OpenSubKey(keyName)))
-                        return true;
-                }
+                var match = _targetProcesses.FirstOrDefault(p =>
+                    keyName.Contains(p, StringComparison.OrdinalIgnoreCase));
+
+                if (match != null && IsMicActiveInSubKey(nonPackagedKey.OpenSubKey(keyName)))
+                    return match;
             }
         }
 
+        // UWP / packaged apps
         foreach (var subKeyName in rootKey.GetSubKeyNames())
         {
             if (subKeyName == "NonPackaged") continue;
 
-            if (_targetProcesses.Any(p => subKeyName.Contains(p, StringComparison.OrdinalIgnoreCase)))
-            {
-                if (IsMicActiveInSubKey(rootKey.OpenSubKey(subKeyName)))
-                    return true;
-            }
+            var match = _targetProcesses.FirstOrDefault(p =>
+                subKeyName.Contains(p, StringComparison.OrdinalIgnoreCase));
+
+            if (match != null && IsMicActiveInSubKey(rootKey.OpenSubKey(subKeyName)))
+                return match;
         }
 
-        return false;
+        return null;
     }
 
-    private bool IsMicActiveInSubKey(RegistryKey? subKey)
+    private static bool IsMicActiveInSubKey(RegistryKey? subKey)
     {
         if (subKey == null) return false;
         using (subKey)
         {
-            var lastUsedTimeStop = subKey.GetValue("LastUsedTimeStop");
-            return lastUsedTimeStop is long stopTime && stopTime == 0;
+            var value = subKey.GetValue("LastUsedTimeStop");
+            return value is long stopTime && stopTime == 0;
         }
+    }
+
+    // ── Audio output / speaker (WASAPI) ──────────────────────────────────────
+
+    private string? GetAudioOutputActiveApp()
+    {
+        try
+        {
+            using var enumerator = new MMDeviceEnumerator();
+            using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+
+            var sessions = device.AudioSessionManager.Sessions;
+
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                var session = sessions[i];
+                if (session.State != AudioSessionState.AudioSessionStateActive) continue;
+
+                try
+                {
+                    var process = Process.GetProcessById((int)session.GetProcessID);
+
+                    var match = _targetProcesses.FirstOrDefault(p =>
+                        process.ProcessName.Contains(p, StringComparison.OrdinalIgnoreCase));
+
+                    if (match != null)
+                    {
+                        Debug.WriteLine($"[AudioMonitor] Output session active: {process.ProcessName}");
+                        return match;
+                    }
+                }
+                catch { /* process may have exited */ }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[AudioMonitor] WASAPI error: {ex.Message}");
+        }
+
+        return null;
     }
 
     public void Stop() => _pollTimer?.Dispose();

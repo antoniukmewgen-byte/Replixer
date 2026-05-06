@@ -1,4 +1,5 @@
 using EchoVault.Infrastructure;
+using EchoVault.Models;
 using EchoVault.ViewModels.Dialogs;
 using System.Windows.Input;
 
@@ -27,17 +28,21 @@ public class MainViewModel : ViewModelBase
 
     private readonly HomeViewModel _homeVm;
     private readonly RecordingsViewModel _recordingsVm = new();
-    private readonly SettingsViewModel _settingsVm = new();
+    private readonly SettingsViewModel _settingsVm;
     private readonly ProfileViewModel _profileVm = new();
 
     public MainViewModel()
     {
-        _homeVm = new HomeViewModel(dialog => Dialog = dialog);
+        var settings = AppSettings.Load();
+
+        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings);
+        _settingsVm = new SettingsViewModel(settings);
+
         _currentViewModel = _homeVm;
 
-        NavigateHomeCommand = new RelayCommand(() => CurrentViewModel = _homeVm);
+        NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
         NavigateRecordingsCommand = new RelayCommand(() => CurrentViewModel = _recordingsVm);
-        NavigateSettingsCommand = new RelayCommand(() => CurrentViewModel = _settingsVm);
-        NavigateProfileCommand = new RelayCommand(() => CurrentViewModel = _profileVm);
+        NavigateSettingsCommand   = new RelayCommand(() => CurrentViewModel = _settingsVm);
+        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = _profileVm);
     }
 }
