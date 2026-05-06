@@ -57,6 +57,10 @@
               "target": "Package",
               "version": "[4.0.0, )"
             },
+            "Google.Apis.Drive.v3": {
+              "target": "Package",
+              "version": "[1.69.0.3674, )"
+            },
             "NAudio": {
               "target": "Package",
               "version": "[2.2.1, )"

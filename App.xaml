@@ -2,6 +2,7 @@
     x:Class="EchoVault.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:EchoVault.Converters"
     xmlns:local="clr-namespace:EchoVault"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
@@ -20,6 +21,11 @@
         <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />
         <SolidColorBrush x:Key="BrushDanger" Color="#C0392B" />
         <SolidColorBrush x:Key="BrushHover" Color="#2A2A2A" />
+
+        <!--  Converters  -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
 
         <!--  Toggle Switch  -->
         <Style x:Key="ToggleSwitch" TargetType="ToggleButton">

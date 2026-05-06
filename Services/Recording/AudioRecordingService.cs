@@ -46,7 +46,7 @@ public class AudioRecordingService : IDisposable
 
             _loopbackTempPath = Path.Combine(tempFolder, $"ev_loopback_{timestamp}.wav");
             _micTempPath      = Path.Combine(tempFolder, $"ev_mic_{timestamp}.wav");
-            _finalMp3Path     = Path.Combine(_settings.RecordingsFolder, $"{safeName}_{timestamp}.mp3");
+            _finalMp3Path     = Path.Combine(tempFolder, $"ev_{safeName}_{timestamp}.mp3");
 
             _loopbackCapture = new WasapiLoopbackCapture();
             _loopbackCapture.DataAvailable += (_, e) => _loopbackWriter?.Write(e.Buffer, 0, e.BytesRecorded);
@@ -166,7 +166,7 @@ public class AudioRecordingService : IDisposable
             // SampleToWaveProvider16 handles float→int16 correctly
             IWaveProvider pcm = new SampleToWaveProvider16(mixer);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(_finalMp3Path)!);
+            // temp folder always exists — no need to create it
 
             using var mp3 = new LameMP3FileWriter(_finalMp3Path, new WaveFormat(44100, 16, 2), 192);
 

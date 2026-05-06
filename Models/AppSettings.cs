@@ -50,6 +50,20 @@ public class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _isGoogleDriveEnabled = false;
+    public bool IsGoogleDriveEnabled
+    {
+        get => _isGoogleDriveEnabled;
+        set { if (_isGoogleDriveEnabled == value) return; _isGoogleDriveEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _googleDriveFolderId = string.Empty;
+    public string GoogleDriveFolderId
+    {
+        get => _googleDriveFolderId;
+        set { if (_googleDriveFolderId == value) return; _googleDriveFolderId = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()

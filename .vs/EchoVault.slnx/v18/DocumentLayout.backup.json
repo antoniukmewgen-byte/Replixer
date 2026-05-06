@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\GitHub\\EchoVault\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\windowmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\windowmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\views\\dialogs\\calldialogview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -56,13 +56,26 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MicrophoneMonitorService.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\MicrophoneMonitorService.cs",
-              "RelativeDocumentMoniker": "Services\\MicrophoneMonitorService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\MicrophoneMonitorService.cs",
-              "RelativeToolTip": "Services\\MicrophoneMonitorService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "RelativeDocumentMoniker": "Services\\Audio\\MicrophoneMonitorService.cs",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "RelativeToolTip": "Services\\Audio\\MicrophoneMonitorService.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAcwBAAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T07:06:51.2Z",
+              "WhenOpened": "2026-05-06T07:59:26.104Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AudioRecordingService.cs",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "RelativeDocumentMoniker": "Services\\Recording\\AudioRecordingService.cs",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "RelativeToolTip": "Services\\Recording\\AudioRecordingService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAKoAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T07:45:25.201Z",
               "EditorCaption": ""
             },
             {
@@ -75,19 +88,6 @@
               "RelativeToolTip": "Views\\Dialogs\\CallDialogView.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-05-06T07:06:05.294Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "WindowMonitorService.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
-              "RelativeDocumentMoniker": "Services\\WindowMonitorService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\WindowMonitorService.cs",
-              "RelativeToolTip": "Services\\WindowMonitorService.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T00:05:00.009Z",
               "EditorCaption": ""
             },
             {

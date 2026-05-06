@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\GitHub\\EchoVault\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\audio\\microphonemonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|d:\\github\\echovault\\services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E347C446-FDCD-D520-614A-7123889150C4}|EchoVault.csproj|solutionrelative:services\\recording\\audiorecordingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -42,28 +46,41 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AudioRecordingService.cs",
-              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
-              "RelativeDocumentMoniker": "Services\\Recording\\AudioRecordingService.cs",
-              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
-              "RelativeToolTip": "Services\\Recording\\AudioRecordingService.cs",
-              "ViewState": "AgIAAMUAAAAAAAAAAAAAwKoAAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T07:45:25.201Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MicrophoneMonitorService.cs",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "RelativeDocumentMoniker": "Services\\Audio\\MicrophoneMonitorService.cs",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Audio\\MicrophoneMonitorService.cs",
+              "RelativeToolTip": "Services\\Audio\\MicrophoneMonitorService.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAcwBAAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T07:59:26.104Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AudioRecordingService.cs",
+              "DocumentMoniker": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "RelativeDocumentMoniker": "Services\\Recording\\AudioRecordingService.cs",
+              "ToolTip": "D:\\GitHub\\EchoVault\\Services\\Recording\\AudioRecordingService.cs",
+              "RelativeToolTip": "Services\\Recording\\AudioRecordingService.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAKoAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T07:45:25.201Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "CallDialogView.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Dialogs\\CallDialogView.xaml",
               "RelativeDocumentMoniker": "Views\\Dialogs\\CallDialogView.xaml",
@@ -75,7 +92,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "NullToVisibilityConverter.cs",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Converters\\NullToVisibilityConverter.cs",
               "RelativeDocumentMoniker": "Converters\\NullToVisibilityConverter.cs",
@@ -87,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "ActiveCallView.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\ActiveCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\ActiveCallView.xaml",
@@ -98,7 +115,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "IdleCallView.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\Call\\IdleCallView.xaml",
               "RelativeDocumentMoniker": "Views\\Call\\IdleCallView.xaml",
@@ -109,7 +126,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
@@ -120,7 +137,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
@@ -132,7 +149,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "HomePage.xaml",
               "DocumentMoniker": "D:\\GitHub\\EchoVault\\Views\\HomePage.xaml",
               "RelativeDocumentMoniker": "Views\\HomePage.xaml",

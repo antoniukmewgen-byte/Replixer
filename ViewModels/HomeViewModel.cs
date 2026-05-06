@@ -2,12 +2,14 @@ using EchoVault.Models;
 using EchoVault.Services;
 using EchoVault.Services.Audio;
 using EchoVault.Services.Recording;
+using EchoVault.Services.Upload;
 using EchoVault.Services.Window;
 using EchoVault.Services.Window.Detectors;
 using EchoVault.ViewModels.Call;
 using EchoVault.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace EchoVault.ViewModels;
@@ -16,6 +18,7 @@ public class HomeViewModel : ViewModelBase
 {
     private readonly Action<CallDialogViewModel?> _setDialog;
     private readonly AppSettings _settings;
+    private readonly GoogleDriveUploadService _uploader;
     private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
@@ -36,10 +39,11 @@ public class HomeViewModel : ViewModelBase
         }
     }
 
-    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings)
+    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader)
     {
         _setDialog = setDialog;
         _settings  = settings;
+        _uploader  = uploader;
         _recorder  = new AudioRecordingService(settings);
 
         _callContent = new IdleCallViewModel(StartRecording);
@@ -154,12 +158,72 @@ public class HomeViewModel : ViewModelBase
         // Switch UI back to idle immediately — recording finishes in background
         CallContent = new IdleCallViewModel(StartRecording);
 
+        Debug.WriteLine("[HomeVM] ── StopRecording ──────────────────────────");
+        Debug.WriteLine($"[HomeVM] IsGoogleDriveEnabled : {_settings.IsGoogleDriveEnabled}");
+        Debug.WriteLine($"[HomeVM] IsGoogleAuthorized   : {_uploader.IsAuthorized}");
+        Debug.WriteLine($"[HomeVM] GoogleDriveFolderId  : '{_settings.GoogleDriveFolderId}'");
+
         string? path = await _recorder.StopRecordingAsync();
 
-        if (path != null)
-            Debug.WriteLine($"[HomeVM] Saved → {path}");
+        if (path is null)
+        {
+            Debug.WriteLine("[HomeVM] ✗ StopRecordingAsync returned null — no file created");
+            return;
+        }
+
+        bool fileExists = File.Exists(path);
+        long fileSize   = fileExists ? new FileInfo(path).Length : -1;
+        Debug.WriteLine($"[HomeVM] Temp file : {path}");
+        Debug.WriteLine($"[HomeVM] Exists    : {fileExists}  |  Size: {fileSize} bytes");
+
+        if (_settings.IsGoogleDriveEnabled)
+        {
+            Debug.WriteLine("[HomeVM] → uploading to Google Drive …");
+
+            bool ok = await _uploader.UploadAsync(
+                path,
+                string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
+                    ? null
+                    : _settings.GoogleDriveFolderId);
+
+            if (ok)
+            {
+                SafeDeleteFile(path);
+                Debug.WriteLine($"[HomeVM] ✓ Upload OK — temp file deleted");
+            }
+            else
+            {
+                Debug.WriteLine("[HomeVM] ✗ Upload FAILED — falling back to local save");
+                MoveToRecordingsFolder(path);
+            }
+        }
         else
-            Debug.WriteLine("[HomeVM] Recording was not saved");
+        {
+            Debug.WriteLine("[HomeVM] → Google Drive disabled, saving locally …");
+            MoveToRecordingsFolder(path);
+        }
+
+        Debug.WriteLine("[HomeVM] ───────────────────────────────────────────");
+    }
+
+    private void MoveToRecordingsFolder(string tempPath)
+    {
+        try
+        {
+            Directory.CreateDirectory(_settings.RecordingsFolder);
+            string dest = Path.Combine(_settings.RecordingsFolder, Path.GetFileName(tempPath));
+            File.Move(tempPath, dest, overwrite: true);
+            Debug.WriteLine($"[HomeVM] Moved → {dest}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[HomeVM] Move failed: {ex.Message}");
+        }
+    }
+
+    private static void SafeDeleteFile(string path)
+    {
+        try { File.Delete(path); } catch { }
     }
 
     // ── Dialog helpers ────────────────────────────────────────────────────────

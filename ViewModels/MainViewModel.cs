@@ -1,5 +1,6 @@
 using EchoVault.Infrastructure;
 using EchoVault.Models;
+using EchoVault.Services.Upload;
 using EchoVault.ViewModels.Dialogs;
 using System.Windows.Input;
 
@@ -34,9 +35,10 @@ public class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         var settings = AppSettings.Load();
+        var uploader = new GoogleDriveUploadService();
 
-        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings);
-        _settingsVm = new SettingsViewModel(settings);
+        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader);
+        _settingsVm = new SettingsViewModel(settings, uploader);
 
         _currentViewModel = _homeVm;
 

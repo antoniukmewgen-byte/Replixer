@@ -58,7 +58,6 @@ D:\GitHub\EchoVault\bin\Debug\net10.0-windows\FlaUI.Core.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\FlaUI.UIA3.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Interop.UIAutomationClient.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\System.Management.dll
-D:\GitHub\EchoVault\bin\Debug\net10.0-windows\runtimes\win\lib\netcoreapp2.0\System.Management.dll
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.AssemblyReference.cache
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\EchoVault.csproj.Up2Date
 D:\GitHub\EchoVault\obj\Debug\net10.0-windows\Views\Dialogs\CallDialogView.baml
@@ -73,3 +72,9 @@ D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.WinMM.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\libmp3lame.32.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\libmp3lame.64.dll
 D:\GitHub\EchoVault\bin\Debug\net10.0-windows\NAudio.Lame.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Google.Apis.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Google.Apis.Auth.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Google.Apis.Core.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Google.Apis.Drive.v3.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\Newtonsoft.Json.dll
+D:\GitHub\EchoVault\bin\Debug\net10.0-windows\runtimes\win\lib\net7.0\System.Management.dll
