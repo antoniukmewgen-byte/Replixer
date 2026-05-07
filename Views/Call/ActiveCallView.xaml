@@ -6,7 +6,7 @@
         <TextBlock
             HorizontalAlignment="Center"
             FontFamily="{StaticResource InterFont}"
-            FontSize="12"
+            FontSize="14"
             FontWeight="Bold"
             Foreground="#CC5555"
             Text="{Binding ElapsedTime}" />
@@ -20,35 +20,47 @@
                         <Storyboard RepeatBehavior="Forever">
                             <!--  Wave 1  -->
                             <DoubleAnimation
+                                BeginTime="0:0:0"
                                 Storyboard.TargetName="Wave1Scale"
                                 Storyboard.TargetProperty="ScaleX"
-                                BeginTime="0:0:0" From="1" To="1.8"
+                                From="1"
+                                To="1.8"
                                 Duration="0:0:0.8" />
                             <DoubleAnimation
+                                BeginTime="0:0:0"
                                 Storyboard.TargetName="Wave1Scale"
                                 Storyboard.TargetProperty="ScaleY"
-                                BeginTime="0:0:0" From="1" To="1.8"
+                                From="1"
+                                To="1.8"
                                 Duration="0:0:0.8" />
                             <DoubleAnimation
+                                BeginTime="0:0:0"
                                 Storyboard.TargetName="Wave1"
                                 Storyboard.TargetProperty="Opacity"
-                                BeginTime="0:0:0" From="0.6" To="0"
+                                From="0.6"
+                                To="0"
                                 Duration="0:0:0.8" />
                             <!--  Wave 2  -->
                             <DoubleAnimation
+                                BeginTime="0:0:0.4"
                                 Storyboard.TargetName="Wave2Scale"
                                 Storyboard.TargetProperty="ScaleX"
-                                BeginTime="0:0:0.4" From="1" To="1.8"
+                                From="1"
+                                To="1.8"
                                 Duration="0:0:0.8" />
                             <DoubleAnimation
+                                BeginTime="0:0:0.4"
                                 Storyboard.TargetName="Wave2Scale"
                                 Storyboard.TargetProperty="ScaleY"
-                                BeginTime="0:0:0.4" From="1" To="1.8"
+                                From="1"
+                                To="1.8"
                                 Duration="0:0:0.8" />
                             <DoubleAnimation
+                                BeginTime="0:0:0.4"
                                 Storyboard.TargetName="Wave2"
                                 Storyboard.TargetProperty="Opacity"
-                                BeginTime="0:0:0.4" From="0.6" To="0"
+                                From="0.6"
+                                To="0"
                                 Duration="0:0:0.8" />
                         </Storyboard>
                     </BeginStoryboard>
@@ -83,7 +95,7 @@
                 Stretch="Uniform" />
         </Grid>
         <Button
-            Padding="8,4"
+            Padding="12,8"
             HorizontalAlignment="Center"
             Command="{Binding StopCommand}"
             Cursor="Hand">
@@ -95,12 +107,12 @@
                         Background="#2A0F0F"
                         BorderBrush="#481919"
                         BorderThickness="1"
-                        CornerRadius="12">
+                        CornerRadius="16">
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                             <Path
                                 x:Name="Icon"
-                                Width="12"
-                                Height="12"
+                                Width="14"
+                                Height="14"
                                 Margin="0,0,6,0"
                                 Data="M106.667,0h298.667C464.244,0,512,47.756,512,106.667v298.667C512,464.244,464.244,512,405.333,512H106.667  C47.756,512,0,464.244,0,405.333V106.667C0,47.756,47.756,0,106.667,0z"
                                 Fill="#CC5555"
@@ -109,7 +121,7 @@
                                 x:Name="Label"
                                 VerticalAlignment="Center"
                                 FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
+                                FontSize="14"
                                 FontWeight="Medium"
                                 Foreground="#CC5555">
                                 Зупинити запис

@@ -39,10 +39,17 @@
                 </Grid.ColumnDefinitions>
 
                 <!--  Secondary — Skip / Continue  -->
-                <Button Grid.Column="0" Height="32" Command="{Binding SecondaryCommand}" Cursor="Hand">
+                <Button
+                    Grid.Column="0"
+                    Height="32"
+                    Command="{Binding SecondaryCommand}"
+                    Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bg" Background="{StaticResource BrushBorder}" CornerRadius="8">
+                            <Border
+                                x:Name="Bg"
+                                Background="{StaticResource BrushBorder}"
+                                CornerRadius="8">
                                 <TextBlock
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
@@ -62,10 +69,17 @@
                 </Button>
 
                 <!--  Primary — Start / Stop recording  -->
-                <Button Grid.Column="2" Height="32" Command="{Binding PrimaryCommand}" Cursor="Hand">
+                <Button
+                    Grid.Column="2"
+                    Height="32"
+                    Command="{Binding PrimaryCommand}"
+                    Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bg" Background="{StaticResource BrushIndicatorActive}" CornerRadius="8">
+                            <Border
+                                x:Name="Bg"
+                                Background="{StaticResource BrushIndicatorActive}"
+                                CornerRadius="8">
                                 <TextBlock
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"

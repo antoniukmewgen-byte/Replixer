@@ -4,320 +4,353 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <StackPanel>
-
-        <TextBlock
-            Margin="0,0,0,12"
-            FontFamily="{StaticResource InterFont}"
-            FontSize="10"
-            FontWeight="Bold"
-            Foreground="{StaticResource BrushIcon}">
-            Метод виявлення дзвінків
-        </TextBlock>
-
-        <!--  Window Monitor  -->
-        <Border
-            Margin="0,0,0,8"
-            Padding="16"
-            Background="{StaticResource BrushCardBackground}"
-            BorderBrush="{StaticResource BrushBorder}"
-            BorderThickness="1"
-            CornerRadius="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!--  Icon  -->
-                <Border
-                    Grid.Column="0"
-                    Width="36"
-                    Height="36"
-                    Margin="0,0,12,0"
-                    Background="{StaticResource BrushCardDeep}"
-                    CornerRadius="10">
-                    <Path
-                        Width="16"
-                        Height="16"
-                        Data="M20,0H4A4,4,0,0,0,0,4V16a4,4,0,0,0,4,4H20a4,4,0,0,0,4-4V4A4,4,0,0,0,20,0ZM22,16a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V7H22ZM22,5H2V4A2,2,0,0,1,4,2H20a2,2,0,0,1,2,2Z"
-                        Fill="{StaticResource BrushIcon}"
-                        Stretch="Uniform" />
-                </Border>
-
-                <!--  Text  -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="11"
-                        FontWeight="SemiBold"
-                        Foreground="White">
-                        Моніторинг вікон
-                    </TextBlock>
-                    <TextBlock
-                        Margin="0,3,0,0"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="9"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource BrushIcon}"
-                        TextWrapping="Wrap">
-                        Відстежує вікна дзвінків через UI Automation (FlaUI)
-                    </TextBlock>
-                </StackPanel>
-
-                <!--  Toggle  -->
-                <ToggleButton
-                    Grid.Column="2"
-                    IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
-                    Style="{StaticResource ToggleSwitch}" />
-            </Grid>
-        </Border>
-
-        <!--  Microphone Monitor  -->
         <Border
             Padding="16"
             Background="{StaticResource BrushCardBackground}"
             BorderBrush="{StaticResource BrushBorder}"
             BorderThickness="1"
-            CornerRadius="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!--  Icon  -->
-                <Border
-                    Grid.Column="0"
-                    Width="36"
-                    Height="36"
-                    Margin="0,0,12,0"
-                    Background="{StaticResource BrushCardDeep}"
-                    CornerRadius="10">
-                    <Path
-                        Width="16"
-                        Height="16"
-                        Data="M12,14a4,4,0,0,0,4-4V4a4,4,0,0,0-8,0v6A4,4,0,0,0,12,14Zm-2-4V4a2,2,0,0,1,4,0v6a2,2,0,0,1-4,0Zm9,0a1,1,0,0,0-2,0A7,7,0,0,1,5,10a1,1,0,0,0-2,0,9,9,0,0,0,8,8.94V21H9a1,1,0,0,0,0,2h6a1,1,0,0,0,0-2H13V18.94A9,9,0,0,0,21,10Z"
-                        Fill="{StaticResource BrushIcon}"
-                        Stretch="Uniform" />
-                </Border>
-
-                <!--  Text  -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="11"
-                        FontWeight="SemiBold"
-                        Foreground="White">
-                        Моніторинг мікрофона
-                    </TextBlock>
-                    <TextBlock
-                        Margin="0,3,0,0"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="9"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource BrushIcon}"
-                        TextWrapping="Wrap">
-                        Відстежує мікрофон (реєстр) та відтворення аудіо (WASAPI)
-                    </TextBlock>
-                </StackPanel>
-
-                <!--  Toggle  -->
-                <ToggleButton
-                    Grid.Column="2"
-                    IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
-                    Style="{StaticResource ToggleSwitch}" />
-            </Grid>
-        </Border>
-
-
-        <!--  Google Drive section  -->
-        <TextBlock
-            Margin="0,24,0,12"
-            FontFamily="{StaticResource InterFont}"
-            FontSize="10"
-            FontWeight="Bold"
-            Foreground="{StaticResource BrushIcon}">
-            Хмарне сховище
-        </TextBlock>
-
-        <!--  Google Drive toggle card  -->
-        <Border
-            Margin="0,0,0,8"
-            Padding="16"
-            Background="{StaticResource BrushCardBackground}"
-            BorderBrush="{StaticResource BrushBorder}"
-            BorderThickness="1"
-            CornerRadius="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!--  Icon  -->
-                <Border
-                    Grid.Column="0"
-                    Width="36"
-                    Height="36"
-                    Margin="0,0,12,0"
-                    Background="{StaticResource BrushCardDeep}"
-                    CornerRadius="10">
-                    <Path
-                        Width="16"
-                        Height="16"
-                        Data="M4.56 9.1L8.08 3H15.9L19.44 9.1H4.56ZM1 10L6.5 20H17.5L23 10H1ZM12 16.5C10.62 16.5 9.5 15.38 9.5 14C9.5 12.62 10.62 11.5 12 11.5C13.38 11.5 14.5 12.62 14.5 14C14.5 15.38 13.38 16.5 12 16.5Z"
-                        Fill="{StaticResource BrushIcon}"
-                        Stretch="Uniform" />
-                </Border>
-
-                <!--  Text  -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="11"
-                        FontWeight="SemiBold"
-                        Foreground="White">
-                        Google Drive
-                    </TextBlock>
-                    <TextBlock
-                        Margin="0,3,0,0"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="9"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource BrushIcon}"
-                        TextWrapping="Wrap">
-                        Автоматично завантажувати записи на Google Drive
-                    </TextBlock>
-                </StackPanel>
-
-                <!--  Toggle  -->
-                <ToggleButton
-                    Grid.Column="2"
-                    IsChecked="{Binding IsGoogleDriveEnabled, Mode=TwoWay}"
-                    Style="{StaticResource ToggleSwitch}" />
-            </Grid>
-        </Border>
-
-        <!--  Google Drive settings (visible when enabled)  -->
-        <Border
-            Padding="16"
-            Background="{StaticResource BrushCardBackground}"
-            BorderBrush="{StaticResource BrushBorder}"
-            BorderThickness="1"
-            CornerRadius="16"
-            Visibility="{Binding IsGoogleDriveEnabled, Converter={StaticResource BoolToVis}}">
+            CornerRadius="12">
             <StackPanel>
-
-                <!--  Folder ID row  -->
                 <TextBlock
-                    Margin="0,0,0,6"
+                    Margin="0,0,0,12"
                     FontFamily="{StaticResource InterFont}"
-                    FontSize="9"
-                    FontWeight="Medium"
+                    FontSize="12"
+                    FontWeight="Bold"
                     Foreground="{StaticResource BrushIcon}">
-                    ID папки на Google Drive (необов'язково)
+                    Метод виявлення дзвінків
                 </TextBlock>
+
+                <!--  Window Monitor  -->
                 <Border
-                    Margin="0,0,0,16"
-                    Padding="10,8"
-                    Background="{StaticResource BrushCardDeep}"
+                    Margin="0,0,0,12"
+                    Padding="16"
+                    Background="{StaticResource BrushCardBackground}"
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="1"
                     CornerRadius="8">
-                    <TextBox
-                        Background="Transparent"
-                        BorderThickness="0"
-                        CaretBrush="White"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="10"
-                        Foreground="White"
-                        Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTip="Вставте ID папки з URL Google Drive"
-                        VerticalAlignment="Center" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushCardDeep}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
+                                Fill="{StaticResource BrushIcon}"
+                                Stretch="Uniform" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource BrushIcon}">
+                                Моніторинг вікон
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource BrushSubtext}"
+                                TextWrapping="Wrap">
+                                Відстежує вікна дзвінків через UI Automation
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!--  Toggle  -->
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
                 </Border>
 
-                <!--  Authorize row  -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <!--  Microphone Monitor  -->
+                <Border
+                    Padding="16"
+                    Background="{StaticResource BrushCardBackground}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <!--  Auth status  -->
-                    <StackPanel
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-                        <!--  Authorized indicator  -->
-                        <Ellipse
-                            Width="7"
-                            Height="7"
-                            Margin="0,0,6,0"
-                            Fill="{StaticResource BrushIndicatorActive}"
-                            Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}" />
-                        <TextBlock
-                            FontFamily="{StaticResource InterFont}"
-                            FontSize="9"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource BrushIcon}"
-                            Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}">
-                            Авторизовано
-                        </TextBlock>
-                        <!--  Not authorized indicator  -->
-                        <Ellipse
-                            Width="7"
-                            Height="7"
-                            Margin="0,0,6,0"
-                            Fill="{StaticResource BrushDanger}"
-                            Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}" />
-                        <TextBlock
-                            FontFamily="{StaticResource InterFont}"
-                            FontSize="9"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource BrushIcon}"
-                            Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}">
-                            Не авторизовано
-                        </TextBlock>
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushCardDeep}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
+                                Fill="{StaticResource BrushIcon}"
+                                Stretch="Uniform" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource BrushIcon}">
+                                Моніторинг мікрофонів
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource BrushSubtext}"
+                                TextWrapping="Wrap">
+                                Відстежується мікрофон та відтворення аудіо
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!--  Toggle  -->
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Margin="0,16,0,0"
+            Padding="16"
+            Background="{StaticResource BrushCardBackground}"
+            BorderBrush="{StaticResource BrushBorder}"
+            BorderThickness="1"
+            CornerRadius="12">
+            <StackPanel>
+                <!--  Google Drive section  -->
+                <TextBlock
+                    Margin="0,0,0,12"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource BrushIcon}">
+                    Хмарне сховище
+                </TextBlock>
+
+                <!--  Google Drive toggle card  -->
+                <Border
+                    Padding="16"
+                    Background="{StaticResource BrushCardBackground}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushCardDeep}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M480.768,87.936l-56.704-56.704c-5.674-5.585-11.957-10.515-18.731-14.699V64   c-0.071,58.881-47.786,106.596-106.667,106.667h-85.333C154.452,170.596,106.737,122.881,106.667,64V0   C47.786,0.071,0.071,47.786,0,106.667v298.667C0.071,464.215,47.786,511.93,106.667,512h298.667   C464.214,511.93,511.93,464.215,512,405.334V163.35C512.08,135.049,500.833,107.893,480.768,87.936z M256,384   c-47.128,0-85.333-38.205-85.333-85.333s38.205-85.333,85.333-85.333s85.333,38.205,85.333,85.333S303.128,384,256,384z                         M213.333,128h85.333c35.346,0,64-28.654,64-64V1.366c-4.638-0.756-9.32-1.212-14.016-1.365H149.333v64   C149.333,99.346,177.987,128,213.333,128z                         "
+                                Fill="{StaticResource BrushIcon}"
+                                Stretch="Uniform" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource BrushIcon}">
+                                Google Drive
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource BrushSubtext}"
+                                TextWrapping="Wrap">
+                                Автоматично завантажувати запис на Google Drive
+                            </TextBlock>
+                        </StackPanel>
+                        <!--  Toggle  -->
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsGoogleDriveEnabled, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
+                </Border>
+
+                <!--  Google Drive settings (visible when enabled)  -->
+                <Border
+                    Margin="0,12,0,0"
+                    Padding="16"
+                    Background="{StaticResource BrushCardBackground}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    Visibility="{Binding IsGoogleDriveEnabled, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+
+                        <!--  Folder ID row  -->
+
+                        <Border
+                            Margin="0,0,0,12"
+                            Padding="12,8"
+                            Background="{StaticResource BrushCardDeep}"
+                            BorderThickness="1"
+                            CornerRadius="16">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                            <Setter Property="BorderBrush" Value="{StaticResource BrushIcon}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBox
+                                VerticalAlignment="Center"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CaretBrush="{StaticResource BrushIcon}"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                Foreground="{StaticResource BrushIcon}"
+                                Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="Вставте ID папки з URL Google Drive" />
+                        </Border>
+
+                        <!--  Authorize row  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  Auth status  -->
+                            <StackPanel
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <!--  Authorized indicator  -->
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    Margin="0,0,6,0"
+                                    Fill="{StaticResource BrushIndicatorActive}"
+                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource BrushIcon}"
+                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}">
+                                    Авторизовано
+                                </TextBlock>
+                                <!--  Not authorized indicator  -->
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    Margin="0,0,6,0"
+                                    Fill="{StaticResource BrushDanger}"
+                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource BrushIcon}"
+                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}">
+                                    Не авторизовано
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!--  Authorize button  -->
+                            <Button
+                                Grid.Column="1"
+                                Padding="12,8"
+                                HorizontalAlignment="Right"
+                                Command="{Binding AuthorizeCommand}"
+                                Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="{StaticResource BrushCardDeep}"
+                                            BorderBrush="{StaticResource BrushBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="16">
+                                            <TextBlock
+                                                x:Name="Label"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource InterFont}"
+                                                FontSize="14"
+                                                FontWeight="Medium"
+                                                Foreground="{StaticResource BrushIcon}">
+                                                Авторизувати
+                                            </TextBlock>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIcon}" />
+                                                <Setter TargetName="Label" Property="Foreground" Value="White" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="Bg" Property="Background" Value="#0A0A0A" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+
                     </StackPanel>
-
-                    <!--  Authorize button  -->
-                    <Button
-                        Grid.Column="1"
-                        Padding="12,6"
-                        Background="{StaticResource BrushCardDeep}"
-                        BorderBrush="{StaticResource BrushBorder}"
-                        BorderThickness="1"
-                        Command="{Binding AuthorizeCommand}"
-                        Cursor="Hand"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="9"
-                        FontWeight="SemiBold"
-                        Foreground="White">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border
-                                                Padding="{TemplateBinding Padding}"
-                                                Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="8">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                        Авторизувати
-                    </Button>
-                </Grid>
-
+                </Border>
             </StackPanel>
         </Border>
 
