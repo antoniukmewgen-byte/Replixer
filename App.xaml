@@ -13,8 +13,8 @@
         <SolidColorBrush x:Key="BrushCardBackground" Color="#111111" />
         <SolidColorBrush x:Key="BrushCardDeep" Color="#161616" />
         <SolidColorBrush x:Key="BrushBorder" Color="#1E1E1E" />
-        <SolidColorBrush x:Key="BrushIcon" Color="#555555" />
-        <SolidColorBrush x:Key="BrushSubtext" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="BrushIcon" Color="#888888" />
+        <SolidColorBrush x:Key="BrushSubtext" Color="#555555" />
         <SolidColorBrush x:Key="BrushIndicatorActive" Color="#306932" />
         <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
         <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />

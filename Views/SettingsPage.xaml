@@ -227,7 +227,7 @@
                     Background="{StaticResource BrushCardBackground}"
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="1"
-                    CornerRadius="16"
+                    CornerRadius="8"
                     Visibility="{Binding IsGoogleDriveEnabled, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
 

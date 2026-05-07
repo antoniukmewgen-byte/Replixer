@@ -15,7 +15,7 @@
             <!--  Title  -->
             <TextBlock
                 FontFamily="{StaticResource InterFont}"
-                FontSize="13"
+                FontSize="14"
                 FontWeight="Bold"
                 Foreground="White"
                 Text="{Binding Title}" />
@@ -24,7 +24,7 @@
             <TextBlock
                 Margin="0,8,0,20"
                 FontFamily="{StaticResource InterFont}"
-                FontSize="10"
+                FontSize="12"
                 FontWeight="Medium"
                 Foreground="{StaticResource BrushIcon}"
                 Text="{Binding Message}"

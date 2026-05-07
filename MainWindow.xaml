@@ -344,16 +344,20 @@
             </Border>
 
             <!--  Modal overlay — covers entire window  -->
-            <!--   <Grid
+            <Grid
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="2"
                 Visibility="{Binding Dialog, Converter={StaticResource NullToVisibility}}">
-                <Rectangle Fill="{StaticResource BrushWindowBackground}" Opacity="0.88" RadiusX="12" RadiusY="12" />
+                <Rectangle
+                    Fill="{StaticResource BrushWindowBackground}"
+                    Opacity="0.88"
+                    RadiusX="12"
+                    RadiusY="12" />
                 <ContentControl
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Content="{Binding Dialog}" />
-            </Grid>-->
+            </Grid>
 
         </Grid>
     </Border>
