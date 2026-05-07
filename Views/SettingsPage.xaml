@@ -285,8 +285,8 @@
                                     <Border
                                         x:Name="Bg"
                                         Padding="{TemplateBinding Padding}"
-                                        Background="#2A0F0F"
-                                        BorderBrush="#481919"
+                                        Background="{StaticResource BrushAccentBackground}"
+                                        BorderBrush="{StaticResource BrushAccentBorder}"
                                         BorderThickness="1"
                                         CornerRadius="16">
                                         <TextBlock
@@ -296,7 +296,7 @@
                                             FontFamily="{StaticResource InterFont}"
                                             FontSize="14"
                                             FontWeight="Medium"
-                                            Foreground="#CC5555"
+                                            Foreground="{StaticResource BrushAccent}"
                                             Text="Авторизувати" />
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -307,7 +307,7 @@
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.7" />
                                         </Trigger>
                                         <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
-                                            <Setter TargetName="Bg" Property="Background" Value="#0D1A0D" />
+                                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushAuthorizedBackground}" />
                                             <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIndicatorActive}" />
                                             <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
                                             <Setter TargetName="Label" Property="Foreground" Value="{StaticResource BrushIndicatorActive}" />

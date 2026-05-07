@@ -6,21 +6,12 @@
     xmlns:local="clr-namespace:EchoVault"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <FontFamily x:Key="InterFont">pack://application:,,,/Fonts/#Inter</FontFamily>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Colors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <!--  Colors  -->
-        <SolidColorBrush x:Key="BrushWindowBackground" Color="#0E0E0E" />
-        <SolidColorBrush x:Key="BrushCardBackground" Color="#111111" />
-        <SolidColorBrush x:Key="BrushCardDeep" Color="#161616" />
-        <SolidColorBrush x:Key="BrushBorder" Color="#1E1E1E" />
-        <SolidColorBrush x:Key="BrushIcon" Color="#888888" />
-        <SolidColorBrush x:Key="BrushSubtext" Color="#555555" />
-        <SolidColorBrush x:Key="BrushIndicatorActive" Color="#4A8A4A" />
-        <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
-        <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />
-        <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />
-        <SolidColorBrush x:Key="BrushDanger" Color="#C0392B" />
-        <SolidColorBrush x:Key="BrushHover" Color="#2A2A2A" />
+            <FontFamily x:Key="InterFont">pack://application:,,,/Fonts/#Inter</FontFamily>
 
         <!--  Converters  -->
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -39,7 +30,7 @@
                         <Grid>
                             <Border x:Name="Track" CornerRadius="11">
                                 <Border.Background>
-                                    <SolidColorBrush x:Name="TrackColor" Color="#1E1E1E" />
+                                    <SolidColorBrush x:Name="TrackColor" Color="{StaticResource ColorBorder}" />
                                 </Border.Background>
                             </Border>
                             <Border
@@ -51,7 +42,7 @@
                                 VerticalAlignment="Center"
                                 CornerRadius="8">
                                 <Border.Background>
-                                    <SolidColorBrush x:Name="ThumbColor" Color="#555555" />
+                                    <SolidColorBrush x:Name="ThumbColor" Color="{StaticResource ColorSubtext}" />
                                 </Border.Background>
                                 <Border.RenderTransform>
                                     <TranslateTransform x:Name="ThumbSlide" />
@@ -71,12 +62,12 @@
                                             <ColorAnimation
                                                 Storyboard.TargetName="TrackColor"
                                                 Storyboard.TargetProperty="Color"
-                                                To="#306932"
+                                                To="{StaticResource ColorToggleActive}"
                                                 Duration="0:0:0.15" />
                                             <ColorAnimation
                                                 Storyboard.TargetName="ThumbColor"
                                                 Storyboard.TargetProperty="Color"
-                                                To="#FFFFFF"
+                                                To="{StaticResource ColorWhite}"
                                                 Duration="0:0:0.15" />
                                         </Storyboard>
                                     </BeginStoryboard>
@@ -92,12 +83,12 @@
                                             <ColorAnimation
                                                 Storyboard.TargetName="TrackColor"
                                                 Storyboard.TargetProperty="Color"
-                                                To="#1E1E1E"
+                                                To="{StaticResource ColorBorder}"
                                                 Duration="0:0:0.15" />
                                             <ColorAnimation
                                                 Storyboard.TargetName="ThumbColor"
                                                 Storyboard.TargetProperty="Color"
-                                                To="#555555"
+                                                To="{StaticResource ColorSubtext}"
                                                 Duration="0:0:0.15" />
                                         </Storyboard>
                                     </BeginStoryboard>
@@ -108,5 +99,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

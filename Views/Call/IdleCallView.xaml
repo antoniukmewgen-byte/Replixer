@@ -64,7 +64,7 @@
                             <Setter TargetName="Label" Property="Foreground" Value="White" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#0A0A0A" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushPressedDeep}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
