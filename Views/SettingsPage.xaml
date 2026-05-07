@@ -229,12 +229,14 @@
                     BorderThickness="1"
                     CornerRadius="8"
                     Visibility="{Binding IsGoogleDriveEnabled, Converter={StaticResource BoolToVis}}">
-                    <StackPanel>
-
-                        <!--  Folder ID row  -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
                         <Border
-                            Margin="0,0,0,12"
+                            Grid.Column="0"
                             Padding="12,8"
                             Background="{StaticResource BrushCardDeep}"
                             BorderThickness="1"
@@ -261,95 +263,60 @@
                                 ToolTip="Вставте ID папки з URL Google Drive" />
                         </Border>
 
-                        <!--  Authorize row  -->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--  Auth status  -->
-                            <StackPanel
-                                Grid.Column="0"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                                <!--  Authorized indicator  -->
-                                <Ellipse
-                                    Width="10"
-                                    Height="10"
-                                    Margin="0,0,6,0"
-                                    Fill="{StaticResource BrushIndicatorActive}"
-                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource BrushIcon}"
-                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource BoolToVis}}">
-                                    Авторизовано
-                                </TextBlock>
-                                <!--  Not authorized indicator  -->
-                                <Ellipse
-                                    Width="10"
-                                    Height="10"
-                                    Margin="0,0,6,0"
-                                    Fill="{StaticResource BrushDanger}"
-                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource BrushIcon}"
-                                    Visibility="{Binding IsGoogleAuthorized, Converter={StaticResource InverseBoolToVis}}">
-                                    Не авторизовано
-                                </TextBlock>
-                            </StackPanel>
-
-                            <!--  Authorize button  -->
-                            <Button
-                                Grid.Column="1"
-                                Padding="12,8"
-                                HorizontalAlignment="Right"
-                                Command="{Binding AuthorizeCommand}"
-                                Cursor="Hand">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border
-                                            x:Name="Bg"
-                                            Padding="{TemplateBinding Padding}"
-                                            Background="{StaticResource BrushCardDeep}"
-                                            BorderBrush="{StaticResource BrushBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="16">
-                                            <TextBlock
-                                                x:Name="Label"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="14"
-                                                FontWeight="Medium"
-                                                Foreground="{StaticResource BrushIcon}">
-                                                Авторизувати
-                                            </TextBlock>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIcon}" />
-                                                <Setter TargetName="Label" Property="Foreground" Value="White" />
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="Bg" Property="Background" Value="#0A0A0A" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </Grid>
-
-                    </StackPanel>
+                        <Button
+                            Grid.Column="1"
+                            Margin="12,0,0,0"
+                            Padding="12,8"
+                            HorizontalAlignment="Right"
+                            Command="{Binding AuthorizeCommand}"
+                            Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Setter Property="Cursor" Value="Arrow" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border
+                                        x:Name="Bg"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="#2A0F0F"
+                                        BorderBrush="#481919"
+                                        BorderThickness="1"
+                                        CornerRadius="16">
+                                        <TextBlock
+                                            x:Name="Label"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="14"
+                                            FontWeight="Medium"
+                                            Foreground="#CC5555"
+                                            Text="Авторизувати" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.85" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.7" />
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
+                                            <Setter TargetName="Bg" Property="Background" Value="#0D1A0D" />
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIndicatorActive}" />
+                                            <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
+                                            <Setter TargetName="Label" Property="Foreground" Value="{StaticResource BrushIndicatorActive}" />
+                                        </DataTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                 </Border>
             </StackPanel>
         </Border>

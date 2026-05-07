@@ -15,7 +15,7 @@
         <SolidColorBrush x:Key="BrushBorder" Color="#1E1E1E" />
         <SolidColorBrush x:Key="BrushIcon" Color="#888888" />
         <SolidColorBrush x:Key="BrushSubtext" Color="#555555" />
-        <SolidColorBrush x:Key="BrushIndicatorActive" Color="#306932" />
+        <SolidColorBrush x:Key="BrushIndicatorActive" Color="#4A8A4A" />
         <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
         <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />
         <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />

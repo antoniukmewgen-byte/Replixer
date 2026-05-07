@@ -20,18 +20,13 @@ public class AsyncRelayCommand : ICommand
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object? parameter) => !_isExecuting && (_canExecute?.Invoke() ?? true);
+    public bool CanExecute(object? parameter) => _canExecute?.Invoke() ?? true;
 
     public async void Execute(object? parameter)
     {
         if (_isExecuting) return;
         _isExecuting = true;
-        CommandManager.InvalidateRequerySuggested();
         try     { await _execute(); }
-        finally
-        {
-            _isExecuting = false;
-            CommandManager.InvalidateRequerySuggested();
-        }
+        finally { _isExecuting = false; }
     }
 }
