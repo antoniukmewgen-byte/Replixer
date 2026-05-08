@@ -30,6 +30,11 @@
     <SolidColorBrush x:Key="OtherBrushSubColor3" Color="#E3AC4F" />
     <SolidColorBrush x:Key="OtherBrushSubColor4" Color="#C64444" />
 
+    <!--  Hover states (+0.5 step lighter)  -->
+    <SolidColorBrush x:Key="BrushColor4Hover" Color="#212121" />
+    <SolidColorBrush x:Key="OtherBrushColor1Hover" Color="#1C302B" />
+    <SolidColorBrush x:Key="OtherBrushColor4Hover" Color="#301D1D" />
+
     <!--    -->
     <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
     <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />

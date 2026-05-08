@@ -51,12 +51,6 @@
                             CornerRadius="0">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushBorderColor1}" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -75,12 +69,6 @@
                             CornerRadius="0,12,0,0">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushSubColor4}" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -89,7 +77,7 @@
         <Style x:Key="SidebarButton" TargetType="Button">
             <Setter Property="Width" Value="38" />
             <Setter Property="Height" Value="38" />
-            <Setter Property="Background" Value="{StaticResource BrushBorderColor1}" />
+            <Setter Property="Background" Value="{StaticResource BrushColor4}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{StaticResource Text}" />
@@ -102,12 +90,6 @@
                             CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Text}" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -126,12 +108,6 @@
                             CornerRadius="50">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor2}" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -344,12 +320,12 @@
             </Border>
 
             <!--  Modal overlay — covers entire window  -->
-            <!--   <Grid
+            <Grid
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="2"
                 Visibility="{Binding Dialog, Converter={StaticResource NullToVisibility}}">
                 <Rectangle
-                    Fill="{StaticResource BrushWindowBackground}"
+                    Fill="{StaticResource BrushColor1}"
                     Opacity="0.88"
                     RadiusX="12"
                     RadiusY="12" />
@@ -357,7 +333,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Content="{Binding Dialog}" />
-            </Grid> -->
+            </Grid>
 
         </Grid>
     </Border>

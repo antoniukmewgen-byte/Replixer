@@ -15,6 +15,12 @@ public partial class MainWindow : Window
         var vm = new MainViewModel();
         vm.PropertyChanged += OnViewModelPropertyChanged;
         DataContext = vm;
+
+        PreviewMouseDown += (_, _) =>
+        {
+            Keyboard.ClearFocus();
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+        };
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

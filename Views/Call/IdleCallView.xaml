@@ -57,16 +57,6 @@
                             </TextBlock>
                         </StackPanel>
                     </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
-                            <Setter TargetName="Icon" Property="Fill" Value="White" />
-                            <Setter TargetName="Label" Property="Foreground" Value="White" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushBorderColor4}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Button.Template>
         </Button>

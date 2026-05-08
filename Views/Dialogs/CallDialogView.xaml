@@ -59,11 +59,6 @@
                                     Foreground="{StaticResource OtherBrushSubColor4}"
                                     Text="{Binding SecondaryLabel}" />
                             </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
@@ -89,11 +84,6 @@
                                     Foreground="White"
                                     Text="{Binding PrimaryLabel}" />
                             </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
