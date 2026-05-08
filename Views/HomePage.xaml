@@ -50,8 +50,8 @@
                     FontFamily="{StaticResource InterFont}"
                     FontSize="12"
                     FontWeight="Bold"
-                    Foreground="{StaticResource Text}">
-                    Останні записи
+                    Foreground="{StaticResource SubText}">
+                    ОСТАННІ ЗАПИСИ
                 </TextBlock>
                 <StackPanel
                     Grid.Row="1"
