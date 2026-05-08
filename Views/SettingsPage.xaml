@@ -6,8 +6,8 @@
     <StackPanel>
         <Border
             Padding="16"
-            Background="{StaticResource BrushCardBackground}"
-            BorderBrush="{StaticResource BrushBorder}"
+            Background="{StaticResource BrushColor2}"
+            BorderBrush="{StaticResource BrushBorderColor2}"
             BorderThickness="1"
             CornerRadius="12">
             <StackPanel>
@@ -16,16 +16,16 @@
                     FontFamily="{StaticResource InterFont}"
                     FontSize="12"
                     FontWeight="Bold"
-                    Foreground="{StaticResource BrushIcon}">
-                    Метод виявлення дзвінків
+                    Foreground="{StaticResource SubText}">
+                    МЕТОД ВИЯВЛЕННЯ ДЗВІНКІВ
                 </TextBlock>
 
                 <!--  Window Monitor  -->
                 <Border
                     Margin="0,0,0,12"
                     Padding="16"
-                    Background="{StaticResource BrushCardBackground}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
                     BorderThickness="1"
                     CornerRadius="8">
                     <Grid>
@@ -40,13 +40,13 @@
                             Grid.Column="0"
                             Width="38"
                             Height="38"
-                            Background="{StaticResource BrushCardDeep}"
+                            Background="{StaticResource OtherBrushColor1}"
                             CornerRadius="8">
                             <Path
                                 Width="18"
                                 Height="18"
                                 Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
-                                Fill="{StaticResource BrushIcon}"
+                                Fill="{StaticResource OtherBrushSubColor1}"
                                 Stretch="Uniform" />
                         </Border>
 
@@ -59,15 +59,15 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="14"
                                 FontWeight="Bold"
-                                Foreground="{StaticResource BrushIcon}">
+                                Foreground="{StaticResource Text}">
                                 Моніторинг вікон
                             </TextBlock>
                             <TextBlock
-                                Margin="0,6,0,0"
+                                Margin="0,4,0,0"
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="12"
                                 FontWeight="Medium"
-                                Foreground="{StaticResource BrushSubtext}"
+                                Foreground="{StaticResource SubText}"
                                 TextWrapping="Wrap">
                                 Відстежує вікна дзвінків через UI Automation
                             </TextBlock>
@@ -84,8 +84,8 @@
                 <!--  Microphone Monitor  -->
                 <Border
                     Padding="16"
-                    Background="{StaticResource BrushCardBackground}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
                     BorderThickness="1"
                     CornerRadius="8">
                     <Grid>
@@ -100,13 +100,13 @@
                             Grid.Column="0"
                             Width="38"
                             Height="38"
-                            Background="{StaticResource BrushCardDeep}"
+                            Background="{StaticResource OtherBrushColor2}"
                             CornerRadius="8">
                             <Path
                                 Width="18"
                                 Height="18"
                                 Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
-                                Fill="{StaticResource BrushIcon}"
+                                Fill="{StaticResource OtherBrushSubColor2}"
                                 Stretch="Uniform" />
                         </Border>
 
@@ -119,15 +119,15 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="14"
                                 FontWeight="Bold"
-                                Foreground="{StaticResource BrushIcon}">
+                                Foreground="{StaticResource Text}">
                                 Моніторинг мікрофонів
                             </TextBlock>
                             <TextBlock
-                                Margin="0,6,0,0"
+                                Margin="0,4,0,0"
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="12"
                                 FontWeight="Medium"
-                                Foreground="{StaticResource BrushSubtext}"
+                                Foreground="{StaticResource SubText}"
                                 TextWrapping="Wrap">
                                 Відстежується мікрофон та відтворення аудіо
                             </TextBlock>
@@ -146,8 +146,8 @@
         <Border
             Margin="0,16,0,0"
             Padding="16"
-            Background="{StaticResource BrushCardBackground}"
-            BorderBrush="{StaticResource BrushBorder}"
+            Background="{StaticResource BrushColor2}"
+            BorderBrush="{StaticResource BrushBorderColor2}"
             BorderThickness="1"
             CornerRadius="12">
             <StackPanel>
@@ -157,15 +157,15 @@
                     FontFamily="{StaticResource InterFont}"
                     FontSize="12"
                     FontWeight="Bold"
-                    Foreground="{StaticResource BrushIcon}">
-                    Хмарне сховище
+                    Foreground="{StaticResource SubText}">
+                    ХМАРНЕ СХОВИЩЕ
                 </TextBlock>
 
                 <!--  Google Drive toggle card  -->
                 <Border
                     Padding="16"
-                    Background="{StaticResource BrushCardBackground}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
                     BorderThickness="1"
                     CornerRadius="8">
                     <Grid>
@@ -180,13 +180,13 @@
                             Grid.Column="0"
                             Width="38"
                             Height="38"
-                            Background="{StaticResource BrushCardDeep}"
+                            Background="{StaticResource OtherBrushColor3}"
                             CornerRadius="8">
                             <Path
                                 Width="18"
                                 Height="18"
                                 Data="M480.768,87.936l-56.704-56.704c-5.674-5.585-11.957-10.515-18.731-14.699V64   c-0.071,58.881-47.786,106.596-106.667,106.667h-85.333C154.452,170.596,106.737,122.881,106.667,64V0   C47.786,0.071,0.071,47.786,0,106.667v298.667C0.071,464.215,47.786,511.93,106.667,512h298.667   C464.214,511.93,511.93,464.215,512,405.334V163.35C512.08,135.049,500.833,107.893,480.768,87.936z M256,384   c-47.128,0-85.333-38.205-85.333-85.333s38.205-85.333,85.333-85.333s85.333,38.205,85.333,85.333S303.128,384,256,384z                         M213.333,128h85.333c35.346,0,64-28.654,64-64V1.366c-4.638-0.756-9.32-1.212-14.016-1.365H149.333v64   C149.333,99.346,177.987,128,213.333,128z                         "
-                                Fill="{StaticResource BrushIcon}"
+                                Fill="{StaticResource OtherBrushSubColor3}"
                                 Stretch="Uniform" />
                         </Border>
 
@@ -199,15 +199,15 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="14"
                                 FontWeight="Bold"
-                                Foreground="{StaticResource BrushIcon}">
+                                Foreground="{StaticResource Text}">
                                 Google Drive
                             </TextBlock>
                             <TextBlock
-                                Margin="0,6,0,0"
+                                Margin="0,4,0,0"
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="12"
                                 FontWeight="Medium"
-                                Foreground="{StaticResource BrushSubtext}"
+                                Foreground="{StaticResource SubText}"
                                 TextWrapping="Wrap">
                                 Автоматично завантажувати запис на Google Drive
                             </TextBlock>
@@ -224,8 +224,8 @@
                 <Border
                     Margin="0,12,0,0"
                     Padding="16"
-                    Background="{StaticResource BrushCardBackground}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
                     BorderThickness="1"
                     CornerRadius="8"
                     Visibility="{Binding IsGoogleDriveEnabled, Converter={StaticResource BoolToVis}}">
@@ -238,15 +238,15 @@
                         <Border
                             Grid.Column="0"
                             Padding="12,8"
-                            Background="{StaticResource BrushCardDeep}"
+                            Background="{StaticResource BrushColor4}"
                             BorderThickness="1"
                             CornerRadius="16">
                             <Border.Style>
                                 <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
                                     <Style.Triggers>
                                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                            <Setter Property="BorderBrush" Value="{StaticResource BrushIcon}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -255,10 +255,10 @@
                                 VerticalAlignment="Center"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                CaretBrush="{StaticResource BrushIcon}"
+                                CaretBrush="{StaticResource Text}"
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="14"
-                                Foreground="{StaticResource BrushIcon}"
+                                Foreground="{StaticResource Text}"
                                 Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 ToolTip="Вставте ID папки з URL Google Drive" />
                         </Border>
@@ -285,8 +285,8 @@
                                     <Border
                                         x:Name="Bg"
                                         Padding="{TemplateBinding Padding}"
-                                        Background="{StaticResource BrushAccentBackground}"
-                                        BorderBrush="{StaticResource BrushAccentBorder}"
+                                        Background="{StaticResource OtherBrushColor4}"
+                                        BorderBrush="{StaticResource OtherBrushSubColor4}"
                                         BorderThickness="1"
                                         CornerRadius="16">
                                         <TextBlock
@@ -296,7 +296,7 @@
                                             FontFamily="{StaticResource InterFont}"
                                             FontSize="14"
                                             FontWeight="Medium"
-                                            Foreground="{StaticResource BrushAccent}"
+                                            Foreground="{StaticResource OtherBrushSubColor4}"
                                             Text="Авторизувати" />
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -307,10 +307,10 @@
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.7" />
                                         </Trigger>
                                         <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
-                                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushAuthorizedBackground}" />
-                                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIndicatorActive}" />
+                                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
                                             <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
-                                            <Setter TargetName="Label" Property="Foreground" Value="{StaticResource BrushIndicatorActive}" />
+                                            <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
                                         </DataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>

@@ -6,8 +6,8 @@
     <Border
         Width="300"
         Padding="20"
-        Background="{StaticResource BrushCardDeep}"
-        BorderBrush="{StaticResource BrushHover}"
+        Background="{StaticResource BrushColor2}"
+        BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="16">
         <StackPanel>
@@ -26,7 +26,7 @@
                 FontFamily="{StaticResource InterFont}"
                 FontSize="12"
                 FontWeight="Medium"
-                Foreground="{StaticResource BrushIcon}"
+                Foreground="{StaticResource Text}"
                 Text="{Binding Message}"
                 TextWrapping="Wrap" />
 
@@ -48,7 +48,7 @@
                         <ControlTemplate TargetType="Button">
                             <Border
                                 x:Name="Bg"
-                                Background="{StaticResource BrushBorder}"
+                                Background="{StaticResource OtherBrushColor4}"
                                 CornerRadius="8">
                                 <TextBlock
                                     HorizontalAlignment="Center"
@@ -56,12 +56,12 @@
                                     FontFamily="{StaticResource InterFont}"
                                     FontSize="10"
                                     FontWeight="Medium"
-                                    Foreground="{StaticResource BrushIcon}"
+                                    Foreground="{StaticResource OtherBrushSubColor4}"
                                     Text="{Binding SecondaryLabel}" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushHover}" />
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -78,7 +78,7 @@
                         <ControlTemplate TargetType="Button">
                             <Border
                                 x:Name="Bg"
-                                Background="{StaticResource BrushIndicatorActive}"
+                                Background="{StaticResource OtherBrushColor1}"
                                 CornerRadius="8">
                                 <TextBlock
                                     HorizontalAlignment="Center"
@@ -91,7 +91,7 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushGreenHover}" />
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

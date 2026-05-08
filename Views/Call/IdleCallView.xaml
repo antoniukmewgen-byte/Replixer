@@ -8,19 +8,19 @@
             FontFamily="{StaticResource InterFont}"
             FontSize="14"
             FontWeight="Bold"
-            Foreground="{StaticResource BrushIcon}">
+            Foreground="{StaticResource Text}">
             Зараз не йде жодного дзвінка
         </TextBlock>
         <Grid
             Width="60"
             Height="60"
             Margin="0,12">
-            <Ellipse Fill="{StaticResource BrushCardDeep}" Stroke="{StaticResource BrushBorder}" />
+            <Ellipse Fill="{StaticResource BrushColor4}" Stroke="{StaticResource BrushBorderColor4}" />
             <Path
                 Width="30"
                 Height="30"
                 Data="M22.183,22.164l.91-1.049a3.1,3.1,0,0,0,0-4.377c-.031-.031-2.437-1.882-2.437-1.882a3.1,3.1,0,0,0-4.281.006l-1.906,1.606A12.784,12.784,0,0,1,7.537,9.524l1.6-1.9a3.1,3.1,0,0,0,.007-4.282S7.291.939,7.26.908A3.082,3.082,0,0,0,2.934.862l-1.15,1C-5.01,9.744,9.62,24.261,17.762,24A6.155,6.155,0,0,0,22.183,22.164Z"
-                Fill="{StaticResource BrushIcon}"
+                Fill="{StaticResource SubText}"
                 Stretch="Uniform" />
         </Grid>
         <Button
@@ -33,8 +33,8 @@
                     <Border
                         x:Name="Bg"
                         Padding="{TemplateBinding Padding}"
-                        Background="{StaticResource BrushCardDeep}"
-                        BorderBrush="{StaticResource BrushBorder}"
+                        Background="{StaticResource BrushColor4}"
+                        BorderBrush="{StaticResource BrushBorderColor4}"
                         BorderThickness="1"
                         CornerRadius="16">
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -44,7 +44,7 @@
                                 Height="14"
                                 Margin="0,0,6,0"
                                 Data="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm0,22c-5.514,0-10-4.486-10-10S6.486,2,12,2s10,4.486,10,10-4.486,10-10,10Zm4-10c0,2.209-1.791,4-4,4s-4-1.791-4-4,1.791-4,4-4,4,1.791,4,4Z"
-                                Fill="{StaticResource BrushIcon}"
+                                Fill="{StaticResource SubText}"
                                 Stretch="Uniform" />
                             <TextBlock
                                 x:Name="Label"
@@ -52,19 +52,19 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="14"
                                 FontWeight="Medium"
-                                Foreground="{StaticResource BrushIcon}">
+                                Foreground="{StaticResource SubText}">
                                 Записати вручну
                             </TextBlock>
                         </StackPanel>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushIcon}" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
                             <Setter TargetName="Icon" Property="Fill" Value="White" />
                             <Setter TargetName="Label" Property="Foreground" Value="White" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushPressedDeep}" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushBorderColor4}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
