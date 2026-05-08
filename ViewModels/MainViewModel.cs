@@ -34,11 +34,12 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        var settings = AppSettings.Load();
-        var uploader = new GoogleDriveUploadService();
+        var settings  = AppSettings.Load();
+        var uploader  = new GoogleDriveUploadService();
+        var telegram  = new TelegramUploadService(settings);
 
-        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader);
-        _settingsVm = new SettingsViewModel(settings, uploader);
+        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader, telegram);
+        _settingsVm = new SettingsViewModel(settings, uploader, telegram);
 
         _currentViewModel = _homeVm;
 

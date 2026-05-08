@@ -64,6 +64,27 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_googleDriveFolderId == value) return; _googleDriveFolderId = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isTelegramEnabled = false;
+    public bool IsTelegramEnabled
+    {
+        get => _isTelegramEnabled;
+        set { if (_isTelegramEnabled == value) return; _isTelegramEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _telegramPhone = string.Empty;
+    public string TelegramPhone
+    {
+        get => _telegramPhone;
+        set { if (_telegramPhone == value) return; _telegramPhone = value; OnPropertyChanged(); Save(); }
+    }
+
+    private long _telegramChatId = 0;
+    public long TelegramChatId
+    {
+        get => _telegramChatId;
+        set { if (_telegramChatId == value) return; _telegramChatId = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()

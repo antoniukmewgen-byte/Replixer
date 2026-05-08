@@ -19,6 +19,7 @@ public class HomeViewModel : ViewModelBase
     private readonly Action<CallDialogViewModel?> _setDialog;
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _uploader;
+    private readonly TelegramUploadService _telegram;
     private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
@@ -39,11 +40,12 @@ public class HomeViewModel : ViewModelBase
         }
     }
 
-    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader)
+    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader, TelegramUploadService telegram)
     {
         _setDialog = setDialog;
         _settings  = settings;
         _uploader  = uploader;
+        _telegram  = telegram;
         _recorder  = new AudioRecordingService(settings);
 
         _callContent = new IdleCallViewModel(StartRecording);
@@ -175,6 +177,17 @@ public class HomeViewModel : ViewModelBase
         long fileSize   = fileExists ? new FileInfo(path).Length : -1;
         Debug.WriteLine($"[HomeVM] Temp file : {path}");
         Debug.WriteLine($"[HomeVM] Exists    : {fileExists}  |  Size: {fileSize} bytes");
+
+        if (_settings.IsTelegramEnabled && _telegram.IsAuthorized)
+        {
+            Debug.WriteLine($"[HomeVM] → sending to Telegram (chatId: {_settings.TelegramChatId}) …");
+            bool ok = await _telegram.SendFileAsync(path, _settings.TelegramChatId);
+            Debug.WriteLine(ok ? "[HomeVM] ✓ Telegram send OK" : "[HomeVM] ✗ Telegram send FAILED");
+        }
+        else
+        {
+            Debug.WriteLine($"[HomeVM] Telegram skip — enabled: {_settings.IsTelegramEnabled}, authorized: {_telegram.IsAuthorized}");
+        }
 
         if (_settings.IsGoogleDriveEnabled)
         {
