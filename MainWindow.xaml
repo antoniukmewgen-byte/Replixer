@@ -158,26 +158,6 @@
                     </TextBlock>
                 </StackPanel>
 
-                <StackPanel
-                    Grid.Column="1"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal">
-                    <Ellipse
-                        Width="10"
-                        Height="10"
-                        Margin="0,0,6,0"
-                        VerticalAlignment="Center"
-                        Fill="{StaticResource OtherBrushSubColor1}" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="12"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource Text}">
-                        Моніторинг активний
-                    </TextBlock>
-                </StackPanel>
-
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button x:Name="EmailButton" Style="{StaticResource HeaderButton}">
                         <Path
