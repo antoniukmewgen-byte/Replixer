@@ -32,6 +32,8 @@ public class HomeViewModel : ViewModelBase
     private string _lastDetectedApp = string.Empty;
 
     private ViewModelBase _callContent;
+    public RecordingsViewModel RecordingsVm => _recordingsVm;
+
     public ViewModelBase CallContent
     {
         get => _callContent;

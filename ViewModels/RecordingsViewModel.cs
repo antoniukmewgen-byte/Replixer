@@ -25,10 +25,17 @@ public class RecordingsViewModel : ViewModelBase
 
     public bool IsEmpty => Recordings.Count == 0;
 
+    public IReadOnlyList<RecordingEntry> RecentRecordings => Recordings.Take(4).ToList();
+
     public RecordingsViewModel()
     {
         Load();
-        Recordings.CollectionChanged += (_, _) => { Save(); OnPropertyChanged(nameof(IsEmpty)); };
+        Recordings.CollectionChanged += (_, _) =>
+        {
+            Save();
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(RecentRecordings));
+        };
     }
 
     // Must be called on the UI thread.

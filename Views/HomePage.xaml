@@ -3,7 +3,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:callViews="clr-namespace:EchoVault.Views.Call"
-    xmlns:callVm="clr-namespace:EchoVault.ViewModels.Call">
+    xmlns:callVm="clr-namespace:EchoVault.ViewModels.Call"
+    xmlns:models="clr-namespace:EchoVault.Models"
+    xmlns:views="clr-namespace:EchoVault.Views">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type callVm:IdleCallViewModel}">
             <callViews:IdleCallView />
@@ -34,7 +36,6 @@
         <!--  LastCallContent  -->
         <Border
             Grid.Row="1"
-            Padding="16"
             Background="{StaticResource BrushColor2}"
             BorderBrush="{StaticResource BrushBorderColor2}"
             BorderThickness="1"
@@ -44,8 +45,11 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+
+                <!--  Title  -->
                 <TextBlock
                     Grid.Row="0"
+                    Margin="16,16,16,0"
                     HorizontalAlignment="Left"
                     FontFamily="{StaticResource InterFont}"
                     FontSize="12"
@@ -53,10 +57,26 @@
                     Foreground="{StaticResource SubText}">
                     ОСТАННІ ЗАПИСИ
                 </TextBlock>
+
+                <!--  List  -->
+                <ItemsControl
+                    Grid.Row="1"
+                    Margin="16,0,16,16"
+                    ItemsSource="{Binding RecordingsVm.RecentRecordings}"
+                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource InverseBoolToVis}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:RecordingEntry}">
+                                <views:RecordingItemView />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!--  Empty state  -->
                 <StackPanel
                     Grid.Row="1"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}">
                     <Grid Width="60" Height="60">
                         <Ellipse Fill="{StaticResource BrushColor4}" Stroke="{StaticResource BrushBorderColor4}" />
                         <Path
@@ -127,6 +147,7 @@
                         </Border>
                     </StackPanel>
                 </StackPanel>
+
             </Grid>
         </Border>
     </Grid>
