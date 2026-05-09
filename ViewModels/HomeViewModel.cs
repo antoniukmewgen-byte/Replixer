@@ -1,5 +1,6 @@
 using EchoVault.Models;
 using EchoVault.Services;
+using RecordingStatus = EchoVault.Models.RecordingStatus;
 using EchoVault.Services.Audio;
 using EchoVault.Services.Recording;
 using EchoVault.Services.Upload;
@@ -20,6 +21,7 @@ public class HomeViewModel : ViewModelBase
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _uploader;
     private readonly TelegramUploadService _telegram;
+    private readonly RecordingsViewModel _recordingsVm;
     private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
@@ -40,13 +42,14 @@ public class HomeViewModel : ViewModelBase
         }
     }
 
-    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader, TelegramUploadService telegram)
+    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader, TelegramUploadService telegram, RecordingsViewModel recordingsVm)
     {
-        _setDialog = setDialog;
-        _settings  = settings;
-        _uploader  = uploader;
-        _telegram  = telegram;
-        _recorder  = new AudioRecordingService(settings);
+        _setDialog    = setDialog;
+        _settings     = settings;
+        _uploader     = uploader;
+        _telegram     = telegram;
+        _recordingsVm = recordingsVm;
+        _recorder     = new AudioRecordingService(settings);
 
         _callContent = new IdleCallViewModel(StartRecording);
 
@@ -160,6 +163,8 @@ public class HomeViewModel : ViewModelBase
         // Switch UI back to idle immediately — recording finishes in background
         CallContent = new IdleCallViewModel(StartRecording);
 
+        var entry = _recordingsVm.AddEntry(_lastDetectedApp);
+
         Debug.WriteLine("[HomeVM] ── StopRecording ──────────────────────────");
         Debug.WriteLine($"[HomeVM] IsGoogleDriveEnabled : {_settings.IsGoogleDriveEnabled}");
         Debug.WriteLine($"[HomeVM] IsGoogleAuthorized   : {_uploader.IsAuthorized}");
@@ -169,6 +174,7 @@ public class HomeViewModel : ViewModelBase
 
         if (path is null)
         {
+            entry.Status = RecordingStatus.Error;
             Debug.WriteLine("[HomeVM] ✗ StopRecordingAsync returned null — no file created");
             return;
         }
@@ -193,16 +199,18 @@ public class HomeViewModel : ViewModelBase
         {
             Debug.WriteLine("[HomeVM] → uploading to Google Drive …");
 
-            bool ok = await _uploader.UploadAsync(
+            string? driveUrl = await _uploader.UploadAsync(
                 path,
                 string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
                     ? null
                     : _settings.GoogleDriveFolderId);
 
-            if (ok)
+            if (driveUrl is not null)
             {
                 SafeDeleteFile(path);
                 Debug.WriteLine($"[HomeVM] ✓ Upload OK — temp file deleted");
+                if (!string.IsNullOrEmpty(driveUrl))
+                    entry.DriveUrl = driveUrl;
             }
             else
             {
@@ -216,6 +224,7 @@ public class HomeViewModel : ViewModelBase
             MoveToRecordingsFolder(path);
         }
 
+        entry.Status = RecordingStatus.Saved;
         Debug.WriteLine("[HomeVM] ───────────────────────────────────────────");
     }
 

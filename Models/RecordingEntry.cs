@@ -1,0 +1,77 @@
+using EchoVault.Infrastructure;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace EchoVault.Models;
+
+public enum RecordingStatus { Loading, Saved, Error }
+
+public class RecordingEntry : INotifyPropertyChanged
+{
+    public string   Platform  { get; }
+    public DateTime StartedAt { get; }
+
+    private string? _driveUrl;
+    public string? DriveUrl
+    {
+        get => _driveUrl;
+        set { if (_driveUrl == value) return; _driveUrl = value; OnPropertyChanged(); }
+    }
+
+    public ICommand OpenInDriveCommand { get; }
+
+    private RecordingStatus _status = RecordingStatus.Loading;
+    public RecordingStatus Status
+    {
+        get => _status;
+        set
+        {
+            if (_status == value) return;
+            _status = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(StatusText));
+        }
+    }
+
+    public string PlatformDisplayName => Platform switch
+    {
+        "WhatsApp.Root" => "WhatsApp",
+        _               => Platform
+    };
+
+    public string IconPath => Platform switch
+    {
+        "Telegram" => "/Assets/Icons/telegram.png",
+        "Viber"    => "/Assets/Icons/viber.png",
+        _          => "/Assets/Icons/whatsapp.png"
+    };
+
+    public string DateDisplay      => StartedAt.ToString("dd.MM.yyyy");
+    public string TimeOfDayDisplay => StartedAt.ToString("HH:mm");
+
+    public string StatusText => Status switch
+    {
+        RecordingStatus.Loading => "Завантаження...",
+        RecordingStatus.Saved   => "Збережено та відправлено",
+        RecordingStatus.Error   => "Помилка",
+        _                       => string.Empty
+    };
+
+    public RecordingEntry(string platform) : this(platform, DateTime.Now) { }
+
+    public RecordingEntry(string platform, DateTime startedAt)
+    {
+        Platform  = platform;
+        StartedAt = startedAt;
+        OpenInDriveCommand = new RelayCommand(
+            () => Process.Start(new ProcessStartInfo("chrome.exe", _driveUrl!) { UseShellExecute = true }),
+            () => !string.IsNullOrEmpty(_driveUrl));
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}

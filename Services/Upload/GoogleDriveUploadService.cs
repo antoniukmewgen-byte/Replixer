@@ -46,8 +46,9 @@ public class GoogleDriveUploadService
         }
     }
 
-    /// <summary>Uploads <paramref name="filePath"/> to <paramref name="folderId"/> on Google Drive.</summary>
-    public async Task<bool> UploadAsync(string filePath, string? folderId, CancellationToken ct = default)
+    /// <summary>Uploads <paramref name="filePath"/> to <paramref name="folderId"/> on Google Drive.
+    /// Returns the webViewLink on success, or null on failure.</summary>
+    public async Task<string?> UploadAsync(string filePath, string? folderId, CancellationToken ct = default)
     {
         Debug.WriteLine($"[GDrive] ── UploadAsync ─────────────────────────────");
         Debug.WriteLine($"[GDrive] File     : {filePath}");
@@ -122,7 +123,7 @@ public class GoogleDriveUploadService
                 Debug.WriteLine($"[GDrive] ✓ File name : {name}");
                 Debug.WriteLine($"[GDrive] ✓ View link : {link}");
                 UploadCompleted?.Invoke(link);
-                return true;
+                return link;
             }
 
             string error = result.Exception is not null
@@ -132,19 +133,19 @@ public class GoogleDriveUploadService
             if (result.Exception is not null)
                 Debug.WriteLine($"[GDrive]   StackTrace: {result.Exception.StackTrace}");
             UploadFailed?.Invoke(error);
-            return false;
+            return null;
         }
         catch (OperationCanceledException)
         {
             Debug.WriteLine("[GDrive] Upload cancelled");
-            return false;
+            return null;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[GDrive] ✗ Exception: {ex.GetType().Name}: {ex.Message}");
             Debug.WriteLine($"[GDrive]   StackTrace: {ex.StackTrace}");
             UploadFailed?.Invoke(ex.Message);
-            return false;
+            return null;
         }
         finally
         {

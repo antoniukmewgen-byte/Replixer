@@ -38,7 +38,7 @@ public class MainViewModel : ViewModelBase
         var uploader  = new GoogleDriveUploadService();
         var telegram  = new TelegramUploadService(settings);
 
-        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader, telegram);
+        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader, telegram, _recordingsVm);
         _settingsVm = new SettingsViewModel(settings, uploader, telegram);
 
         _currentViewModel = _homeVm;
