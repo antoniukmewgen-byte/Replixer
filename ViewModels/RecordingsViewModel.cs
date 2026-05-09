@@ -70,6 +70,7 @@ public class RecordingsViewModel : ViewModelBase
                 {
                     Status   = dto.Status,
                     DriveUrl = dto.DriveUrl,
+                    FilePath = dto.FilePath,
                 };
                 SubscribeEntry(entry);
                 Recordings.Add(entry);
@@ -89,7 +90,7 @@ public class RecordingsViewModel : ViewModelBase
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SavePath)!);
             var dtos = Recordings
-                .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl))
+                .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath))
                 .ToList();
             File.WriteAllText(SavePath, JsonSerializer.Serialize(dtos, JsonOptions));
         }
@@ -100,5 +101,6 @@ public class RecordingsViewModel : ViewModelBase
         string          Platform,
         DateTime        StartedAt,
         RecordingStatus Status,
-        string?         DriveUrl);
+        string?         DriveUrl,
+        string?         FilePath);
 }

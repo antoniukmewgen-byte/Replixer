@@ -20,7 +20,15 @@ public class RecordingEntry : INotifyPropertyChanged
         set { if (_driveUrl == value) return; _driveUrl = value; OnPropertyChanged(); }
     }
 
-    public ICommand OpenInDriveCommand { get; }
+    private string? _filePath;
+    public string? FilePath
+    {
+        get => _filePath;
+        set { if (_filePath == value) return; _filePath = value; OnPropertyChanged(); }
+    }
+
+    public ICommand OpenInDriveCommand    { get; }
+    public ICommand OpenInExplorerCommand { get; }
 
     private RecordingStatus _status = RecordingStatus.Loading;
     public RecordingStatus Status
@@ -73,6 +81,10 @@ public class RecordingEntry : INotifyPropertyChanged
         OpenInDriveCommand = new RelayCommand(
             () => Process.Start(new ProcessStartInfo("chrome.exe", _driveUrl!) { UseShellExecute = true }),
             () => !string.IsNullOrEmpty(_driveUrl));
+
+        OpenInExplorerCommand = new RelayCommand(
+            () => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_filePath}\"") { UseShellExecute = true }),
+            () => !string.IsNullOrEmpty(_filePath));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

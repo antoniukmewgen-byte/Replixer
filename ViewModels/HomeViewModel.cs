@@ -217,20 +217,20 @@ public class HomeViewModel : ViewModelBase
             else
             {
                 Debug.WriteLine("[HomeVM] ✗ Upload FAILED — falling back to local save");
-                MoveToRecordingsFolder(path);
+                entry.FilePath = MoveToRecordingsFolder(path);
             }
         }
         else
         {
             Debug.WriteLine("[HomeVM] → Google Drive disabled, saving locally …");
-            MoveToRecordingsFolder(path);
+            entry.FilePath = MoveToRecordingsFolder(path);
         }
 
         entry.Status = RecordingStatus.Saved;
         Debug.WriteLine("[HomeVM] ───────────────────────────────────────────");
     }
 
-    private void MoveToRecordingsFolder(string tempPath)
+    private string? MoveToRecordingsFolder(string tempPath)
     {
         try
         {
@@ -238,10 +238,12 @@ public class HomeViewModel : ViewModelBase
             string dest = Path.Combine(_settings.RecordingsFolder, Path.GetFileName(tempPath));
             File.Move(tempPath, dest, overwrite: true);
             Debug.WriteLine($"[HomeVM] Moved → {dest}");
+            return dest;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[HomeVM] Move failed: {ex.Message}");
+            return null;
         }
     }
 
