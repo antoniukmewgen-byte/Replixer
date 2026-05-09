@@ -9,7 +9,7 @@
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="12">
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
             <StackPanel Margin="0,16,0,16" Orientation="Vertical">
                 <TextBlock
                     FontFamily="{StaticResource InterFont}"
@@ -44,6 +44,7 @@
                                         CornerRadius="8">
                                         <Border.Style>
                                             <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{StaticResource BrushColor4}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Platform}" Value="Telegram">
                                                         <Setter Property="Background" Value="{StaticResource BrushTelegram}" />
@@ -57,12 +58,26 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <Image
-                                            Width="18"
-                                            Height="18"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Source="{Binding IconPath}" />
+                                        <Grid>
+                                            <!--  Platform PNG — hidden for manual  -->
+                                            <Image
+                                                Width="18"
+                                                Height="18"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Source="{Binding IconPath}"
+                                                Visibility="{Binding IsManual, Converter={StaticResource InverseBoolToVis}}" />
+                                            <!--  Mic icon — shown for manual  -->
+                                            <Path
+                                                Width="16"
+                                                Height="16"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Data="M12,14c2.206,0,4-1.794,4-4V4c0-2.206-1.794-4-4-4S8,1.794,8,4v6C8,12.206,9.794,14,12,14zM18,10c0,3.309-2.691,6-6,6s-6-2.691-6-6H4c0,4.072,3.061,7.436,7,7.931V20H9v2h6v-2h-2v-2.069C16.939,17.436,20,14.072,20,10H18z"
+                                                Fill="{StaticResource SubText}"
+                                                Stretch="Uniform"
+                                                Visibility="{Binding IsManual, Converter={StaticResource BoolToVis}}" />
+                                        </Grid>
                                     </Border>
 
                                     <!--  Text  -->
