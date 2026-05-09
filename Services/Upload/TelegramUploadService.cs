@@ -70,22 +70,17 @@ public class TelegramUploadService
                 return false;
             }
 
-            var chats = await _client.Messages_GetAllChats();
-            if (!chats.chats.TryGetValue(chatId, out var chat))
-            {
-                Debug.WriteLine($"[TG] ✗ Chat {chatId} not found. Available chats ({chats.chats.Count}):");
-                foreach (var (id, c) in chats.chats)
-                    Debug.WriteLine($"[TG]   {id} → {c}");
+            TL.InputPeer? peer = await ResolvePeerAsync(chatId);
+            if (peer == null)
                 return false;
-            }
 
-            Debug.WriteLine($"[TG] Chat found: {chat}");
+            Debug.WriteLine($"[TG] Peer resolved: {peer}");
             Debug.WriteLine("[TG] Uploading file…");
 
             var inputFile = await _client.UploadFileAsync(filePath);
             var fileName  = Path.GetFileName(filePath);
 
-            await _client.SendMediaAsync(chat, $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg");
+            await _client.SendMediaAsync(peer, $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg");
 
             Debug.WriteLine("[TG] ✓ Sent successfully");
             return true;
@@ -101,6 +96,33 @@ public class TelegramUploadService
         }
     }
 
+    private async Task<TL.InputPeer?> ResolvePeerAsync(long chatId)
+    {
+        // Groups & channels
+        var allChats = await _client!.Messages_GetAllChats();
+        if (allChats.chats.TryGetValue(chatId, out var chatBase))
+            return chatBase;
+
+        Debug.WriteLine($"[TG] Not found in GetAllChats ({allChats.chats.Count} entries), trying GetAllDialogs…");
+
+        // Private chats / bots / users
+        var dialogs = await _client.Messages_GetAllDialogs();
+        if (dialogs.chats.TryGetValue(chatId, out var dialogChat))
+            return dialogChat;
+        if (dialogs.users.TryGetValue(chatId, out var user))
+            return user;
+
+        Debug.WriteLine($"[TG] ✗ Peer {chatId} not found in any source.");
+        Debug.WriteLine($"[TG]   Chats in GetAllChats    : {allChats.chats.Count}");
+        Debug.WriteLine($"[TG]   Chats in GetAllDialogs  : {dialogs.chats.Count}");
+        Debug.WriteLine($"[TG]   Users in GetAllDialogs  : {dialogs.users.Count}");
+        foreach (var (id, c) in allChats.chats)
+            Debug.WriteLine($"[TG]   chat  {id} → {c}");
+        foreach (var (id, u) in dialogs.users)
+            Debug.WriteLine($"[TG]   user  {id} → {u}");
+        return null;
+    }
+
     // ── Private ───────────────────────────────────────────────────────────────
 
     private async Task EnsureClientAsync()
@@ -108,8 +130,17 @@ public class TelegramUploadService
         if (_client != null) return;
         if (!IsAuthorized) return;
 
-        _client = new WTelegram.Client(ConfigProvider);
-        await _client.LoginUserIfNeeded();
+        try
+        {
+            _client = new WTelegram.Client(ConfigProvider);
+            await _client.LoginUserIfNeeded();
+            Debug.WriteLine("[TG] Session restored from file");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[TG] ✗ Failed to restore session: {ex.Message}");
+            _client = null;
+        }
     }
 
     private string? ConfigProvider(string what) => what switch
