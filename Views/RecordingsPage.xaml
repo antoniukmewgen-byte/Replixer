@@ -2,5 +2,262 @@
     x:Class="EchoVault.Views.RecordingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid />
+    <Border
+        Padding="16,0,16,0"
+        Background="{StaticResource BrushColor2}"
+        BorderBrush="{StaticResource BrushBorderColor2}"
+        BorderThickness="1"
+        CornerRadius="12">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,16,0,16" Orientation="Vertical">
+                <TextBlock
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource SubText}">
+                    ВСІ ВАШІ ЗАПИСИ
+                </TextBlock>
+                <Border
+                    Margin="0,12,0,0"
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushTelegram}"
+                            CornerRadius="8">
+                            <Image
+                                Width="18"
+                                Height="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Source="/Assets/Icons/telegram.png" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                Telegram
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Сьогодні - 18:45
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Border
+                                Padding="12,8"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource OtherBrushColor4}"
+                                BorderBrush="{StaticResource OtherBrushSubColor4}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource OtherBrushSubColor4}"
+                                    Text="Помилка" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Margin="0,12,0,0"
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushViber}"
+                            CornerRadius="8">
+                            <Image
+                                Width="18"
+                                Height="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Source="/Assets/Icons/viber.png" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                Viber
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Сьогодні - 18:45
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Border
+                                Padding="12,8"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource OtherBrushColor3}"
+                                BorderBrush="{StaticResource OtherBrushSubColor3}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource OtherBrushSubColor3}"
+                                    Text="Заванетаження..." />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Margin="0,12,0,0"
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Icon  -->
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource BrushWhatsApp}"
+                            CornerRadius="8">
+                            <Image
+                                Width="18"
+                                Height="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Source="/Assets/Icons/whatsapp.png" />
+                        </Border>
+
+                        <!--  Text  -->
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                WhatsApp
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Сьогодні - 18:45
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button
+                                Margin="0,0,12,0"
+                                Padding="8,8"
+                                VerticalAlignment="Center"
+                                Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="{StaticResource BrushColor4}"
+                                            BorderBrush="{StaticResource BrushBorderColor4}"
+                                            BorderThickness="1"
+                                            CornerRadius="50">
+                                            <Path
+                                                Width="17"
+                                                Height="17"
+                                                Data="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm4.404,13.873l-5.212,2.854c-.325.183-.683.274-1.041.274-.373,0-.747-.099-1.087-.297-.667-.39-1.064-1.083-1.064-1.855v-5.699c0-.772.397-1.465,1.064-1.855.665-.389,1.465-.396,2.138-.017l5.192,2.843c.696.391,1.105,1.091,1.105,1.878s-.409,1.487-1.096,1.873Zm-.904-1.873c0,.087-.058.119-.066.125l-5.212,2.855c-.019.01-.077.042-.147-.001-.074-.043-.074-.107-.074-.128v-5.699c0-.021,0-.085.074-.128.027-.016.052-.021.074-.021.036,0,.065.016.083.026l5.192,2.844c.019.011.076.043.076.13Z"
+                                                Fill="{StaticResource SubText}"
+                                                Stretch="Uniform" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Border
+                                Padding="12,8"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource OtherBrushColor1}"
+                                BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource OtherBrushSubColor1}"
+                                    Text="Збережено та відправлено" />
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>
