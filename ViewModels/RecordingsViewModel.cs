@@ -23,10 +23,12 @@ public class RecordingsViewModel : ViewModelBase
 
     public ObservableCollection<RecordingEntry> Recordings { get; } = new();
 
+    public bool IsEmpty => Recordings.Count == 0;
+
     public RecordingsViewModel()
     {
         Load();
-        Recordings.CollectionChanged += (_, _) => Save();
+        Recordings.CollectionChanged += (_, _) => { Save(); OnPropertyChanged(nameof(IsEmpty)); };
     }
 
     // Must be called on the UI thread.
