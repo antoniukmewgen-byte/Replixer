@@ -9,13 +9,14 @@ namespace Replixer;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainViewModel vm)
     {
         InitializeComponent();
-        this.Closing += MainWindow_Closing;
-        var vm = new MainViewModel();
+
         vm.PropertyChanged += OnViewModelPropertyChanged;
         DataContext = vm;
+
+        Closing += (_, e) => { e.Cancel = true; Hide(); };
 
         PreviewMouseDown += (_, _) =>
         {
@@ -23,7 +24,7 @@ public partial class MainWindow : Window
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
         };
 
-        this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
+        MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -32,23 +33,19 @@ public partial class MainWindow : Window
 
         var button = ((MainViewModel)DataContext).CurrentViewModel switch
         {
-            HomeViewModel => HomeButton,
+            HomeViewModel       => HomeButton,
             RecordingsViewModel => RecordingsButton,
-            SettingsViewModel => SettingsButton,
-            ProfileViewModel => ProfileButton,
-            _ => null
+            SettingsViewModel   => SettingsButton,
+            ProfileViewModel    => ProfileButton,
+            _                   => null
         };
 
         if (button is null) return;
 
         var targetY = button.TransformToAncestor(SidebarGrid)
                             .Transform(new Point(0, 0)).Y;
-        AnimateIndicator(targetY);
-    }
 
-    private void AnimateIndicator(double toY)
-    {
-        var animation = new DoubleAnimation(toY, TimeSpan.FromMilliseconds(250))
+        var animation = new DoubleAnimation(targetY, TimeSpan.FromMilliseconds(250))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
         };
@@ -64,24 +61,10 @@ public partial class MainWindow : Window
     private void MinimizeButton_Click(object sender, RoutedEventArgs e) =>
         WindowState = WindowState.Minimized;
 
-    private void FullscreenButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (this.WindowState == WindowState.Maximized)
-        {
-            this.WindowState = WindowState.Normal;
-        }
-        else
-        {
-            this.WindowState = WindowState.Maximized;
-        }
-    }
+    private void FullscreenButton_Click(object sender, RoutedEventArgs e) =>
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e) =>
-        Hide();
-
-    private void MainWindow_Closing(object? sender, CancelEventArgs e)
-    {
-        e.Cancel = true;
-        this.Hide();
-    }
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => Hide();
 }

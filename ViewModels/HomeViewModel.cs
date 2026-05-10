@@ -9,18 +9,18 @@ using Replixer.ViewModels.Call;
 using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using RecordingStatus = Replixer.Models.RecordingStatus;
 
 namespace Replixer.ViewModels;
 
-public class HomeViewModel : ViewModelBase
+public sealed class HomeViewModel : ViewModelBase, IDisposable
 {
-    private readonly Action<CallDialogViewModel?> _setDialog;
+    // MainViewModel subscribes to wire up the dialog overlay.
+    public event Action<CallDialogViewModel?>? DialogRequested;
+
     private readonly AppSettings _settings;
-    private readonly GoogleDriveUploadService _uploader;
-    private readonly TelegramUploadService _telegram;
+    private readonly IUploadOrchestrator _orchestrator;
     private readonly RecordingsViewModel _recordingsVm;
     private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
@@ -31,6 +31,17 @@ public class HomeViewModel : ViewModelBase
     private bool _hasActiveDialog;
     private string _lastDetectedApp = string.Empty;
     private DateTime? _recordingStartedAt;
+
+    private static readonly string[] CallHints =
+    [
+        "1. Привітання, тест на дебіла та встановлення рамок",
+        "2. Первинний анамнез та підводимо лінію",
+        "3. Вторинний анамнез, розкриваємо досвід клієнта через техніку \"ближче-далі\"",
+        "4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува",
+        "5. Прийом \" чашка чаю \" + \" ваш кейс унікальний, антиприклад щойно був порожній кейс \"",
+        "6. Ставимо дедлайн, вибираємо день і час",
+        "7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити",
+    ];
 
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
@@ -45,12 +56,10 @@ public class HomeViewModel : ViewModelBase
         }
     }
 
-    public HomeViewModel(Action<CallDialogViewModel?> setDialog, AppSettings settings, GoogleDriveUploadService uploader, TelegramUploadService telegram, RecordingsViewModel recordingsVm)
+    public HomeViewModel(AppSettings settings, IUploadOrchestrator orchestrator, RecordingsViewModel recordingsVm)
     {
-        _setDialog    = setDialog;
         _settings     = settings;
-        _uploader     = uploader;
-        _telegram     = telegram;
+        _orchestrator = orchestrator;
         _recordingsVm = recordingsVm;
         _recorder     = new AudioRecordingService(settings);
 
@@ -83,7 +92,6 @@ public class HomeViewModel : ViewModelBase
 
         Unsubscribe(_activeMonitor);
         _activeMonitor.Stop();
-
         _activeMonitor = next;
         Subscribe(_activeMonitor);
         _activeMonitor.Start();
@@ -111,13 +119,11 @@ public class HomeViewModel : ViewModelBase
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             _lastDetectedApp = app;
-
-            if (_isRecording) return;
-            if (_hasActiveDialog) return;
+            if (_isRecording || _hasActiveDialog) return;
 
             ShowDialog(new CallDialogViewModel(
-                appName: app,
-                message: "Виявлено дзвінок. Бажаєте розпочати запис розмови?",
+                appName:        app,
+                message:        "Виявлено дзвінок. Бажаєте розпочати запис розмови?",
                 primaryLabel:   "Почати запис", onPrimary:   StartRecording,
                 secondaryLabel: "Пропустити",   onSecondary: DismissDialog
             ));
@@ -128,17 +134,12 @@ public class HomeViewModel : ViewModelBase
     {
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
-            if (!_isRecording)
-            {
-                DismissDialog();
-                return;
-            }
-
+            if (!_isRecording) { DismissDialog(); return; }
             if (_hasActiveDialog) return;
 
             ShowDialog(new CallDialogViewModel(
-                appName: _lastDetectedApp,
-                message: "Дзвінок завершено. Зупинити запис?",
+                appName:        _lastDetectedApp,
+                message:        "Дзвінок завершено. Зупинити запис?",
                 primaryLabel:   "Завершити запис",  onPrimary:   StopRecording,
                 secondaryLabel: "Продовжити запис", onSecondary: DismissDialog,
                 recordingStartedAt: _recordingStartedAt
@@ -151,126 +152,46 @@ public class HomeViewModel : ViewModelBase
     private void StartRecording()
     {
         DismissDialog();
-        _isRecording = true;
+        _isRecording        = true;
         _recordingStartedAt = DateTime.Now;
 
-        bool started = _recorder.StartRecording(_lastDetectedApp);
-        if (!started)
+        if (!_recorder.StartRecording(_lastDetectedApp))
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
 
         CallContent = new ActiveCallViewModel(StopRecording);
-
-        var hints = new[] { 
-            "1. Привітання, тест на дебіла та встановлення рамок",
-            "2. Первинний анамнез та підводимо лінію",
-            "3. Вторинний анамнез, розкриваємо досвід клієнта через техніку \"ближче-далі\"",
-            "4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува",
-            "5. Прийом \" чашка чаю \" + \" ваш кейс унікальний, антиприклад щойно був порожній кейс \"",
-            "6. Ставимо дедлайн, вибираємо день і час",
-            "7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити",
-        };
-
-        App.WindowManager.ShowCheatSheet(hints);
+        App.WindowManager.ShowCheatSheet(CallHints);
     }
 
     private async void StopRecording()
     {
         DismissDialog();
-        _isRecording = false;
+        _isRecording        = false;
         _recordingStartedAt = null;
-
-        // Switch UI back to idle immediately — recording finishes in background
-        CallContent = new IdleCallViewModel(StartRecording);
+        CallContent         = new IdleCallViewModel(StartRecording);
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
-
-        Debug.WriteLine("[HomeVM] ── StopRecording ──────────────────────────");
-        Debug.WriteLine($"[HomeVM] IsGoogleDriveEnabled : {_settings.IsGoogleDriveEnabled}");
-        Debug.WriteLine($"[HomeVM] GoogleDriveFolderId  : '{_settings.GoogleDriveFolderId}'");
-        Debug.WriteLine($"[HomeVM] UserFolderId         : '{_settings.UserFolderId}'");
-
-        string? path = await _recorder.StopRecordingAsync();
-        App.WindowManager.CloseCheatSheet();
-
-        if (path is null)
-        {
-            entry.Status = RecordingStatus.Error;
-            Debug.WriteLine("[HomeVM] ✗ StopRecordingAsync returned null — no file created");
-            return;
-        }
-
-        bool fileExists = File.Exists(path);
-        long fileSize   = fileExists ? new FileInfo(path).Length : -1;
-        Debug.WriteLine($"[HomeVM] Temp file : {path}");
-        Debug.WriteLine($"[HomeVM] Exists    : {fileExists}  |  Size: {fileSize} bytes");
-
-        if (_settings.IsTelegramEnabled && _telegram.IsAuthorized)
-        {
-            Debug.WriteLine($"[HomeVM] → sending to Telegram (chatId: {_settings.TelegramChatId}) …");
-            bool ok = await _telegram.SendFileAsync(path, _settings.TelegramChatId);
-            Debug.WriteLine(ok ? "[HomeVM] ✓ Telegram send OK" : "[HomeVM] ✗ Telegram send FAILED");
-        }
-        else
-        {
-            Debug.WriteLine($"[HomeVM] Telegram skip — enabled: {_settings.IsTelegramEnabled}, authorized: {_telegram.IsAuthorized}");
-        }
-
-        if (_settings.IsGoogleDriveEnabled)
-        {
-            Debug.WriteLine("[HomeVM] → uploading to Google Drive …");
-
-            // Prefer user's personal subfolder; fall back to the main folder
-            string? targetFolderId = !string.IsNullOrWhiteSpace(_settings.UserFolderId)
-                ? _settings.UserFolderId
-                : string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
-                    ? null
-                    : _settings.GoogleDriveFolderId;
-
-            string? driveUrl = await _uploader.UploadAsync(path, targetFolderId);
-
-            if (driveUrl is not null)
-            {
-                SafeDeleteFile(path);
-                Debug.WriteLine($"[HomeVM] ✓ Upload OK — temp file deleted");
-                if (!string.IsNullOrEmpty(driveUrl))
-                    entry.DriveUrl = driveUrl;
-            }
-            else
-            {
-                Debug.WriteLine("[HomeVM] ✗ Upload FAILED — falling back to local save");
-                entry.FilePath = MoveToRecordingsFolder(path);
-            }
-        }
-        else
-        {
-            Debug.WriteLine("[HomeVM] → Google Drive disabled, saving locally …");
-            entry.FilePath = MoveToRecordingsFolder(path);
-        }
-
-        entry.Status = RecordingStatus.Saved;
-        Debug.WriteLine("[HomeVM] ───────────────────────────────────────────");
-    }
-
-    private string? MoveToRecordingsFolder(string tempPath)
-    {
         try
         {
-            Directory.CreateDirectory(_settings.RecordingsFolder);
-            string dest = Path.Combine(_settings.RecordingsFolder, Path.GetFileName(tempPath));
-            File.Move(tempPath, dest, overwrite: true);
-            Debug.WriteLine($"[HomeVM] Moved → {dest}");
-            return dest;
+            string? path = await _recorder.StopRecordingAsync();
+            App.WindowManager.CloseCheatSheet();
+
+            if (path is null)
+            {
+                entry.Status = RecordingStatus.Error;
+                return;
+            }
+
+            var result = await _orchestrator.UploadAsync(path);
+            entry.DriveUrl = result.DriveUrl;
+            entry.FilePath = result.LocalPath;
+            entry.Status   = RecordingStatus.Saved;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[HomeVM] Move failed: {ex.Message}");
-            return null;
+            Debug.WriteLine($"[HomeVM] StopRecording error: {ex.Message}");
+            App.WindowManager.CloseCheatSheet();
+            entry.Status = RecordingStatus.Error;
         }
-    }
-
-    private static void SafeDeleteFile(string path)
-    {
-        try { File.Delete(path); } catch { }
     }
 
     // ── Dialog helpers ────────────────────────────────────────────────────────
@@ -278,12 +199,24 @@ public class HomeViewModel : ViewModelBase
     private void ShowDialog(CallDialogViewModel vm)
     {
         _hasActiveDialog = true;
-        _setDialog(vm);
+        DialogRequested?.Invoke(vm);
     }
 
     private void DismissDialog()
     {
         _hasActiveDialog = false;
-        _setDialog(null);
+        DialogRequested?.Invoke(null);
+    }
+
+    // ── IDisposable ───────────────────────────────────────────────────────────
+
+    public void Dispose()
+    {
+        _settings.PropertyChanged -= OnSettingsChanged;
+        Unsubscribe(_activeMonitor);
+        _activeMonitor.Stop();
+        _windowMonitor.Dispose();
+        _micMonitor.Dispose();
+        _recorder.Dispose();
     }
 }

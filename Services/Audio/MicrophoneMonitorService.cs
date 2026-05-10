@@ -8,7 +8,7 @@ namespace Replixer.Services.Audio;
 public class MicrophoneMonitorService : IMonitorService
 {
     private Timer? _pollTimer;
-    private bool _isCallActive = false;
+    private volatile bool _isCallActive;
     private string _activeApp = string.Empty;
 
     public event Action<string>? CallDetected;
@@ -18,7 +18,7 @@ public class MicrophoneMonitorService : IMonitorService
 
     public void Start()
     {
-        _pollTimer = new Timer(PollCallback, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(1000));
+        _pollTimer = new Timer(PollCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
     private void PollCallback(object? state)

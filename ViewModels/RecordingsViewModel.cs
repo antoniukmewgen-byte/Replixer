@@ -19,6 +19,7 @@ public class RecordingsViewModel : ViewModelBase
         Converters    = { new JsonStringEnumConverter() },
     };
 
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
     private bool _loading;
 
     public ObservableCollection<RecordingEntry> Recordings { get; } = new();
@@ -32,9 +33,9 @@ public class RecordingsViewModel : ViewModelBase
         Load();
         Recordings.CollectionChanged += (_, _) =>
         {
-            Save();
             OnPropertyChanged(nameof(IsEmpty));
             OnPropertyChanged(nameof(RecentRecordings));
+            ScheduleSave();
         };
     }
 
@@ -48,7 +49,7 @@ public class RecordingsViewModel : ViewModelBase
     }
 
     private void SubscribeEntry(RecordingEntry entry)
-        => entry.PropertyChanged += (_, _) => Save();
+        => entry.PropertyChanged += (_, _) => ScheduleSave();
 
     // ── Persistence ───────────────────────────────────────────────────────────
 
@@ -83,18 +84,34 @@ public class RecordingsViewModel : ViewModelBase
         }
     }
 
-    private void Save()
+    private void ScheduleSave()
     {
         if (_loading) return;
+
+        // Snapshot on the UI thread, write asynchronously — never blocks the UI.
+        var dtos = Recordings
+            .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath))
+            .ToList();
+
+        _ = SaveAsync(dtos);
+    }
+
+    private async Task SaveAsync(List<RecordingDto> dtos)
+    {
+        // Drop the write if a previous save is still in progress —
+        // the next change will trigger another ScheduleSave anyway.
+        if (!await _saveLock.WaitAsync(millisecondsTimeout: 0)) return;
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SavePath)!);
-            var dtos = Recordings
-                .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath))
-                .ToList();
-            File.WriteAllText(SavePath, JsonSerializer.Serialize(dtos, JsonOptions));
+            var json = JsonSerializer.Serialize(dtos, JsonOptions);
+            await File.WriteAllTextAsync(SavePath, json);
         }
         catch { }
+        finally
+        {
+            _saveLock.Release();
+        }
     }
 
     private record RecordingDto(

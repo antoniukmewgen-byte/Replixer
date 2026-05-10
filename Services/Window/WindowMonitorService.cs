@@ -1,5 +1,6 @@
 using Replixer.Services.Window.Detectors;
 using FlaUI.UIA3;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -8,7 +9,7 @@ namespace Replixer.Services.Window;
 public class WindowMonitorService : IMonitorService
 {
     private readonly IReadOnlyList<ICallDetector> _detectors;
-    private readonly Dictionary<string, bool> _callState = new();
+    private readonly ConcurrentDictionary<string, bool> _callState = new();
     private UIA3Automation? _automation;
     private Timer? _pollTimer;
 
@@ -101,6 +102,10 @@ public class WindowMonitorService : IMonitorService
             catch (Exception ex)
             {
                 Debug.WriteLine($"[WindowMonitor] [{detector.ProcessName}] EnumWindows error: {ex.Message}");
+            }
+            finally
+            {
+                process.Dispose();
             }
 
             if (found) return true;

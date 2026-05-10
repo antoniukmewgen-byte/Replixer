@@ -8,25 +8,10 @@ public class TelegramCallDetector : ICallDetector
 
     public bool IsCallWindow(AutomationElement element)
     {
-        return HasClassName(element, "class Ui::CallButton");
-    }
-
-    private bool HasClassName(AutomationElement parent, string className, int depth = 0)
-    {
-        if (depth > 10) return false;
         try
         {
-            foreach (var child in parent.FindAllChildren())
-            {
-                try
-                {
-                    if (child.ClassName == className) return true;
-                    if (HasClassName(child, className, depth + 1)) return true;
-                }
-                catch { }
-            }
+            return element.FindFirstDescendant(cf => cf.ByClassName("class Ui::CallButton")) is not null;
         }
-        catch { }
-        return false;
+        catch { return false; }
     }
 }

@@ -117,7 +117,17 @@ public class AppSettings : INotifyPropertyChanged
         return new AppSettings();
     }
 
+    private Timer? _saveDebounce;
+
     private void Save()
+    {
+        // Debounce: coalesce rapid successive saves (e.g. user typing in a text field)
+        // into a single write 500 ms after the last change.
+        _saveDebounce?.Dispose();
+        _saveDebounce = new Timer(_ => WriteToDisk(), null, dueTime: 500, period: Timeout.Infinite);
+    }
+
+    private void WriteToDisk()
     {
         try
         {

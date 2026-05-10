@@ -81,7 +81,7 @@ public class RecordingEntry : INotifyPropertyChanged
         Platform  = platform;
         StartedAt = startedAt;
         OpenInDriveCommand = new RelayCommand(
-            () => Process.Start(new ProcessStartInfo("chrome.exe", _driveUrl!) { UseShellExecute = true }),
+            () => Process.Start(new ProcessStartInfo(_driveUrl!) { UseShellExecute = true }),
             () => !string.IsNullOrEmpty(_driveUrl));
 
         OpenInExplorerCommand = new RelayCommand(

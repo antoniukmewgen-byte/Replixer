@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace Replixer.ViewModels;
 
-public class SettingsViewModel : ViewModelBase
+public sealed class SettingsViewModel : ViewModelBase, IDisposable
 {
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _uploader;
@@ -179,6 +179,10 @@ public class SettingsViewModel : ViewModelBase
         _telegram.Logout();
         IsTelegramAuthorized = false;
     }
+
+    // ── IDisposable ───────────────────────────────────────────────────────────
+
+    public void Dispose() => _settings.PropertyChanged -= OnSettingsChanged;
 
     // ── Settings change relay ─────────────────────────────────────────────────
 

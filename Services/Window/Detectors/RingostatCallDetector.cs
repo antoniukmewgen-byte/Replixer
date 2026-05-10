@@ -64,15 +64,19 @@ public class RingostatCallDetector : ICallDetector
                 int b = (int)((color >> 16) & 0xFF);
 
                 bool isBlue = b > 150 && b > r * 2;
+#if DEBUG
                 Debug.WriteLine($"[Pixel] ({sampleX,4}, {dy,4}) R={r,3} G={g,3} B={b,3}  {(isBlue ? "← CALL BLUE" : "")}");
+#endif
                 if (isBlue) hits++;
                 total++;
             }
 
             bool isCall = hits >= RequiredHits;
+#if DEBUG
             Debug.WriteLine($"[Pixel] hits={hits}/{total} → isCall={isCall}");
             if (isCall)
                 Debug.WriteLine($"[Pixel] >>> CALL DETECTED: {ProcessName}");
+#endif
 
             return isCall;
         }

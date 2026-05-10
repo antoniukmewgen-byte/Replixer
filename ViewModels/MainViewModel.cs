@@ -1,12 +1,10 @@
 using Replixer.Infrastructure;
-using Replixer.Models;
-using Replixer.Services.Upload;
 using Replixer.ViewModels.Dialogs;
 using System.Windows.Input;
 
 namespace Replixer.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public sealed class MainViewModel : ViewModelBase, IDisposable
 {
     private ViewModelBase _currentViewModel;
     public ViewModelBase CurrentViewModel
@@ -22,30 +20,35 @@ public class MainViewModel : ViewModelBase
         private set => SetField(ref _dialog, value);
     }
 
-    public ICommand NavigateHomeCommand { get; }
+    public ICommand NavigateHomeCommand       { get; }
     public ICommand NavigateRecordingsCommand { get; }
-    public ICommand NavigateSettingsCommand { get; }
-    public ICommand NavigateProfileCommand { get; }
+    public ICommand NavigateSettingsCommand   { get; }
+    public ICommand NavigateProfileCommand    { get; }
 
     private readonly HomeViewModel _homeVm;
-    private readonly RecordingsViewModel _recordingsVm = new();
     private readonly SettingsViewModel _settingsVm;
-    private readonly ProfileViewModel _profileVm = new();
 
-    public MainViewModel()
+    public MainViewModel(
+        HomeViewModel homeVm,
+        RecordingsViewModel recordingsVm,
+        SettingsViewModel settingsVm,
+        ProfileViewModel profileVm)
     {
-        var settings  = AppSettings.Load();
-        var uploader  = new GoogleDriveUploadService();
-        var telegram  = new TelegramUploadService(settings);
+        _homeVm     = homeVm;
+        _settingsVm = settingsVm;
 
-        _homeVm     = new HomeViewModel(dialog => Dialog = dialog, settings, uploader, telegram, _recordingsVm);
-        _settingsVm = new SettingsViewModel(settings, uploader, telegram);
-
+        _homeVm.DialogRequested += vm => Dialog = vm;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
-        NavigateRecordingsCommand = new RelayCommand(() => CurrentViewModel = _recordingsVm);
+        NavigateRecordingsCommand = new RelayCommand(() => CurrentViewModel = recordingsVm);
         NavigateSettingsCommand   = new RelayCommand(() => CurrentViewModel = _settingsVm);
-        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = _profileVm);
+        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = profileVm);
+    }
+
+    public void Dispose()
+    {
+        _homeVm.Dispose();
+        _settingsVm.Dispose();
     }
 }

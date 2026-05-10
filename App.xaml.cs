@@ -1,33 +1,62 @@
-﻿using Replixer.Services.Manager;
-using System.Configuration;
-using System.Data;
+using Microsoft.Extensions.DependencyInjection;
+using Replixer.Models;
+using Replixer.Services.Manager;
+using Replixer.Services.Upload;
+using Replixer.ViewModels;
 using System.Windows;
-using WpfApp = System.Windows.Application;
 
-namespace Replixer
+namespace Replixer;
+
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : WpfApp
+    public static IWindowManager WindowManager { get; } = new WindowManager();
+
+    private ServiceProvider? _services;
+    private Hardcodet.Wpf.TaskbarNotification.TaskbarIcon? _notifyIcon;
+
+    protected override void OnStartup(StartupEventArgs e)
     {
-        public static IWindowManager WindowManager { get; } = new WindowManager();
+        base.OnStartup(e);
 
-        private Hardcodet.Wpf.TaskbarNotification.TaskbarIcon _notifyIcon;
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
+        _services = BuildServices();
 
-            // Знаходимо іконку в ресурсах та ініціалізуємо її
-            _notifyIcon = (Hardcodet.Wpf.TaskbarNotification.TaskbarIcon)FindResource("NotifyIcon");
-        }
+        var mainWindow = _services.GetRequiredService<MainWindow>();
+        MainWindow = mainWindow;
+        mainWindow.Show();
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            // Обов'язково вивільняємо ресурси
-            _notifyIcon.Dispose();
-            base.OnExit(e);
-        }
+        _notifyIcon = (Hardcodet.Wpf.TaskbarNotification.TaskbarIcon)FindResource("NotifyIcon");
     }
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _services?.GetService<MainViewModel>()?.Dispose();
+        _notifyIcon?.Dispose();
+        _services?.Dispose();
+        base.OnExit(e);
+    }
+
+    private static ServiceProvider BuildServices()
+    {
+        var services = new ServiceCollection();
+
+        // Core
+        services.AddSingleton(AppSettings.Load());
+
+        // Upload
+        services.AddSingleton<GoogleDriveUploadService>();
+        services.AddSingleton<TelegramUploadService>();
+        services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
+
+        // ViewModels
+        services.AddSingleton<RecordingsViewModel>();
+        services.AddSingleton<ProfileViewModel>();
+        services.AddSingleton<HomeViewModel>();
+        services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<MainViewModel>();
+
+        // View
+        services.AddSingleton<MainWindow>();
+
+        return services.BuildServiceProvider();
+    }
 }
