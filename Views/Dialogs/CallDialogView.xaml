@@ -119,43 +119,43 @@
                                             <DoubleAnimation
                                                 AutoReverse="True"
                                                 BeginTime="0:0:0"
-                                                Duration="0:0:0.45"
-                                                From="0.25"
                                                 Storyboard.TargetName="EqBar1"
                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="1.0" />
+                                                From="0.25"
+                                                To="1.0"
+                                                Duration="0:0:0.45" />
                                             <DoubleAnimation
                                                 AutoReverse="True"
                                                 BeginTime="0:0:0.12"
-                                                Duration="0:0:0.3"
-                                                From="0.5"
                                                 Storyboard.TargetName="EqBar2"
                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="1.0" />
+                                                From="0.5"
+                                                To="1.0"
+                                                Duration="0:0:0.3" />
                                             <DoubleAnimation
                                                 AutoReverse="True"
                                                 BeginTime="0:0:0.05"
-                                                Duration="0:0:0.55"
-                                                From="0.2"
                                                 Storyboard.TargetName="EqBar3"
                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="1.0" />
+                                                From="0.2"
+                                                To="1.0"
+                                                Duration="0:0:0.55" />
                                             <DoubleAnimation
                                                 AutoReverse="True"
                                                 BeginTime="0:0:0.2"
-                                                Duration="0:0:0.38"
-                                                From="0.4"
                                                 Storyboard.TargetName="EqBar4"
                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="1.0" />
+                                                From="0.4"
+                                                To="1.0"
+                                                Duration="0:0:0.38" />
                                             <DoubleAnimation
                                                 AutoReverse="True"
                                                 BeginTime="0:0:0.15"
-                                                Duration="0:0:0.42"
-                                                From="0.3"
                                                 Storyboard.TargetName="EqBar5"
                                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="0.9" />
+                                                From="0.3"
+                                                To="0.9"
+                                                Duration="0:0:0.42" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -169,9 +169,9 @@
                                     Width="3"
                                     Height="7"
                                     Margin="0,0,2,0"
+                                    Fill="{StaticResource SubText}"
                                     RadiusX="1.5"
                                     RadiusY="1.5"
-                                    Fill="{StaticResource SubText}"
                                     RenderTransformOrigin="0.5,1">
                                     <Rectangle.RenderTransform>
                                         <ScaleTransform ScaleY="0.25" />
@@ -182,9 +182,9 @@
                                     Width="3"
                                     Height="13"
                                     Margin="0,0,2,0"
+                                    Fill="{StaticResource SubText}"
                                     RadiusX="1.5"
                                     RadiusY="1.5"
-                                    Fill="{StaticResource SubText}"
                                     RenderTransformOrigin="0.5,1">
                                     <Rectangle.RenderTransform>
                                         <ScaleTransform ScaleY="0.5" />
@@ -195,9 +195,9 @@
                                     Width="3"
                                     Height="16"
                                     Margin="0,0,2,0"
+                                    Fill="{StaticResource SubText}"
                                     RadiusX="1.5"
                                     RadiusY="1.5"
-                                    Fill="{StaticResource SubText}"
                                     RenderTransformOrigin="0.5,1">
                                     <Rectangle.RenderTransform>
                                         <ScaleTransform ScaleY="0.2" />
@@ -208,9 +208,9 @@
                                     Width="3"
                                     Height="11"
                                     Margin="0,0,2,0"
+                                    Fill="{StaticResource SubText}"
                                     RadiusX="1.5"
                                     RadiusY="1.5"
-                                    Fill="{StaticResource SubText}"
                                     RenderTransformOrigin="0.5,1">
                                     <Rectangle.RenderTransform>
                                         <ScaleTransform ScaleY="0.4" />
@@ -220,9 +220,9 @@
                                     x:Name="EqBar5"
                                     Width="3"
                                     Height="8"
+                                    Fill="{StaticResource SubText}"
                                     RadiusX="1.5"
                                     RadiusY="1.5"
-                                    Fill="{StaticResource SubText}"
                                     RenderTransformOrigin="0.5,1">
                                     <Rectangle.RenderTransform>
                                         <ScaleTransform ScaleY="0.3" />

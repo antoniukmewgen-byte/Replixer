@@ -36,6 +36,9 @@
                             <DataTrigger Binding="{Binding Platform}" Value="WhatsApp.Root">
                                 <Setter Property="Background" Value="{StaticResource BrushWhatsApp}" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding Platform}" Value="Ringostat Smart Phone">
+                                <Setter Property="Background" Value="{StaticResource BrushRingostat}" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Border.Style>

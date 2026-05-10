@@ -62,6 +62,7 @@ public class HomeViewModel : ViewModelBase
             new TelegramCallDetector(),
             new WhatsAppCallDetector(),
             new ViberCallDetector(),
+            new RingostatCallDetector(),
         });
         _micMonitor = new MicrophoneMonitorService();
 

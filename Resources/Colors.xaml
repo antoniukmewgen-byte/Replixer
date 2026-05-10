@@ -34,6 +34,7 @@
     <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
     <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />
     <SolidColorBrush x:Key="BrushWhatsApp" Color="#1B4A2E" />
+    <SolidColorBrush x:Key="BrushRingostat" Color="#FF2E4A00" />
 
 
 </ResourceDictionary>

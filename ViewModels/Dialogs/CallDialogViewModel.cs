@@ -75,7 +75,8 @@ public class CallDialogViewModel : ViewModelBase
         processName.ToLowerInvariant() switch
         {
             "viber" => "Viber",
-            var s when s.Contains("whatsapp") => "WhatsApp",
+            var s when s.Contains("whatsapp")   => "WhatsApp",
+            var s when s.Contains("ringostat")  => "Ringostat",
             _ => "Telegram"
         };
 
@@ -83,15 +84,20 @@ public class CallDialogViewModel : ViewModelBase
         new BitmapImage(new Uri(processName.ToLowerInvariant() switch
         {
             "viber" => "pack://application:,,,/Assets/Icons/viber.png",
-            var s when s.Contains("whatsapp") => "pack://application:,,,/Assets/Icons/whatsapp.png",
+            var s when s.Contains("whatsapp")   => "pack://application:,,,/Assets/Icons/whatsapp.png",
+            var s when s.Contains("ringostat")  => "pack://application:,,,/Assets/Icons/ringostat.png",
             _ => "pack://application:,,,/Assets/Icons/telegram.png"
         }));
 
-    private static Brush ResolveBrush(string processName) =>
-        processName.ToLowerInvariant() switch
+    private static Brush ResolveBrush(string processName)
+    {
+        var key = processName.ToLowerInvariant() switch
         {
-            "viber" => new SolidColorBrush(Color.FromRgb(0x3A, 0x1A, 0x4A)),
-            var s when s.Contains("whatsapp") => new SolidColorBrush(Color.FromRgb(0x1B, 0x4A, 0x2E)),
-            _ => new SolidColorBrush(Color.FromRgb(0x1A, 0x3A, 0x5C))
+            "viber"                            => "BrushViber",
+            var s when s.Contains("whatsapp")  => "BrushWhatsApp",
+            var s when s.Contains("ringostat") => "BrushRingostat",
+            _                                  => "BrushTelegram"
         };
+        return (Brush)System.Windows.Application.Current.Resources[key];
+    }
 }
