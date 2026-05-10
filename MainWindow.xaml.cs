@@ -12,6 +12,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        this.Closing += MainWindow_Closing;
         var vm = new MainViewModel();
         vm.PropertyChanged += OnViewModelPropertyChanged;
         DataContext = vm;
@@ -29,11 +30,11 @@ public partial class MainWindow : Window
 
         var button = ((MainViewModel)DataContext).CurrentViewModel switch
         {
-            HomeViewModel       => HomeButton,
+            HomeViewModel => HomeButton,
             RecordingsViewModel => RecordingsButton,
-            SettingsViewModel   => SettingsButton,
-            ProfileViewModel    => ProfileButton,
-            _                   => null
+            SettingsViewModel => SettingsButton,
+            ProfileViewModel => ProfileButton,
+            _ => null
         };
 
         if (button is null) return;
@@ -62,5 +63,11 @@ public partial class MainWindow : Window
         WindowState = WindowState.Minimized;
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) =>
-        Close();
+        Hide();
+
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        e.Cancel = true;
+        this.Hide();
+    }
 }

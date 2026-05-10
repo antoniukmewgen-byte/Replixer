@@ -1,6 +1,5 @@
 using EchoVault.Models;
 using EchoVault.Services;
-using RecordingStatus = EchoVault.Models.RecordingStatus;
 using EchoVault.Services.Audio;
 using EchoVault.Services.Recording;
 using EchoVault.Services.Upload;
@@ -12,6 +11,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
+using RecordingStatus = EchoVault.Models.RecordingStatus;
 
 namespace EchoVault.ViewModels;
 
@@ -158,6 +159,9 @@ public class HomeViewModel : ViewModelBase
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
 
         CallContent = new ActiveCallViewModel(StopRecording);
+
+        var hints = new[] { "План дзвінка...", "Запитати про ціну" };
+        App.WindowManager.ShowCheatSheet(hints);
     }
 
     private async void StopRecording()
@@ -177,6 +181,7 @@ public class HomeViewModel : ViewModelBase
         Debug.WriteLine($"[HomeVM] GoogleDriveFolderId  : '{_settings.GoogleDriveFolderId}'");
 
         string? path = await _recorder.StopRecordingAsync();
+        App.WindowManager.CloseCheatSheet();
 
         if (path is null)
         {
