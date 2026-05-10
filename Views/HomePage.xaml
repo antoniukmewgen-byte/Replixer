@@ -64,11 +64,11 @@
                     Margin="16,0,16,16"
                     ItemsSource="{Binding RecordingsVm.RecentRecordings}"
                     Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource InverseBoolToVis}}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type models:RecordingEntry}">
-                                <views:RecordingItemView />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:RecordingEntry}">
+                            <views:RecordingItemView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
                 <!--  Empty state  -->
@@ -87,7 +87,7 @@
                             Stretch="Uniform" />
                     </Grid>
                     <TextBlock
-                        Margin="0,12,0,6"
+                        Margin="0,12,0,4"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource InterFont}"
                         FontSize="14"

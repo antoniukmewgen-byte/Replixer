@@ -4,91 +4,197 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Border
-        Width="300"
-        Padding="20"
         Background="{StaticResource BrushColor2}"
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
-        CornerRadius="16">
+        CornerRadius="12">
         <StackPanel>
+            <Grid Margin="16,16,16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+                    <Border
+                        Width="38"
+                        Height="38"
+                        Background="{StaticResource BrushTelegram}"
+                        CornerRadius="8">
+                        <Image
+                            Width="18"
+                            Height="18"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Source="/Assets/Icons/telegram.png" />
+                    </Border>
+                    <StackPanel Margin="12,0" VerticalAlignment="Center">
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="{StaticResource Text}">
+                            Telegram
+                        </TextBlock>
+                        <TextBlock
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}">
+                            Дзвінок
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Ellipse
+                        Width="8"
+                        Height="8"
+                        Margin="0,0,6,0"
+                        VerticalAlignment="Center"
+                        Fill="{StaticResource OtherBrushSubColor1}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource OtherBrushSubColor1}">
+                        Активний
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
 
-            <!--  Title  -->
+            <Rectangle
+                Height="1"
+                Margin="0,12"
+                Fill="{StaticResource BrushBorderColor2}" />
             <TextBlock
-                FontFamily="{StaticResource InterFont}"
-                FontSize="14"
-                FontWeight="Bold"
-                Foreground="White"
-                Text="{Binding Title}" />
-
-            <!--  Message  -->
-            <TextBlock
-                Margin="0,8,0,20"
+                Width="170"
+                Margin="16,0"
                 FontFamily="{StaticResource InterFont}"
                 FontSize="12"
                 FontWeight="Medium"
-                Foreground="{StaticResource Text}"
-                Text="{Binding Message}"
-                TextWrapping="Wrap" />
-
-            <!--  Buttons  -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!--  Secondary — Skip / Continue  -->
+                Foreground="{StaticResource SubText}"
+                TextAlignment="Center"
+                TextWrapping="Wrap">
+                Виявлено дзвінок. Бажаєте розпочати запис розмови?
+            </TextBlock>
+            <Border
+                Margin="16,12"
+                Padding="12,8"
+                Background="{StaticResource BrushColor3}"
+                BorderBrush="{StaticResource BrushBorderColor3}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <Path
+                            Width="16"
+                            Height="16"
+                            Margin="0,0,12,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="M9.34,10.793a6.179,6.179,0,0,1,.545-8.275l.633-.634a6.179,6.179,0,0,1,8.274-.544,5.946,5.946,0,0,1,2.146,4.343,6.01,6.01,0,0,1-1.751,4.5l-1,1a6.018,6.018,0,0,1-4.246,1.758q-.129,0-.258-.006A5.95,5.95,0,0,1,9.34,10.793ZM18.757,16a5.214,5.214,0,0,0-3.707,1.535A15.14,15.14,0,0,1,4.272,22H3.122a1.121,1.121,0,0,1-.794-1.914l.7-.7a7.176,7.176,0,0,0,4.6-2.092l3.054-3.054A8,8,0,0,1,7.809,12.08a7.568,7.568,0,0,1-1.082-1.725L3.7,13.379a7.171,7.171,0,0,0-2.092,4.6l-.7.7A3.121,3.121,0,0,0,3.122,24h1.15a17.13,17.13,0,0,0,12.192-5.05A3.243,3.243,0,0,1,22,21.242V23a1,1,0,0,0,2,0V21.242A5.249,5.249,0,0,0,18.757,16Z"
+                            Fill="{StaticResource SubText}"
+                            Stretch="Uniform" />
+                        <Path
+                            Width="auto"
+                            Height="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="M384,181.33v149.33c0,17.66-14.34,32-32,32s-32-14.34-32-32v-149.33c0-17.66,14.34-32,32-32s32,14.34,32,32ZM245.33,0c-17.66,0-32,14.34-32,32v448c0,17.66,14.34,32,32,32s32-14.34,32-32V32c0-17.66-14.34-32-32-32ZM458.67,85.33c-17.66,0-32,14.34-32,32v277.33c0,17.66,14.34,32,32,32s32-14.34,32-32V117.33c0-17.66-14.34-32-32-32ZM138.67,106.67c-17.66,0-32,14.34-32,32v234.67c0,17.66,14.34,32,32,32s32-14.34,32-32v-234.67c0-17.66-14.34-32-32-32ZM32,192c-17.66,0-32,14.34-32,32v64c0,17.66,14.34,32,32,32s32-14.34,32-32v-64c0-17.66-14.34-32-32-32Z M910.58,181.33v149.33c0,17.66-14.34,32-32,32s-32-14.34-32-32v-149.33c0-17.66,14.34-32,32-32s32,14.34,32,32ZM771.91,0C754.25,0,739.91,14.34,739.91,32v448c0,17.66,14.34,32,32,32s32-14.34,32-32V32C803.91,14.34,789.58,0,771.91,0ZM985.25,85.33c-17.66,0-32,14.34-32,32v277.33c0,17.66,14.34,32,32,32s32-14.34,32-32V117.33c0-17.66-14.34-32-32-32ZM665.25,106.67c-17.66,0-32,14.34-32,32v234.67c0,17.66,14.34,32,32,32s32-14.34,32-32v-234.67c0-17.66-14.34-32-32-32ZM558.58,192c-17.66,0-32,14.34-32,32v64c0,17.66,14.34,32,32,32s32-14.34,32-32v-64c0-17.66-14.34-32-32-32Z"
+                            Fill="{StaticResource SubText}"
+                            Stretch="Uniform" />
+                    </StackPanel>
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource SubText}">
+                        0:00
+                    </TextBlock>
+                </Grid>
+            </Border>
+            <StackPanel Margin="16,0,16,16" Orientation="Horizontal">
                 <Button
-                    Grid.Column="0"
-                    Height="32"
-                    Command="{Binding SecondaryCommand}"
+                    Margin="0,0,12,0"
+                    Padding="12,8"
+                    HorizontalAlignment="Center"
                     Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border
                                 x:Name="Bg"
-                                Background="{StaticResource OtherBrushColor4}"
-                                CornerRadius="8">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="10"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource OtherBrushSubColor4}"
-                                    Text="{Binding SecondaryLabel}" />
+                                Padding="{TemplateBinding Padding}"
+                                Background="{StaticResource BrushColor4}"
+                                BorderBrush="{StaticResource BrushBorderColor4}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock
+                                        x:Name="Label"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="14"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource SubText}">
+                                        Пропустити
+                                    </TextBlock>
+                                </StackPanel>
                             </Border>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-
-                <!--  Primary — Start / Stop recording  -->
                 <Button
-                    Grid.Column="2"
-                    Height="32"
-                    Command="{Binding PrimaryCommand}"
+                    Padding="12,8"
+                    HorizontalAlignment="Center"
                     Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border
-                                x:Name="Bg"
+                                Padding="{TemplateBinding Padding}"
                                 Background="{StaticResource OtherBrushColor1}"
-                                CornerRadius="8">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="10"
-                                    FontWeight="SemiBold"
-                                    Foreground="White"
-                                    Text="{Binding PrimaryLabel}" />
+                                BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                BorderThickness="1"
+                                CornerRadius="16">
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <Ellipse
+                                        Width="10"
+                                        Height="10"
+                                        Margin="0,0,6,0"
+                                        VerticalAlignment="Center"
+                                        Fill="{StaticResource OtherBrushSubColor1}" />
+                                    <TextBlock
+                                        x:Name="Label"
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="14"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource OtherBrushSubColor1}">
+                                        Почати запис
+                                    </TextBlock>
+                                </StackPanel>
                             </Border>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-
-            </Grid>
+            </StackPanel>
         </StackPanel>
     </Border>
 </UserControl>
