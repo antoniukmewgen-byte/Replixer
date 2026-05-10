@@ -191,7 +191,7 @@
                             Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                             Stretch="Uniform" />
                     </Button>
-                    <Button x:Name="FullscreenButton" Style="{StaticResource HeaderButton}">
+                    <Button x:Name="FullscreenButton" Style="{StaticResource HeaderButton}" Click="FullscreenButton_Click">
                         <Path
                             Width="12"
                             Height="12"

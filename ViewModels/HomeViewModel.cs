@@ -11,7 +11,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
 using RecordingStatus = EchoVault.Models.RecordingStatus;
 
 namespace EchoVault.ViewModels;
@@ -161,7 +160,16 @@ public class HomeViewModel : ViewModelBase
 
         CallContent = new ActiveCallViewModel(StopRecording);
 
-        var hints = new[] { "План дзвінка...", "Запитати про ціну" };
+        var hints = new[] { 
+            "1. Привітання, тест на дебіла та встановлення рамок",
+            "2. Первинний анамнез та підводимо лінію",
+            "3. Вторинний анамнез, розкриваємо досвід клієнта через техніку \"ближче-далі\"",
+            "4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува",
+            "5. Прийом \" чашка чаю \" + \" ваш кейс унікальний, антиприклад щойно був порожній кейс \"",
+            "6. Ставимо дедлайн, вибираємо день і час",
+            "7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити",
+        };
+
         App.WindowManager.ShowCheatSheet(hints);
     }
 

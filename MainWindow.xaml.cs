@@ -22,6 +22,8 @@ public partial class MainWindow : Window
             Keyboard.ClearFocus();
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
         };
+
+        this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -61,6 +63,18 @@ public partial class MainWindow : Window
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e) =>
         WindowState = WindowState.Minimized;
+
+    private void FullscreenButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.WindowState == WindowState.Maximized)
+        {
+            this.WindowState = WindowState.Normal;
+        }
+        else
+        {
+            this.WindowState = WindowState.Maximized;
+        }
+    }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) =>
         Hide();
