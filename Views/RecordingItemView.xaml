@@ -1,8 +1,8 @@
 <UserControl
-    x:Class="EchoVault.Views.RecordingItemView"
+    x:Class="Replixer.Views.RecordingItemView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:models="clr-namespace:EchoVault.Models">
+    xmlns:models="clr-namespace:Replixer.Models">
     <Border
         Margin="0,12,0,0"
         Padding="16"

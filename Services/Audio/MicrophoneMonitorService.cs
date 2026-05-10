@@ -3,7 +3,7 @@ using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using System.Diagnostics;
 
-namespace EchoVault.Services.Audio;
+namespace Replixer.Services.Audio;
 
 public class MicrophoneMonitorService : IMonitorService
 {

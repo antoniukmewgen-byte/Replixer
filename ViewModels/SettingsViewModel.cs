@@ -1,10 +1,10 @@
-using EchoVault.Infrastructure;
-using EchoVault.Models;
-using EchoVault.Services.Upload;
+using Replixer.Infrastructure;
+using Replixer.Models;
+using Replixer.Services.Upload;
 using System.ComponentModel;
 using System.Windows;
 
-namespace EchoVault.ViewModels;
+namespace Replixer.ViewModels;
 
 public class SettingsViewModel : ViewModelBase
 {

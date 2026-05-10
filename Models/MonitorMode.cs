@@ -1,4 +1,4 @@
-namespace EchoVault.Models;
+namespace Replixer.Models;
 
 public enum MonitorMode
 {

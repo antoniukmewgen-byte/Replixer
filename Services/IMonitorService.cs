@@ -1,4 +1,4 @@
-namespace EchoVault.Services;
+namespace Replixer.Services;
 
 public interface IMonitorService : IDisposable
 {

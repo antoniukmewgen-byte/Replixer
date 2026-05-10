@@ -1,4 +1,4 @@
-using EchoVault.Infrastructure;
+using Replixer.Infrastructure;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
@@ -8,18 +8,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace EchoVault.Services.Upload;
+namespace Replixer.Services.Upload;
 
 public class GoogleDriveUploadService
 {
     private static readonly string TokenStorePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EchoVault", "google_token");
+        "Replixer", "google_token");
 
     private static readonly string[] Scopes = { DriveService.Scope.Drive };
 
     // Embedded resource name: <DefaultNamespace>.<FileName>
-    private const string CredentialsResourceName = "EchoVault.credentials.json";
+    private const string CredentialsResourceName = "Replixer.credentials.json";
 
     public bool IsAuthorized => Directory.Exists(TokenStorePath) &&
                                 Directory.GetFiles(TokenStorePath).Length > 0;
@@ -63,7 +63,7 @@ public class GoogleDriveUploadService
             using var service = new DriveService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = credential,
-                ApplicationName       = "EchoVault",
+                ApplicationName       = "Replixer",
             });
 
             var metadata = new Google.Apis.Drive.v3.Data.File

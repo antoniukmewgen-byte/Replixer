@@ -1,6 +1,6 @@
 using FlaUI.Core.AutomationElements;
 
-namespace EchoVault.Services.Window.Detectors;
+namespace Replixer.Services.Window.Detectors;
 
 public interface ICallDetector
 {

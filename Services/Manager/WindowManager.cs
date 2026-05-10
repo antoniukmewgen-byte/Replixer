@@ -1,7 +1,7 @@
-﻿using EchoVault.Views;
+﻿using Replixer.Views;
 using System.Windows;
 
-namespace EchoVault.Services.Manager
+namespace Replixer.Services.Manager
 {
     public class WindowManager : IWindowManager
     {

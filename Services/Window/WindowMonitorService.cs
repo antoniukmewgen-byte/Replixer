@@ -1,9 +1,9 @@
-using EchoVault.Services.Window.Detectors;
+using Replixer.Services.Window.Detectors;
 using FlaUI.UIA3;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace EchoVault.Services.Window;
+namespace Replixer.Services.Window;
 
 public class WindowMonitorService : IMonitorService
 {

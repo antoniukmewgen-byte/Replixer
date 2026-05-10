@@ -1,10 +1,10 @@
-using EchoVault.Infrastructure;
-using EchoVault.Models;
-using EchoVault.Services.Upload;
-using EchoVault.ViewModels.Dialogs;
+using Replixer.Infrastructure;
+using Replixer.Models;
+using Replixer.Services.Upload;
+using Replixer.ViewModels.Dialogs;
 using System.Windows.Input;
 
-namespace EchoVault.ViewModels;
+namespace Replixer.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {

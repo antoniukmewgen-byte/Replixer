@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace EchoVault.Converters;
+namespace Replixer.Converters;
 
 [ValueConversion(typeof(bool), typeof(Visibility))]
 public class InverseBoolToVisibilityConverter : IValueConverter

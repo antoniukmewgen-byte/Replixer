@@ -1,11 +1,11 @@
 <UserControl
-    x:Class="EchoVault.Views.HomePage"
+    x:Class="Replixer.Views.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:callViews="clr-namespace:EchoVault.Views.Call"
-    xmlns:callVm="clr-namespace:EchoVault.ViewModels.Call"
-    xmlns:models="clr-namespace:EchoVault.Models"
-    xmlns:views="clr-namespace:EchoVault.Views">
+    xmlns:callViews="clr-namespace:Replixer.Views.Call"
+    xmlns:callVm="clr-namespace:Replixer.ViewModels.Call"
+    xmlns:models="clr-namespace:Replixer.Models"
+    xmlns:views="clr-namespace:Replixer.Views">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type callVm:IdleCallViewModel}">
             <callViews:IdleCallView />

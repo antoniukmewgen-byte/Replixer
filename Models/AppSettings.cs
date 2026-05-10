@@ -4,13 +4,13 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EchoVault.Models;
+namespace Replixer.Models;
 
 public class AppSettings : INotifyPropertyChanged
 {
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EchoVault", "settings.json");
+        "Replixer", "settings.json");
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -36,7 +36,7 @@ public class AppSettings : INotifyPropertyChanged
 
     private string _recordingsFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "EchoVault", "Recordings");
+        "Replixer", "Recordings");
 
     public string RecordingsFolder
     {

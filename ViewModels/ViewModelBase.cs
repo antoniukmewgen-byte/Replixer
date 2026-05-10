@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace EchoVault.ViewModels;
+namespace Replixer.ViewModels;
 
 public abstract class ViewModelBase : INotifyPropertyChanged
 {

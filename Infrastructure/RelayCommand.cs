@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace EchoVault.Infrastructure;
+namespace Replixer.Infrastructure;
 
 public class RelayCommand(Action execute, Func<bool>? canExecute = null) : ICommand
 {

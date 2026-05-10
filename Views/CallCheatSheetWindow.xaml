@@ -1,4 +1,4 @@
-﻿<Window x:Class="EchoVault.Views.CallCheatSheetWindow"
+﻿<Window x:Class="Replixer.Views.CallCheatSheetWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Cheat Sheet" 

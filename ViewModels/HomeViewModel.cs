@@ -1,19 +1,19 @@
-using EchoVault.Models;
-using EchoVault.Services;
-using EchoVault.Services.Audio;
-using EchoVault.Services.Recording;
-using EchoVault.Services.Upload;
-using EchoVault.Services.Window;
-using EchoVault.Services.Window.Detectors;
-using EchoVault.ViewModels.Call;
-using EchoVault.ViewModels.Dialogs;
+using Replixer.Models;
+using Replixer.Services;
+using Replixer.Services.Audio;
+using Replixer.Services.Recording;
+using Replixer.Services.Upload;
+using Replixer.Services.Window;
+using Replixer.Services.Window.Detectors;
+using Replixer.ViewModels.Call;
+using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using RecordingStatus = EchoVault.Models.RecordingStatus;
+using RecordingStatus = Replixer.Models.RecordingStatus;
 
-namespace EchoVault.ViewModels;
+namespace Replixer.ViewModels;
 
 public class HomeViewModel : ViewModelBase
 {

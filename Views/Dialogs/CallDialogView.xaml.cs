@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace EchoVault.Views.Dialogs;
+namespace Replixer.Views.Dialogs;
 
 public partial class CallDialogView : UserControl
 {

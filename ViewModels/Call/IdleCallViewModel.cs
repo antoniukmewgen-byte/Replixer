@@ -1,7 +1,7 @@
-using EchoVault.Infrastructure;
+using Replixer.Infrastructure;
 using System.Windows.Input;
 
-namespace EchoVault.ViewModels.Call;
+namespace Replixer.ViewModels.Call;
 
 public class IdleCallViewModel : ViewModelBase
 {

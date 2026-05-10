@@ -1,10 +1,10 @@
-﻿using EchoVault.Services.Manager;
+﻿using Replixer.Services.Manager;
 using System.Configuration;
 using System.Data;
 using System.Windows;
 using WpfApp = System.Windows.Application;
 
-namespace EchoVault
+namespace Replixer
 {
     /// <summary>
     /// Interaction logic for App.xaml

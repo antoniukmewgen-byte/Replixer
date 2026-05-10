@@ -1,4 +1,4 @@
-namespace EchoVault.Models;
+namespace Replixer.Models;
 
 public record TelegramChat(string Name, long Id)
 {

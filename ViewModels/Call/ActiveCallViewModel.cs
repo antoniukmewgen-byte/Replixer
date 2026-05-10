@@ -1,8 +1,8 @@
-using EchoVault.Infrastructure;
+using Replixer.Infrastructure;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace EchoVault.ViewModels.Call;
+namespace Replixer.ViewModels.Call;
 
 public class ActiveCallViewModel : ViewModelBase, IDisposable
 {

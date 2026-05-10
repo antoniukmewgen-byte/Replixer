@@ -1,10 +1,10 @@
-using EchoVault.Models;
-using EchoVault.Views;
+using Replixer.Models;
+using Replixer.Views;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 
-namespace EchoVault.Services.Upload;
+namespace Replixer.Services.Upload;
 
 public class TelegramUploadService
 {
@@ -13,7 +13,7 @@ public class TelegramUploadService
 
     private static readonly string SessionPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EchoVault", "telegram_session.dat");
+        "Replixer", "telegram_session.dat");
 
     public static readonly IReadOnlyList<TelegramChat> Chats = new[]
     {

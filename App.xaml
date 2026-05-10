@@ -1,9 +1,9 @@
 <Application
-    x:Class="EchoVault.App"
+    x:Class="Replixer.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:EchoVault.Converters"
-    xmlns:local="clr-namespace:EchoVault"
+    xmlns:converters="clr-namespace:Replixer.Converters"
+    xmlns:local="clr-namespace:Replixer"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>

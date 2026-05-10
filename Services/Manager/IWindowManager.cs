@@ -1,4 +1,4 @@
-﻿namespace EchoVault.Services.Manager
+﻿namespace Replixer.Services.Manager
 {
     public interface IWindowManager
     {

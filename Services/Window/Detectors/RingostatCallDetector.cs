@@ -2,7 +2,7 @@ using FlaUI.Core.AutomationElements;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace EchoVault.Services.Window.Detectors;
+namespace Replixer.Services.Window.Detectors;
 
 public class RingostatCallDetector : ICallDetector
 {

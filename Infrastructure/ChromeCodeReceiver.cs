@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 
-namespace EchoVault.Infrastructure;
+namespace Replixer.Infrastructure;
 
 /// <summary>
 /// OAuth code receiver that forces the authorization URL to open in Google Chrome
@@ -106,7 +106,7 @@ public class ChromeCodeReceiver : ICodeReceiver
         const string html =
             "<html><head><meta charset='utf-8'></head><body style='font-family:sans-serif;text-align:center;margin-top:80px'>" +
             "<h2>✅ Авторизацію завершено</h2>" +
-            "<p>Можна закрити цю вкладку та повернутися до EchoVault.</p>" +
+            "<p>Можна закрити цю вкладку та повернутися до Replixer.</p>" +
             "</body></html>";
 
         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(html);

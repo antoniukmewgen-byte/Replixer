@@ -1,10 +1,10 @@
-using EchoVault.Infrastructure;
+using Replixer.Infrastructure;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace EchoVault.ViewModels.Dialogs;
+namespace Replixer.ViewModels.Dialogs;
 
 public class CallDialogViewModel : ViewModelBase
 {

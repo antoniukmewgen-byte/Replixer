@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace EchoVault.Converters;
+namespace Replixer.Converters;
 
 [ValueConversion(typeof(object), typeof(Visibility))]
 public class NullToVisibilityConverter : IValueConverter

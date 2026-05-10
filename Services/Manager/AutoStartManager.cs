@@ -1,11 +1,11 @@
 ﻿using Microsoft.Win32;
 using System.IO;
 
-namespace EchoVault.Services.Manager
+namespace Replixer.Services.Manager
 {
     public static class AutoStartManager
     {
-        private const string AppName = "EchoVault";
+        private const string AppName = "Replixer";
 
         public static void SetState(bool enable)
         {

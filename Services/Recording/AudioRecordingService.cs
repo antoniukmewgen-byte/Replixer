@@ -1,4 +1,4 @@
-using EchoVault.Models;
+using Replixer.Models;
 using NAudio.CoreAudioApi;
 using NAudio.Lame;
 using NAudio.Wave;
@@ -6,7 +6,7 @@ using NAudio.Wave.SampleProviders;
 using System.Diagnostics;
 using System.IO;
 
-namespace EchoVault.Services.Recording;
+namespace Replixer.Services.Recording;
 
 public class AudioRecordingService : IDisposable
 {

@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace EchoVault.Views;
+namespace Replixer.Views;
 
 public partial class InputWindow : Window
 {

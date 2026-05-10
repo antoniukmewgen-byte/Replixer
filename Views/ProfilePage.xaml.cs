@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace EchoVault.Views;
+namespace Replixer.Views;
 
 public partial class ProfilePage : UserControl
 {

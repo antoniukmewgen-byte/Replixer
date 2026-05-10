@@ -1,6 +1,6 @@
 using System.Windows.Input;
 
-namespace EchoVault.Infrastructure;
+namespace Replixer.Infrastructure;
 
 public class AsyncRelayCommand : ICommand
 {

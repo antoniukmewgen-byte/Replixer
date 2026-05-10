@@ -1,8 +1,8 @@
-﻿using EchoVault.Infrastructure;
+﻿using Replixer.Infrastructure;
 using System.Windows;
 using System.Windows.Input;
 
-namespace EchoVault.ViewModels
+namespace Replixer.ViewModels
 {
     public class TrayViewModel : ViewModelBase
     {

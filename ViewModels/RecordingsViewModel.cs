@@ -1,17 +1,17 @@
-using EchoVault.Models;
+using Replixer.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EchoVault.ViewModels;
+namespace Replixer.ViewModels;
 
 public class RecordingsViewModel : ViewModelBase
 {
     private static readonly string SavePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EchoVault", "recordings.json");
+        "Replixer", "recordings.json");
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

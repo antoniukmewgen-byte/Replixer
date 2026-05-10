@@ -1,10 +1,10 @@
-using EchoVault.Infrastructure;
+using Replixer.Infrastructure;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-namespace EchoVault.Models;
+namespace Replixer.Models;
 
 public enum RecordingStatus { Loading, Saved, Error }
 
