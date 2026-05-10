@@ -14,7 +14,7 @@ public class MicrophoneMonitorService : IMonitorService
     public event Action<string>? CallDetected;
     public event Action<string>? CallEnded;
 
-    private readonly string[] _targetProcesses = { "Telegram", "WhatsApp", "Viber" };
+    private readonly string[] _targetProcesses = { "Telegram", "WhatsApp", "Viber", "Ringostat" };
 
     public void Start()
     {
