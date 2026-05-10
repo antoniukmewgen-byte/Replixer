@@ -186,8 +186,8 @@ public class HomeViewModel : ViewModelBase
 
         Debug.WriteLine("[HomeVM] ── StopRecording ──────────────────────────");
         Debug.WriteLine($"[HomeVM] IsGoogleDriveEnabled : {_settings.IsGoogleDriveEnabled}");
-        Debug.WriteLine($"[HomeVM] IsGoogleAuthorized   : {_uploader.IsAuthorized}");
         Debug.WriteLine($"[HomeVM] GoogleDriveFolderId  : '{_settings.GoogleDriveFolderId}'");
+        Debug.WriteLine($"[HomeVM] UserFolderId         : '{_settings.UserFolderId}'");
 
         string? path = await _recorder.StopRecordingAsync();
         App.WindowManager.CloseCheatSheet();
@@ -219,11 +219,14 @@ public class HomeViewModel : ViewModelBase
         {
             Debug.WriteLine("[HomeVM] → uploading to Google Drive …");
 
-            string? driveUrl = await _uploader.UploadAsync(
-                path,
-                string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
+            // Prefer user's personal subfolder; fall back to the main folder
+            string? targetFolderId = !string.IsNullOrWhiteSpace(_settings.UserFolderId)
+                ? _settings.UserFolderId
+                : string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
                     ? null
-                    : _settings.GoogleDriveFolderId);
+                    : _settings.GoogleDriveFolderId;
+
+            string? driveUrl = await _uploader.UploadAsync(path, targetFolderId);
 
             if (driveUrl is not null)
             {

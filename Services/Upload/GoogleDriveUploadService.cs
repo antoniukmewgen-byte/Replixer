@@ -1,9 +1,7 @@
-using Replixer.Infrastructure;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Upload;
-using Google.Apis.Util.Store;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -12,37 +10,79 @@ namespace Replixer.Services.Upload;
 
 public class GoogleDriveUploadService
 {
-    private static readonly string TokenStorePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "Replixer", "google_token");
+    private const string ServiceAccountResourceName = "Replixer.service_account.json";
 
-    private static readonly string[] Scopes = { DriveService.Scope.Drive };
+    private readonly DriveService? _service;
 
-    // Embedded resource name: <DefaultNamespace>.<FileName>
-    private const string CredentialsResourceName = "Replixer.credentials.json";
-
-    public bool IsAuthorized => Directory.Exists(TokenStorePath) &&
-                                Directory.GetFiles(TokenStorePath).Length > 0;
+    public bool IsAuthorized => _service is not null;
 
     public event Action<int>?    ProgressChanged;  // 0–100
     public event Action<string>? UploadCompleted;  // web view link
     public event Action<string>? UploadFailed;     // error message
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
-    /// <summary>Opens browser for OAuth consent (first time) or uses cached token.</summary>
-    public async Task<bool> AuthorizeAsync(CancellationToken ct = default)
+    public GoogleDriveUploadService()
     {
         try
         {
-            var credential = await GetCredentialAsync(ct);
-            Debug.WriteLine($"[GDrive] Authorized — token type: {credential.Token.TokenType}, stale: {credential.Token.IsStale}");
-            return true;
+            _service = CreateService();
+            Debug.WriteLine("[GDrive] Service account initialized successfully");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[GDrive] Auth failed: {ex.GetType().Name}: {ex.Message}");
-            return false;
+            Debug.WriteLine($"[GDrive] Failed to initialize service account: {ex.GetType().Name}: {ex.Message}");
+        }
+    }
+
+    // ── Public API ────────────────────────────────────────────────────────────
+
+    /// <summary>Checks access to the folder. Returns null on success, or an error message on failure.</summary>
+    public async Task<string?> TestFolderAccessAsync(string folderId, CancellationToken ct = default)
+    {
+        Debug.WriteLine($"[GDrive] ── TestFolderAccess ──────────────────────────");
+        Debug.WriteLine($"[GDrive] Service initialized : {_service is not null}");
+        Debug.WriteLine($"[GDrive] FolderId            : '{folderId}'");
+
+        if (_service is null)
+        {
+            const string err = "service_account.json не знайдено або має невірний формат";
+            Debug.WriteLine($"[GDrive] ✗ {err}");
+            return err;
+        }
+
+        if (string.IsNullOrWhiteSpace(folderId))
+        {
+            const string err = "ID папки не вказано";
+            Debug.WriteLine($"[GDrive] ✗ {err}");
+            return err;
+        }
+
+        try
+        {
+            var req = _service.Files.Get(folderId);
+            req.Fields           = "id,name,mimeType";
+            req.SupportsAllDrives = true;
+            var file = await req.ExecuteAsync(ct);
+            Debug.WriteLine($"[GDrive] ✓ Folder found: '{file.Name}' ({file.MimeType})");
+            return null;
+        }
+        catch (Google.GoogleApiException apiEx)
+        {
+            string err = $"[{(int)apiEx.HttpStatusCode}] {apiEx.Error?.Message ?? apiEx.Message}";
+            Debug.WriteLine($"[GDrive] ✗ API error: {err}");
+            if (apiEx.Error?.Errors != null)
+                foreach (var e in apiEx.Error.Errors)
+                    Debug.WriteLine($"[GDrive]   Detail: {e.Reason} — {e.Message}");
+            return err;
+        }
+        catch (Exception ex)
+        {
+            string err = $"{ex.GetType().Name}: {ex.Message}";
+            Debug.WriteLine($"[GDrive] ✗ Exception: {err}");
+            return err;
+        }
+        finally
+        {
+            Debug.WriteLine($"[GDrive] ───────────────────────────────────────────");
         }
     }
 
@@ -54,18 +94,16 @@ public class GoogleDriveUploadService
         Debug.WriteLine($"[GDrive] File     : {filePath}");
         Debug.WriteLine($"[GDrive] FolderId : {(folderId ?? "(root)")}");
 
+        if (_service is null)
+        {
+            const string err = "Service account not initialized. Check that service_account.json is embedded.";
+            Debug.WriteLine($"[GDrive] ✗ {err}");
+            UploadFailed?.Invoke(err);
+            return null;
+        }
+
         try
         {
-            Debug.WriteLine("[GDrive] Getting credential …");
-            var credential = await GetCredentialAsync(ct);
-            Debug.WriteLine($"[GDrive] Credential OK — access token present: {!string.IsNullOrEmpty(credential.Token.AccessToken)}");
-
-            using var service = new DriveService(new BaseClientService.Initializer
-            {
-                HttpClientInitializer = credential,
-                ApplicationName       = "Replixer",
-            });
-
             var metadata = new Google.Apis.Drive.v3.Data.File
             {
                 Name     = Path.GetFileName(filePath),
@@ -86,8 +124,9 @@ public class GoogleDriveUploadService
             long totalBytes = stream.Length;
             Debug.WriteLine($"[GDrive] File size : {totalBytes:N0} bytes ({totalBytes / 1024.0 / 1024.0:F2} MB)");
 
-            var request = service.Files.Create(metadata, stream, "audio/mpeg");
-            request.Fields = "id,webViewLink,name";
+            var request = _service.Files.Create(metadata, stream, "audio/mpeg");
+            request.Fields           = "id,webViewLink,name";
+            request.SupportsAllDrives = true;
 
             int lastReported = 0;
             request.ProgressChanged += p =>
@@ -97,7 +136,6 @@ public class GoogleDriveUploadService
                     int pct = (int)(p.BytesSent * 100 / totalBytes);
                     ProgressChanged?.Invoke(pct);
 
-                    // Log every 25 %
                     if (pct / 25 > lastReported / 25)
                     {
                         lastReported = pct;
@@ -110,15 +148,15 @@ public class GoogleDriveUploadService
                 }
             };
 
-            Debug.WriteLine($"[GDrive] Starting upload …");
+            Debug.WriteLine("[GDrive] Starting upload …");
             var result = await request.UploadAsync(ct);
             Debug.WriteLine($"[GDrive] Upload finished — status: {result.Status}");
 
             if (result.Status == UploadStatus.Completed)
             {
-                string id   = request.ResponseBody?.Id           ?? "(no id)";
-                string name = request.ResponseBody?.Name         ?? "(no name)";
-                string link = request.ResponseBody?.WebViewLink  ?? string.Empty;
+                string id   = request.ResponseBody?.Id          ?? "(no id)";
+                string name = request.ResponseBody?.Name        ?? "(no name)";
+                string link = request.ResponseBody?.WebViewLink ?? string.Empty;
                 Debug.WriteLine($"[GDrive] ✓ File id   : {id}");
                 Debug.WriteLine($"[GDrive] ✓ File name : {name}");
                 Debug.WriteLine($"[GDrive] ✓ View link : {link}");
@@ -130,8 +168,6 @@ public class GoogleDriveUploadService
                 ? $"{result.Exception.GetType().Name}: {result.Exception.Message}"
                 : "Unknown error";
             Debug.WriteLine($"[GDrive] ✗ Upload failed: {error}");
-            if (result.Exception is not null)
-                Debug.WriteLine($"[GDrive]   StackTrace: {result.Exception.StackTrace}");
             UploadFailed?.Invoke(error);
             return null;
         }
@@ -149,26 +185,72 @@ public class GoogleDriveUploadService
         }
         finally
         {
-            Debug.WriteLine($"[GDrive] ───────────────────────────────────────────");
+            Debug.WriteLine("[GDrive] ───────────────────────────────────────────");
+        }
+    }
+
+    /// <summary>Finds or creates a subfolder with <paramref name="userName"/> inside <paramref name="parentFolderId"/>.
+    /// Returns the folder ID, or null on failure.</summary>
+    public async Task<string?> GetOrCreateUserFolderAsync(string parentFolderId, string userName, CancellationToken ct = default)
+    {
+        if (_service is null || string.IsNullOrWhiteSpace(parentFolderId) || string.IsNullOrWhiteSpace(userName))
+            return null;
+
+        try
+        {
+            var listReq = _service.Files.List();
+            listReq.Q                        = $"name='{EscapeQuery(userName)}' and mimeType='application/vnd.google-apps.folder' and '{parentFolderId}' in parents and trashed=false";
+            listReq.Fields                   = "files(id,name)";
+            listReq.SupportsAllDrives        = true;
+            listReq.IncludeItemsFromAllDrives = true;
+            var listResult = await listReq.ExecuteAsync(ct);
+
+            if (listResult.Files?.Count > 0)
+            {
+                Debug.WriteLine($"[GDrive] User folder found: {listResult.Files[0].Id}");
+                return listResult.Files[0].Id;
+            }
+
+            var folder = new Google.Apis.Drive.v3.Data.File
+            {
+                Name     = userName,
+                MimeType = "application/vnd.google-apps.folder",
+                Parents  = new List<string> { parentFolderId },
+            };
+
+            var createReq = _service.Files.Create(folder);
+            createReq.Fields           = "id";
+            createReq.SupportsAllDrives = true;
+            var created = await createReq.ExecuteAsync(ct);
+            Debug.WriteLine($"[GDrive] User folder created: {created.Id}");
+            return created.Id;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[GDrive] GetOrCreateUserFolder failed: {ex.Message}");
+            return null;
         }
     }
 
     // ── Private ───────────────────────────────────────────────────────────────
 
-    private static async Task<UserCredential> GetCredentialAsync(CancellationToken ct)
+    private static DriveService CreateService()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        await using var stream = assembly.GetManifestResourceStream(CredentialsResourceName)
+        using var stream = assembly.GetManifestResourceStream(ServiceAccountResourceName)
             ?? throw new FileNotFoundException(
-                $"Embedded resource '{CredentialsResourceName}' not found. " +
-                "Make sure credentials.json is included as EmbeddedResource in the project.");
+                $"Embedded resource '{ServiceAccountResourceName}' not found. " +
+                "Add service_account.json to the project as EmbeddedResource.");
 
-        return await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            GoogleClientSecrets.FromStream(stream).Secrets,
-            Scopes,
-            "user",
-            ct,
-            new FileDataStore(TokenStorePath, true),
-            new ChromeCodeReceiver());
+        var credential = GoogleCredential.FromStream(stream)
+            .CreateScoped(DriveService.Scope.Drive);
+
+        return new DriveService(new BaseClientService.Initializer
+        {
+            HttpClientInitializer = credential,
+            ApplicationName       = "Replixer",
+        });
     }
+
+    private static string EscapeQuery(string value) => value.Replace("'", "\\'");
 }

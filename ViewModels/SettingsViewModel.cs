@@ -48,14 +48,29 @@ public class SettingsViewModel : ViewModelBase
         set => _settings.GoogleDriveFolderId = value;
     }
 
-    private bool _isGoogleAuthorized;
-    public bool IsGoogleAuthorized
+    // null = не перевірено, true = OK, false = помилка
+    private bool? _isDriveConnected;
+    public bool? IsDriveConnected
     {
-        get => _isGoogleAuthorized;
-        private set => SetField(ref _isGoogleAuthorized, value);
+        get => _isDriveConnected;
+        private set => SetField(ref _isDriveConnected, value);
     }
 
-    public AsyncRelayCommand AuthorizeCommand { get; }
+    private bool _isCheckingDrive;
+    public bool IsCheckingDrive
+    {
+        get => _isCheckingDrive;
+        private set => SetField(ref _isCheckingDrive, value);
+    }
+
+    private string? _driveConnectionError;
+    public string? DriveConnectionError
+    {
+        get => _driveConnectionError;
+        private set => SetField(ref _driveConnectionError, value);
+    }
+
+    public AsyncRelayCommand TestDriveConnectionCommand { get; }
 
     // ── Telegram ──────────────────────────────────────────────────────────────
 
@@ -101,7 +116,6 @@ public class SettingsViewModel : ViewModelBase
         _uploader = uploader;
         _telegram = telegram;
 
-        _isGoogleAuthorized   = uploader.IsAuthorized;
         _isTelegramAuthorized = telegram.IsAuthorized;
         _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId)
                                 ?? TelegramChats.FirstOrDefault();
@@ -109,21 +123,26 @@ public class SettingsViewModel : ViewModelBase
         if (_selectedTelegramChat != null && settings.TelegramChatId == 0)
             settings.TelegramChatId = _selectedTelegramChat.Id;
 
-        AuthorizeCommand         = new AsyncRelayCommand(AuthorizeGoogleAsync);
-        AuthorizeTelegramCommand = new AsyncRelayCommand(AuthorizeTelegramAsync);
+        TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
+        AuthorizeTelegramCommand   = new AsyncRelayCommand(AuthorizeTelegramAsync);
 
         _settings.PropertyChanged += OnSettingsChanged;
     }
 
     // ── Commands ──────────────────────────────────────────────────────────────
 
-    private async Task AuthorizeGoogleAsync()
+    private async Task TestDriveConnectionAsync()
     {
-        bool ok = await _uploader.AuthorizeAsync();
-
-        // Google SDK uses ConfigureAwait(false) internally — ensure UI update
-        // happens on the dispatcher thread so WPF binding picks it up
-        Application.Current.Dispatcher.Invoke(() => IsGoogleAuthorized = ok);
+        IsDriveConnected     = null;
+        DriveConnectionError = null;
+        IsCheckingDrive      = true;
+        string? error = await _uploader.TestFolderAccessAsync(_settings.GoogleDriveFolderId);
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsCheckingDrive      = false;
+            IsDriveConnected     = error is null;
+            DriveConnectionError = error;
+        });
     }
 
     private async Task AuthorizeTelegramAsync()
@@ -147,6 +166,9 @@ public class SettingsViewModel : ViewModelBase
                 break;
             case nameof(AppSettings.GoogleDriveFolderId):
                 OnPropertyChanged(nameof(GoogleDriveFolderId));
+                IsDriveConnected     = null;
+                DriveConnectionError = null;
+                IsCheckingDrive      = false;
                 break;
             case nameof(AppSettings.IsTelegramEnabled):
                 OnPropertyChanged(nameof(IsTelegramEnabled));

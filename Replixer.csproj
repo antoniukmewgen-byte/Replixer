@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="credentials.json" Condition="Exists('credentials.json')" />
+    <EmbeddedResource Include="service_account.json" Condition="Exists('service_account.json')" />
   </ItemGroup>
 
   <ItemGroup>

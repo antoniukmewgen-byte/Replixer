@@ -264,14 +264,14 @@
                                         FontSize="14"
                                         Foreground="{StaticResource Text}"
                                         Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        ToolTip="Вставте ID папки з URL Google Drive" />
+                                        ToolTip="Вставте ID Shared Drive або папки з URL" />
                                     <TextBlock
                                         VerticalAlignment="Center"
                                         FontFamily="{StaticResource InterFont}"
                                         FontSize="14"
                                         Foreground="{StaticResource SubText}"
                                         IsHitTestVisible="False"
-                                        Text="ID папки Google Drive">
+                                        Text="ID головної папки (Shared Drive)">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -286,17 +286,19 @@
                                 </Grid>
                             </Border>
 
+                            <!--  Перевірити / Перевірка... / Підключено / Немає доступу  -->
                             <Button
                                 Grid.Column="1"
                                 Margin="12,0,0,0"
                                 Padding="12,8"
                                 HorizontalAlignment="Right"
-                                Command="{Binding AuthorizeCommand}"
-                                Cursor="Hand">
+                                Command="{Binding TestDriveConnectionCommand}"
+                                Cursor="Hand"
+                                ToolTip="{Binding DriveConnectionError}">
                                 <Button.Style>
                                     <Style TargetType="Button">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
+                                            <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
                                                 <Setter Property="IsEnabled" Value="False" />
                                                 <Setter Property="Cursor" Value="Arrow" />
                                             </DataTrigger>
@@ -308,8 +310,8 @@
                                         <Border
                                             x:Name="Bg"
                                             Padding="{TemplateBinding Padding}"
-                                            Background="{StaticResource OtherBrushColor4}"
-                                            BorderBrush="{StaticResource OtherBrushSubColor4}"
+                                            Background="{StaticResource BrushColor4}"
+                                            BorderBrush="{StaticResource BrushBorderColor4}"
                                             BorderThickness="1"
                                             CornerRadius="16">
                                             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -322,6 +324,15 @@
                                                     Fill="{StaticResource OtherBrushSubColor1}"
                                                     Stretch="Uniform"
                                                     Visibility="Collapsed" />
+                                                <Path
+                                                    x:Name="ErrorIcon"
+                                                    Width="12"
+                                                    Height="12"
+                                                    Margin="0,0,6,0"
+                                                    Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
+                                                    Fill="{StaticResource OtherBrushSubColor4}"
+                                                    Stretch="Uniform"
+                                                    Visibility="Collapsed" />
                                                 <TextBlock
                                                     x:Name="Label"
                                                     HorizontalAlignment="Center"
@@ -329,17 +340,30 @@
                                                     FontFamily="{StaticResource InterFont}"
                                                     FontSize="14"
                                                     FontWeight="Medium"
-                                                    Foreground="{StaticResource OtherBrushSubColor4}"
-                                                    Text="Авторизувати" />
+                                                    Foreground="{StaticResource SubText}"
+                                                    Text="Перевірити" />
                                             </StackPanel>
                                         </Border>
                                         <ControlTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding IsGoogleAuthorized}" Value="True">
+                                            <!--  Перевірка...  -->
+                                            <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
+                                                <Setter TargetName="Label" Property="Text" Value="Перевірка..." />
+                                            </DataTrigger>
+                                            <!--  Підключено — зелений  -->
+                                            <DataTrigger Binding="{Binding IsDriveConnected}" Value="True">
                                                 <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
                                                 <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
+                                                <Setter TargetName="Label" Property="Text" Value="Підключено" />
                                                 <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
                                                 <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <!--  Немає доступу — червоний  -->
+                                            <DataTrigger Binding="{Binding IsDriveConnected}" Value="False">
+                                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                                <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                <Setter TargetName="Label" Property="Text" Value="Немає доступу" />
+                                                <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>

@@ -85,6 +85,20 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_telegramChatId == value) return; _telegramChatId = value; OnPropertyChanged(); Save(); }
     }
 
+    private string _userFolderName = string.Empty;
+    public string UserFolderName
+    {
+        get => _userFolderName;
+        set { if (_userFolderName == value) return; _userFolderName = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _userFolderId = string.Empty;
+    public string UserFolderId
+    {
+        get => _userFolderId;
+        set { if (_userFolderId == value) return; _userFolderId = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()
