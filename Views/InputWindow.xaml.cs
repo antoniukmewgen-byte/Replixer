@@ -11,14 +11,28 @@ public partial class InputWindow : Window
     {
         InitializeComponent();
         PromptText.Text = prompt;
-        Loaded += (_, _) => InputBox.Focus();
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Owner != null)
+        {
+            Left   = Owner.Left;
+            Top    = Owner.Top;
+            Width  = Owner.Width;
+            Height = Owner.Height;
+        }
+        InputBox.Focus();
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e) => Confirm();
+    private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
+    private void Overlay_MouseDown(object sender, MouseButtonEventArgs e) => Close();
 
     private void InputBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter) Confirm();
+        if (e.Key == Key.Enter)  Confirm();
+        if (e.Key == Key.Escape) Close();
     }
 
     private void Confirm()

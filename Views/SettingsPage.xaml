@@ -553,44 +553,42 @@
                                     </Grid>
                                 </Border>
 
-                                <Button
+                                <!--  Authorize / Authorized + Logout  -->
+                                <StackPanel
                                     Grid.Column="1"
                                     Margin="12,0,0,0"
-                                    Padding="12,8"
-                                    HorizontalAlignment="Right"
-                                    Command="{Binding AuthorizeTelegramCommand}"
-                                    Cursor="Hand">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsTelegramAuthorized}" Value="True">
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border
-                                                x:Name="Bg"
-                                                Padding="{TemplateBinding Padding}"
-                                                Background="{StaticResource BrushTelegram}"
-                                                BorderBrush="{StaticResource OtherBrushSubColor2}"
-                                                BorderThickness="1"
-                                                CornerRadius="16">
-                                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                    <Path
-                                                        x:Name="CheckIcon"
-                                                        Width="12"
-                                                        Height="12"
-                                                        Margin="0,0,6,0"
-                                                        Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
-                                                        Fill="{StaticResource OtherBrushSubColor1}"
-                                                        Stretch="Uniform"
-                                                        Visibility="Collapsed" />
+                                    Orientation="Horizontal">
+
+                                    <!--  Авторизувати (shown when not authorized)  -->
+                                    <Button
+                                        Padding="12,8"
+                                        Command="{Binding AuthorizeTelegramCommand}"
+                                        Cursor="Hand">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsTelegramAuthorized}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border
+                                                    x:Name="AuthBg"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    Background="{StaticResource BrushTelegram}"
+                                                    BorderBrush="{StaticResource OtherBrushSubColor2}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="16">
                                                     <TextBlock
-                                                        x:Name="Label"
+                                                        x:Name="AuthLabel"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
                                                         FontFamily="{StaticResource InterFont}"
@@ -598,21 +596,100 @@
                                                         FontWeight="Medium"
                                                         Foreground="{StaticResource OtherBrushSubColor2}"
                                                         Text="Авторизувати" />
-                                                </StackPanel>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding IsTelegramAuthorized}" Value="True">
-                                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                                    <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                    <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
-                                                    <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
-                                                    <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
+                                                        <Setter TargetName="AuthLabel" Property="Text" Value="Авторизація..." />
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <!--  Авторизовано + Вийти (shown when authorized)  -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsTelegramAuthorized}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+
+                                        <Border
+                                            Padding="12,8"
+                                            Background="{StaticResource OtherBrushColor1}"
+                                            BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                            BorderThickness="1"
+                                            CornerRadius="16">
+                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                <Path
+                                                    Width="12"
+                                                    Height="12"
+                                                    Margin="0,0,6,0"
+                                                    Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
+                                                    Fill="{StaticResource OtherBrushSubColor1}"
+                                                    Stretch="Uniform" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{StaticResource InterFont}"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource OtherBrushSubColor1}"
+                                                    Text="Авторизовано" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Button
+                                            Margin="8,0,0,0"
+                                            Padding="12,8"
+                                            Command="{Binding LogoutTelegramCommand}"
+                                            Cursor="Hand">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border
+                                                        x:Name="LogoutBg"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        Background="{StaticResource BrushColor4}"
+                                                        BorderBrush="{StaticResource BrushBorderColor4}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="16">
+                                                        <TextBlock
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            FontFamily="{StaticResource InterFont}"
+                                                            FontSize="14"
+                                                            FontWeight="Medium"
+                                                            Foreground="{StaticResource SubText}"
+                                                            Text="Вийти" />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="LogoutBg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                                            <Setter TargetName="LogoutBg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </StackPanel>
+
+                                </StackPanel>
                             </Grid>
+
+                            <!--  Error message  -->
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource OtherBrushSubColor4}"
+                                Text="{Binding TelegramAuthError}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding TelegramAuthError, Converter={StaticResource NullToVisibility}}" />
 
                         </StackPanel>
                     </Border>

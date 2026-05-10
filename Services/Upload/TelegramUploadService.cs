@@ -28,10 +28,22 @@ public class TelegramUploadService
 
     public bool IsAuthorized => File.Exists(SessionPath);
 
+    public void Logout()
+    {
+        _client?.Dispose();
+        _client = null;
+        if (File.Exists(SessionPath))
+            File.Delete(SessionPath);
+        Debug.WriteLine("[TG] Logged out, session deleted");
+    }
+
     // ── Auth ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> AuthorizeAsync(string phone)
+    public async Task<(bool ok, string? error)> AuthorizeAsync(string phone)
     {
+        if (string.IsNullOrWhiteSpace(phone))
+            return (false, "Введіть номер телефону");
+
         _pendingPhone = phone;
         try
         {
@@ -40,13 +52,14 @@ public class TelegramUploadService
             _client = new WTelegram.Client(ConfigProvider);
             var user = await _client.LoginUserIfNeeded();
             Debug.WriteLine($"[TG] Authorized as: {user?.username ?? user?.first_name}");
-            return user != null;
+            return user != null ? (true, null) : (false, "Авторизація не вдалася");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] Auth failed: {ex.Message}");
+            _client?.Dispose();
             _client = null;
-            return false;
+            return (false, ex.Message);
         }
         finally
         {
@@ -159,7 +172,11 @@ public class TelegramUploadService
         string? result = null;
         Application.Current.Dispatcher.Invoke(() =>
         {
-            var win = new InputWindow(prompt);
+            var win = new InputWindow(prompt)
+            {
+                Owner    = Application.Current.MainWindow,
+                Topmost  = true,
+            };
             win.ShowDialog();
             result = win.Result;
         });

@@ -106,7 +106,22 @@ public class SettingsViewModel : ViewModelBase
         private set => SetField(ref _isTelegramAuthorized, value);
     }
 
+    private bool _isAuthorizingTelegram;
+    public bool IsAuthorizingTelegram
+    {
+        get => _isAuthorizingTelegram;
+        private set => SetField(ref _isAuthorizingTelegram, value);
+    }
+
+    private string? _telegramAuthError;
+    public string? TelegramAuthError
+    {
+        get => _telegramAuthError;
+        private set => SetField(ref _telegramAuthError, value);
+    }
+
     public AsyncRelayCommand AuthorizeTelegramCommand { get; }
+    public RelayCommand       LogoutTelegramCommand   { get; }
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -125,6 +140,7 @@ public class SettingsViewModel : ViewModelBase
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         AuthorizeTelegramCommand   = new AsyncRelayCommand(AuthorizeTelegramAsync);
+        LogoutTelegramCommand      = new RelayCommand(LogoutTelegram);
 
         _settings.PropertyChanged += OnSettingsChanged;
     }
@@ -147,8 +163,21 @@ public class SettingsViewModel : ViewModelBase
 
     private async Task AuthorizeTelegramAsync()
     {
-        bool ok = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
-        Application.Current.Dispatcher.Invoke(() => IsTelegramAuthorized = ok);
+        TelegramAuthError = null;
+        IsAuthorizingTelegram = true;
+        var (ok, error) = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsAuthorizingTelegram = false;
+            IsTelegramAuthorized  = ok;
+            TelegramAuthError     = error;
+        });
+    }
+
+    private void LogoutTelegram()
+    {
+        _telegram.Logout();
+        IsTelegramAuthorized = false;
     }
 
     // ── Settings change relay ─────────────────────────────────────────────────
