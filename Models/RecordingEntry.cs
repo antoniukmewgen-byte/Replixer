@@ -43,22 +43,24 @@ public class RecordingEntry : INotifyPropertyChanged
         }
     }
 
-    public bool IsManual => Platform is not ("Telegram" or "Viber" or "WhatsApp.Root");
+    public bool IsManual => Platform is not ("Telegram" or "Viber" or "WhatsApp.Root" or "Ringostat Smart Phone");
 
     public string PlatformDisplayName => Platform switch
     {
-        "WhatsApp.Root" => "WhatsApp",
-        "Telegram"      => "Telegram",
-        "Viber"         => "Viber",
-        _               => "Ручний запис"
+        "WhatsApp.Root"        => "WhatsApp",
+        "Telegram"             => "Telegram",
+        "Viber"                => "Viber",
+        "Ringostat Smart Phone" => "Ringostat",
+        _                      => "Ручний запис"
     };
 
     public string? IconPath => Platform switch
     {
-        "Telegram"      => "/Assets/Icons/telegram.png",
-        "Viber"         => "/Assets/Icons/viber.png",
-        "WhatsApp.Root" => "/Assets/Icons/whatsapp.png",
-        _               => null
+        "Telegram"              => "/Assets/Icons/telegram.png",
+        "Viber"                 => "/Assets/Icons/viber.png",
+        "WhatsApp.Root"         => "/Assets/Icons/whatsapp.png",
+        "Ringostat Smart Phone" => "/Assets/Icons/ringostat.png",
+        _                       => null
     };
 
     public string DateDisplay      => StartedAt.ToString("dd.MM.yyyy");
