@@ -30,6 +30,7 @@ public class HomeViewModel : ViewModelBase
     private bool _isRecording;
     private bool _hasActiveDialog;
     private string _lastDetectedApp = string.Empty;
+    private DateTime? _recordingStartedAt;
 
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
@@ -114,8 +115,8 @@ public class HomeViewModel : ViewModelBase
             if (_hasActiveDialog) return;
 
             ShowDialog(new CallDialogViewModel(
-                title: "Виявлено дзвінок",
-                message: $"Виявлено дзвінок у {app}. Розпочати запис?",
+                appName: app,
+                message: "Виявлено дзвінок. Бажаєте розпочати запис розмови?",
                 primaryLabel:   "Почати запис", onPrimary:   StartRecording,
                 secondaryLabel: "Пропустити",   onSecondary: DismissDialog
             ));
@@ -135,10 +136,11 @@ public class HomeViewModel : ViewModelBase
             if (_hasActiveDialog) return;
 
             ShowDialog(new CallDialogViewModel(
-                title: "Дзвінок завершено",
+                appName: _lastDetectedApp,
                 message: "Дзвінок завершено. Зупинити запис?",
-                primaryLabel:   "Завершити запис",    onPrimary:   StopRecording,
-                secondaryLabel: "Продовжити запис",   onSecondary: DismissDialog
+                primaryLabel:   "Завершити запис",  onPrimary:   StopRecording,
+                secondaryLabel: "Продовжити запис", onSecondary: DismissDialog,
+                recordingStartedAt: _recordingStartedAt
             ));
         });
     }
@@ -149,6 +151,7 @@ public class HomeViewModel : ViewModelBase
     {
         DismissDialog();
         _isRecording = true;
+        _recordingStartedAt = DateTime.Now;
 
         bool started = _recorder.StartRecording(_lastDetectedApp);
         if (!started)
@@ -161,6 +164,7 @@ public class HomeViewModel : ViewModelBase
     {
         DismissDialog();
         _isRecording = false;
+        _recordingStartedAt = null;
 
         // Switch UI back to idle immediately — recording finishes in background
         CallContent = new IdleCallViewModel(StartRecording);

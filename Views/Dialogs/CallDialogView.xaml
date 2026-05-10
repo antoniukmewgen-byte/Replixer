@@ -21,14 +21,14 @@
                     <Border
                         Width="38"
                         Height="38"
-                        Background="{StaticResource BrushTelegram}"
+                        Background="{Binding AppBackground}"
                         CornerRadius="8">
                         <Image
                             Width="18"
                             Height="18"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Source="/Assets/Icons/telegram.png" />
+                            Source="{Binding AppIconSource}" />
                     </Border>
                     <StackPanel Margin="12,0" VerticalAlignment="Center">
                         <TextBlock
@@ -36,9 +36,8 @@
                             FontFamily="{StaticResource InterFont}"
                             FontSize="14"
                             FontWeight="Bold"
-                            Foreground="{StaticResource Text}">
-                            Telegram
-                        </TextBlock>
+                            Foreground="{StaticResource Text}"
+                            Text="{Binding AppName}" />
                         <TextBlock
                             FontFamily="{StaticResource InterFont}"
                             FontSize="12"
@@ -58,15 +57,14 @@
                         Height="8"
                         Margin="0,0,6,0"
                         VerticalAlignment="Center"
-                        Fill="{StaticResource OtherBrushSubColor1}" />
+                        Fill="{Binding StatusColor}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         FontFamily="{StaticResource InterFont}"
                         FontSize="12"
                         FontWeight="Medium"
-                        Foreground="{StaticResource OtherBrushSubColor1}">
-                        Активний
-                    </TextBlock>
+                        Foreground="{Binding StatusColor}"
+                        Text="{Binding StatusText}" />
                 </StackPanel>
             </Grid>
 
@@ -81,10 +79,9 @@
                 FontSize="12"
                 FontWeight="Medium"
                 Foreground="{StaticResource SubText}"
+                Text="{Binding Message}"
                 TextAlignment="Center"
-                TextWrapping="Wrap">
-                Виявлено дзвінок. Бажаєте розпочати запис розмови?
-            </TextBlock>
+                TextWrapping="Wrap" />
             <Border
                 Margin="16,12"
                 Padding="12,8"
@@ -126,9 +123,8 @@
                         FontFamily="{StaticResource InterFont}"
                         FontSize="12"
                         FontWeight="Medium"
-                        Foreground="{StaticResource SubText}">
-                        0:00
-                    </TextBlock>
+                        Foreground="{StaticResource SubText}"
+                        Text="{Binding RecordingDuration}" />
                 </Grid>
             </Border>
             <StackPanel Margin="16,0,16,16" Orientation="Horizontal">
@@ -136,6 +132,7 @@
                     Margin="0,0,12,0"
                     Padding="12,8"
                     HorizontalAlignment="Center"
+                    Command="{Binding SecondaryCommand}"
                     Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
@@ -148,14 +145,12 @@
                                 CornerRadius="16">
                                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                     <TextBlock
-                                        x:Name="Label"
                                         VerticalAlignment="Center"
                                         FontFamily="{StaticResource InterFont}"
                                         FontSize="14"
                                         FontWeight="Medium"
-                                        Foreground="{StaticResource SubText}">
-                                        Пропустити
-                                    </TextBlock>
+                                        Foreground="{StaticResource SubText}"
+                                        Text="{Binding SecondaryLabel}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -164,13 +159,14 @@
                 <Button
                     Padding="12,8"
                     HorizontalAlignment="Center"
+                    Command="{Binding PrimaryCommand}"
                     Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border
                                 Padding="{TemplateBinding Padding}"
-                                Background="{StaticResource OtherBrushColor1}"
-                                BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                Background="{Binding PrimaryBackground}"
+                                BorderBrush="{Binding PrimaryAccent}"
                                 BorderThickness="1"
                                 CornerRadius="16">
                                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -179,16 +175,14 @@
                                         Height="10"
                                         Margin="0,0,6,0"
                                         VerticalAlignment="Center"
-                                        Fill="{StaticResource OtherBrushSubColor1}" />
+                                        Fill="{Binding PrimaryAccent}" />
                                     <TextBlock
-                                        x:Name="Label"
                                         VerticalAlignment="Center"
                                         FontFamily="{StaticResource InterFont}"
                                         FontSize="14"
                                         FontWeight="Medium"
-                                        Foreground="{StaticResource OtherBrushSubColor1}">
-                                        Почати запис
-                                    </TextBlock>
+                                        Foreground="{Binding PrimaryAccent}"
+                                        Text="{Binding PrimaryLabel}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
