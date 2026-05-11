@@ -7,6 +7,10 @@
     AllowsTransparency="True"
     Background="Transparent"
     Icon="/Assets/Icons/IconApp.png"
+    RenderOptions.BitmapScalingMode="NearestNeighbor"
+    SnapsToDevicePixels="True"
+    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextRenderingMode="ClearType"
     WindowStyle="None">
 
     <Window.Resources>

@@ -6,8 +6,12 @@
     AllowsTransparency="True"
     Background="Transparent"
     Opacity="0"
+    RenderOptions.BitmapScalingMode="NearestNeighbor"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
+    SnapsToDevicePixels="True"
+    TextOptions.TextFormattingMode="Display"
+    TextOptions.TextRenderingMode="ClearType"
     Topmost="True"
     WindowStyle="None">
 
