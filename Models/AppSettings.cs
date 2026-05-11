@@ -64,6 +64,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_googleDriveFolderId == value) return; _googleDriveFolderId = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool? _isGoogleDriveConnected;
+    public bool? IsGoogleDriveConnected
+    {
+        get => _isGoogleDriveConnected;
+        set { if (_isGoogleDriveConnected == value) return; _isGoogleDriveConnected = value; OnPropertyChanged(); Save(); }
+    }
+
     private bool _isTelegramEnabled = false;
     public bool IsTelegramEnabled
     {
@@ -83,6 +90,13 @@ public class AppSettings : INotifyPropertyChanged
     {
         get => _telegramChatId;
         set { if (_telegramChatId == value) return; _telegramChatId = value; OnPropertyChanged(); Save(); }
+    }
+
+    private bool? _isTelegramConnected;
+    public bool? IsTelegramConnected
+    {
+        get => _isTelegramConnected;
+        set { if (_isTelegramConnected == value) return; _isTelegramConnected = value; OnPropertyChanged(); Save(); }
     }
 
     private string _userFolderName = string.Empty;
@@ -125,6 +139,13 @@ public class AppSettings : INotifyPropertyChanged
         // into a single write 500 ms after the last change.
         _saveDebounce?.Dispose();
         _saveDebounce = new Timer(_ => WriteToDisk(), null, dueTime: 500, period: Timeout.Infinite);
+    }
+
+    public void Flush()
+    {
+        _saveDebounce?.Dispose();
+        _saveDebounce = null;
+        WriteToDisk();
     }
 
     private void WriteToDisk()

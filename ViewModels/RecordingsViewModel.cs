@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace Replixer.ViewModels;
 
@@ -20,6 +21,7 @@ public class RecordingsViewModel : ViewModelBase
     };
 
     private readonly SemaphoreSlim _saveLock = new(1, 1);
+    private List<RecordingDto>? _pendingSave;
     private bool _loading;
 
     public ObservableCollection<RecordingEntry> Recordings { get; } = new();
@@ -88,24 +90,27 @@ public class RecordingsViewModel : ViewModelBase
     {
         if (_loading) return;
 
-        // Snapshot on the UI thread, write asynchronously — never blocks the UI.
-        var dtos = Recordings
+        // Snapshot on the UI thread; SaveAsync picks up the latest snapshot.
+        _pendingSave = Recordings
             .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath))
             .ToList();
 
-        _ = SaveAsync(dtos);
+        _ = SaveAsync();
     }
 
-    private async Task SaveAsync(List<RecordingDto> dtos)
+    private async Task SaveAsync()
     {
-        // Drop the write if a previous save is still in progress —
-        // the next change will trigger another ScheduleSave anyway.
+        // If another save is already running it will loop back and pick up _pendingSave.
         if (!await _saveLock.WaitAsync(millisecondsTimeout: 0)) return;
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SavePath)!);
-            var json = JsonSerializer.Serialize(dtos, JsonOptions);
-            await File.WriteAllTextAsync(SavePath, json);
+            List<RecordingDto>? dtos;
+            while ((dtos = Interlocked.Exchange(ref _pendingSave, null)) is not null)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(SavePath)!);
+                var json = JsonSerializer.Serialize(dtos, JsonOptions);
+                await File.WriteAllTextAsync(SavePath, json);
+            }
         }
         catch { }
         finally

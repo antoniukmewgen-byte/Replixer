@@ -53,7 +53,7 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
     public bool? IsDriveConnected
     {
         get => _isDriveConnected;
-        private set => SetField(ref _isDriveConnected, value);
+        private set { SetField(ref _isDriveConnected, value); _settings.IsGoogleDriveConnected = value; }
     }
 
     private bool _isCheckingDrive;
@@ -99,11 +99,12 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private bool _isTelegramAuthorized;
-    public bool IsTelegramAuthorized
+    // null = не авторизовано, true = авторизовано, false = помилка
+    private bool? _isTelegramConnected;
+    public bool? IsTelegramConnected
     {
-        get => _isTelegramAuthorized;
-        private set => SetField(ref _isTelegramAuthorized, value);
+        get => _isTelegramConnected;
+        private set { SetField(ref _isTelegramConnected, value); _settings.IsTelegramConnected = value; }
     }
 
     private bool _isAuthorizingTelegram;
@@ -120,8 +121,7 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         private set => SetField(ref _telegramAuthError, value);
     }
 
-    public AsyncRelayCommand AuthorizeTelegramCommand { get; }
-    public RelayCommand       LogoutTelegramCommand   { get; }
+    public RelayCommand TelegramActionCommand { get; }
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -131,7 +131,8 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         _uploader = uploader;
         _telegram = telegram;
 
-        _isTelegramAuthorized = telegram.IsAuthorized;
+        _isDriveConnected     = settings.IsGoogleDriveConnected;
+        _isTelegramConnected  = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
         _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId)
                                 ?? TelegramChats.FirstOrDefault();
 
@@ -139,8 +140,7 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
             settings.TelegramChatId = _selectedTelegramChat.Id;
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
-        AuthorizeTelegramCommand   = new AsyncRelayCommand(AuthorizeTelegramAsync);
-        LogoutTelegramCommand      = new RelayCommand(LogoutTelegram);
+        TelegramActionCommand      = new RelayCommand(TelegramAction);
 
         _settings.PropertyChanged += OnSettingsChanged;
     }
@@ -161,15 +161,17 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         });
     }
 
+    private void TelegramAction() => _ = AuthorizeTelegramAsync();
+
     private async Task AuthorizeTelegramAsync()
     {
-        TelegramAuthError = null;
+        TelegramAuthError    = null;
         IsAuthorizingTelegram = true;
         var (ok, error) = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
         Application.Current.Dispatcher.Invoke(() =>
         {
             IsAuthorizingTelegram = false;
-            IsTelegramAuthorized  = ok;
+            IsTelegramConnected   = ok ? true : (bool?)false;
             TelegramAuthError     = error;
         });
     }
@@ -177,7 +179,8 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
     private void LogoutTelegram()
     {
         _telegram.Logout();
-        IsTelegramAuthorized = false;
+        IsTelegramConnected  = null;
+        TelegramAuthError    = null;
     }
 
     // ── IDisposable ───────────────────────────────────────────────────────────
@@ -208,6 +211,8 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
                 break;
             case nameof(AppSettings.TelegramPhone):
                 OnPropertyChanged(nameof(TelegramPhone));
+                IsTelegramConnected = null;
+                TelegramAuthError   = null;
                 break;
         }
     }

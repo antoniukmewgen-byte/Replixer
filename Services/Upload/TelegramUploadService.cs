@@ -44,7 +44,7 @@ public class TelegramUploadService
         if (string.IsNullOrWhiteSpace(phone))
             return (false, "Введіть номер телефону");
 
-        _pendingPhone = phone;
+        _pendingPhone = NormalizePhone(phone);
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SessionPath)!);
@@ -154,6 +154,15 @@ public class TelegramUploadService
             Debug.WriteLine($"[TG] ✗ Failed to restore session: {ex.Message}");
             _client = null;
         }
+    }
+
+    private static string NormalizePhone(string phone)
+    {
+        var digits = phone.TrimStart('+').Replace(" ", "").Replace("-", "");
+        // 0XXXXXXXXX → +380XXXXXXXXX
+        if (digits.StartsWith("0") && digits.Length == 10)
+            digits = "380" + digits[1..];
+        return "+" + digits;
     }
 
     private string? ConfigProvider(string what) => what switch

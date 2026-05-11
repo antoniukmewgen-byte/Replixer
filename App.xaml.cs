@@ -29,6 +29,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _services?.GetService<AppSettings>()?.Flush();
         _services?.GetService<MainViewModel>()?.Dispose();
         _notifyIcon?.Dispose();
         _services?.Dispose();
