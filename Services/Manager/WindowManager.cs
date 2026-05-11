@@ -7,13 +7,11 @@ namespace Replixer.Services.Manager
     {
         private CallCheatSheetWindow? _cheatSheet;
 
-        public void ShowCheatSheet(IEnumerable<string> items)
+        public void ShowCheatSheet()
         {
             if (_cheatSheet != null) return;
 
             _cheatSheet = new CallCheatSheetWindow();
-
-            _cheatSheet.DataContext = new { Hints = items };
 
             _cheatSheet.Left = SystemParameters.PrimaryScreenWidth - _cheatSheet.Width - 20;
             _cheatSheet.Top = 50;

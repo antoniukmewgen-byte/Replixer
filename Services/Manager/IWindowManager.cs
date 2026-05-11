@@ -2,7 +2,7 @@
 {
     public interface IWindowManager
     {
-        void ShowCheatSheet(IEnumerable<string> items);
+        void ShowCheatSheet();
         void CloseCheatSheet();
     }
 }

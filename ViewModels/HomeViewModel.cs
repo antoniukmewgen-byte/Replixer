@@ -34,17 +34,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private string _lastDetectedApp = string.Empty;
     private DateTime? _recordingStartedAt;
 
-    private static readonly string[] CallHints =
-    [
-        "1. Привітання, тест на дебіла та встановлення рамок",
-        "2. Первинний анамнез та підводимо лінію",
-        "3. Вторинний анамнез, розкриваємо досвід клієнта через техніку \"ближче-далі\"",
-        "4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува",
-        "5. Прийом \" чашка чаю \" + \" ваш кейс унікальний, антиприклад щойно був порожній кейс \"",
-        "6. Ставимо дедлайн, вибираємо день і час",
-        "7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити",
-    ];
-
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
 
@@ -175,7 +164,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
 
         CallContent = new ActiveCallViewModel(StopRecording);
-        App.WindowManager.ShowCheatSheet(CallHints);
+        App.WindowManager.ShowCheatSheet();
     }
 
     private async void StopRecording()
