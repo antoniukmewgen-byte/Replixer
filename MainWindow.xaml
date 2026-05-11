@@ -172,7 +172,7 @@
                         Height="24"
                         Margin="6,0"
                         Fill="{StaticResource BrushBorderColor1}" />
-                    <Button x:Name="CollapseButton" Style="{StaticResource HeaderButton}">
+                    <Button x:Name="CollapseButton" Click="CollapseButton_Click" Style="{StaticResource HeaderButton}">
                         <Path
                             Width="12"
                             Height="12"
