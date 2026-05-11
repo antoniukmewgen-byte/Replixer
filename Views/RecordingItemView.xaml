@@ -136,7 +136,8 @@
                                 Background="{StaticResource BrushColor4}"
                                 BorderBrush="{StaticResource BrushBorderColor4}"
                                 BorderThickness="1"
-                                CornerRadius="50">
+                                CornerRadius="50"
+                                Cursor="{TemplateBinding Cursor}">
                                 <Path
                                     Width="17"
                                     Height="17"
@@ -164,7 +165,8 @@
                                 Background="{StaticResource BrushColor4}"
                                 BorderBrush="{StaticResource BrushBorderColor4}"
                                 BorderThickness="1"
-                                CornerRadius="50">
+                                CornerRadius="50"
+                                Cursor="{TemplateBinding Cursor}">
                                 <Path
                                     Width="17"
                                     Height="17"
