@@ -1,5 +1,7 @@
 using Replixer.Infrastructure;
 using Replixer.ViewModels.Dialogs;
+using Replixer.Views;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Replixer.ViewModels;
@@ -27,6 +29,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
     private readonly HomeViewModel _homeVm;
     private readonly SettingsViewModel _settingsVm;
+    private CallToastWindow? _toast;
 
     public MainViewModel(
         HomeViewModel homeVm,
@@ -37,7 +40,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         _homeVm     = homeVm;
         _settingsVm = settingsVm;
 
-        _homeVm.DialogRequested += vm => Dialog = vm;
+        _homeVm.DialogRequested += OnDialogRequested;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
@@ -46,9 +49,39 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = profileVm);
     }
 
+    private void OnDialogRequested(CallDialogViewModel? vm)
+    {
+        if (vm is null)
+        {
+            Dialog = null;
+            CloseToast();
+            return;
+        }
+
+        if (Application.Current.MainWindow?.IsVisible == true)
+            Dialog = vm;
+        else
+            ShowToast(vm);
+    }
+
+    private void ShowToast(CallDialogViewModel vm)
+    {
+        CloseToast();
+        _toast = new CallToastWindow(vm);
+        _toast.Show();
+    }
+
+    private void CloseToast()
+    {
+        _toast?.Close();
+        _toast = null;
+    }
+
     public void Dispose()
     {
+        _homeVm.DialogRequested -= OnDialogRequested;
         _homeVm.Dispose();
         _settingsVm.Dispose();
+        CloseToast();
     }
 }

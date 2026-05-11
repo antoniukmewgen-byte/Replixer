@@ -29,6 +29,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private bool _isRecording;
     private bool _hasActiveDialog;
+
+    public bool IsRecording => _isRecording;
     private string _lastDetectedApp = string.Empty;
     private DateTime? _recordingStartedAt;
 
@@ -149,11 +151,25 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     // ── Recording ─────────────────────────────────────────────────────────────
 
+    public void ManualStartRecording()
+    {
+        if (_isRecording) return;
+        if (string.IsNullOrEmpty(_lastDetectedApp))
+            _lastDetectedApp = "Ручний запис";
+        StartRecording();
+    }
+
+    public void ManualStopRecording()
+    {
+        if (_isRecording) StopRecording();
+    }
+
     private void StartRecording()
     {
         DismissDialog();
         _isRecording        = true;
         _recordingStartedAt = DateTime.Now;
+        OnPropertyChanged(nameof(IsRecording));
 
         if (!_recorder.StartRecording(_lastDetectedApp))
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
@@ -167,6 +183,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         DismissDialog();
         _isRecording        = false;
         _recordingStartedAt = null;
+        OnPropertyChanged(nameof(IsRecording));
         CallContent         = new IdleCallViewModel(StartRecording);
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);

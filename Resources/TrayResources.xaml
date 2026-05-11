@@ -1,7 +1,6 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:tb="http://www.hardcodet.net/taskbar"
-                    xmlns:local="clr-namespace:Replixer.ViewModels">
+                    xmlns:tb="http://www.hardcodet.net/taskbar">
 
     <SolidColorBrush x:Key="TrayBg" Color="#111214"/>
     <SolidColorBrush x:Key="TrayHover" Color="#35373C"/>
@@ -14,12 +13,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
-                    <Border x:Name="BgBorder" 
-                            Background="Transparent" 
-                            CornerRadius="5" 
+                    <Border x:Name="BgBorder"
+                            Background="Transparent"
+                            CornerRadius="5"
                             Margin="5,2">
                         <Grid Height="34">
-                            <ContentPresenter ContentSource="Header" 
+                            <ContentPresenter ContentSource="Header"
                                               VerticalAlignment="Center"
                                               Margin="10,0"/>
                         </Grid>
@@ -42,12 +41,12 @@
         <Setter Property="Background" Value="{StaticResource TrayBg}"/>
         <Setter Property="Width" Value="210"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Grid.IsSharedSizeScope" Value="false"/>
+        <Setter Property="HasDropShadow" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContextMenu">
-                    <Border Background="{TemplateBinding Background}" 
-                            CornerRadius="9" 
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="9"
                             Padding="0,5">
                         <StackPanel IsItemsHost="True"/>
                     </Border>
@@ -56,35 +55,52 @@
         </Setter>
     </Style>
 
-    <local:TrayViewModel x:Key="TrayVM"/>
+    <Style x:Key="TraySeparatorStyle" TargetType="Separator">
+        <Setter Property="Background" Value="{StaticResource TraySeparator}"/>
+        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Rectangle Height="1"
+                               Fill="{TemplateBinding Background}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <tb:TaskbarIcon x:Key="NotifyIcon"
-                    DataContext="{StaticResource TrayVM}"
                     IconSource="/Assets/Icons/IconApp.png"
-                    ToolTipText="Replixer">
+                    ToolTipText="Replixer"
+                    LeftClickCommand="{Binding OpenCommand}"
+                    DoubleClickCommand="{Binding OpenCommand}">
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu Style="{StaticResource TrayContextMenuStyle}">
 
-                <MenuItem Header="Replixer" IsEnabled="False" Opacity="1">
-                    <MenuItem.HeaderTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" FontWeight="Bold" Foreground="Gray" FontSize="11"/>
-                        </DataTemplate>
-                    </MenuItem.HeaderTemplate>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock Text="Replixer"
+                                   FontWeight="Bold"
+                                   Foreground="Gray"
+                                   FontSize="11"/>
+                    </MenuItem.Header>
                 </MenuItem>
 
+                <Separator Style="{StaticResource TraySeparatorStyle}"/>
 
-                <MenuItem Header="Записати дзвінок" 
-                          Command="{Binding RecordCommand}"
-                          Foreground="{StaticResource TrayText}"/>
+                <MenuItem Header="{Binding RecordLabel}"
+                          Command="{Binding RecordCommand}"/>
 
                 <MenuItem Header="Відкрити Replixer"
-                          Command="{Binding OpenVaultCommand}"/>
+                          Command="{Binding OpenCommand}"/>
 
+                <Separator Style="{StaticResource TraySeparatorStyle}"/>
 
                 <MenuItem Header="Вийти"
                           Command="{Binding ExitCommand}"/>
+
             </ContextMenu>
         </tb:TaskbarIcon.ContextMenu>
     </tb:TaskbarIcon>
+
 </ResourceDictionary>

@@ -1,3 +1,4 @@
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.DependencyInjection;
 using Replixer.Models;
 using Replixer.Services.Manager;
@@ -12,7 +13,7 @@ public partial class App : Application
     public static IWindowManager WindowManager { get; } = new WindowManager();
 
     private ServiceProvider? _services;
-    private Hardcodet.Wpf.TaskbarNotification.TaskbarIcon? _notifyIcon;
+    private TaskbarIcon? _notifyIcon;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -24,7 +25,12 @@ public partial class App : Application
         MainWindow = mainWindow;
         mainWindow.Show();
 
-        _notifyIcon = (Hardcodet.Wpf.TaskbarNotification.TaskbarIcon)FindResource("NotifyIcon");
+        _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
+
+        var trayVm = _services.GetRequiredService<TrayViewModel>();
+        _notifyIcon.DataContext = trayVm;
+        trayVm.BalloonRequested += (title, msg) =>
+            _notifyIcon.ShowBalloonTip(title, msg, BalloonIcon.Info);
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -54,6 +60,7 @@ public partial class App : Application
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<MainViewModel>();
+        services.AddSingleton<TrayViewModel>();
 
         // View
         services.AddSingleton<MainWindow>();

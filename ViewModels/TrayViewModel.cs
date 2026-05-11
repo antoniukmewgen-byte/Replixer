@@ -1,41 +1,58 @@
-﻿using Replixer.Infrastructure;
+using Replixer.Infrastructure;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Replixer.ViewModels
+namespace Replixer.ViewModels;
+
+public sealed class TrayViewModel : ViewModelBase
 {
-    public class TrayViewModel : ViewModelBase
+    private readonly MainWindow  _mainWindow;
+    private readonly HomeViewModel _homeVm;
+
+    public event Action<string, string>? BalloonRequested;
+
+    public ICommand OpenCommand   { get; }
+    public ICommand RecordCommand { get; }
+    public ICommand ExitCommand   { get; }
+
+    public string RecordLabel =>
+        _homeVm.IsRecording ? "Зупинити запис" : "Записати дзвінок";
+
+    public TrayViewModel(MainWindow mainWindow, HomeViewModel homeVm)
     {
-        public ICommand RecordCommand { get; }
-        public ICommand OpenVaultCommand { get; }
-        public ICommand ExitCommand { get; }
+        _mainWindow = mainWindow;
+        _homeVm     = homeVm;
 
-        public TrayViewModel()
-        {
-            RecordCommand = new RelayCommand(StartRecording);
-            OpenVaultCommand = new RelayCommand(OpenVault);
-            ExitCommand = new RelayCommand(ExitApp);
-        }
+        OpenCommand   = new RelayCommand(OpenVault);
+        RecordCommand = new RelayCommand(ToggleRecording);
+        ExitCommand   = new RelayCommand(() => Application.Current.Shutdown());
 
-        private void StartRecording()
-        {
-
-        }
-
-        private void OpenVault()
-        {
-            var mainWindow = Application.Current.MainWindow;
-            if (mainWindow != null)
-            {
-                mainWindow.Show();
-                mainWindow.WindowState = WindowState.Normal;
-                mainWindow.Activate();
-            }
-        }
-
-        private void ExitApp()
-        {
-            Application.Current.Shutdown();
-        }
+        _homeVm.PropertyChanged += OnHomePropertyChanged;
     }
+
+    private void OnHomePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(HomeViewModel.IsRecording))
+            OnPropertyChanged(nameof(RecordLabel));
+    }
+
+    private void OpenVault()
+    {
+        _mainWindow.Show();
+        if (_mainWindow.WindowState == WindowState.Minimized)
+            _mainWindow.WindowState = WindowState.Normal;
+        _mainWindow.Activate();
+    }
+
+    private void ToggleRecording()
+    {
+        if (_homeVm.IsRecording)
+            _homeVm.ManualStopRecording();
+        else
+            _homeVm.ManualStartRecording();
+    }
+
+    public void ShowBalloon(string title, string message) =>
+        BalloonRequested?.Invoke(title, message);
 }
