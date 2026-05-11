@@ -104,12 +104,15 @@ public partial class MainWindow : Window
             ? WindowState.Normal
             : WindowState.Maximized;
 
+    private const string IconExpand  = "M22.5,15.5A1.5,1.5,0,0,0,21,17v1.5A2.5,2.5,0,0,1,18.5,21H17a1.5,1.5,0,0,0,0,3h1.5A5.506,5.506,0,0,0,24,18.5V17A1.5,1.5,0,0,0,22.5,15.5Z M7,0H5.5A5.506,5.506,0,0,0,0,5.5V7A1.5,1.5,0,0,0,3,7V5.5A2.5,2.5,0,0,1,5.5,3H7A1.5,1.5,0,0,0,7,0Z M7,21H5.5A2.5,2.5,0,0,1,3,18.5V17a1.5,1.5,0,0,0-3,0v1.5A5.506,5.506,0,0,0,5.5,24H7a1.5,1.5,0,0,0,0-3Z M18.5,0H17a1.5,1.5,0,0,0,0,3h1.5A2.5,2.5,0,0,1,21,5.5V7a1.5,1.5,0,0,0,3,0V5.5A5.506,5.506,0,0,0,18.5,0Z";
+    private const string IconCollapse = "M9,2.5A6.5,6.5,0,0,1,2.5,9h-1a1.5,1.5,0,0,1,0-3h1A3.5,3.5,0,0,0,6,2.5v-1a1.5,1.5,0,0,1,3,0Z M16.5,24A1.5,1.5,0,0,1,15,22.5v-1A6.5,6.5,0,0,1,21.5,15h1a1.5,1.5,0,0,1,0,3h-1A3.5,3.5,0,0,0,18,21.5v1A1.5,1.5,0,0,1,16.5,24Z M22.5,9h-1A6.5,6.5,0,0,1,15,2.5v-1a1.5,1.5,0,0,1,3,0v1A3.5,3.5,0,0,0,21.5,6h1a1.5,1.5,0,0,1,0,3Z M7.5,24A1.5,1.5,0,0,1,6,22.5v-1A3.5,3.5,0,0,0,2.5,18h-1a1.5,1.5,0,0,1,0-3h1A6.5,6.5,0,0,1,9,21.5v1A1.5,1.5,0,0,1,7.5,24Z";
+
     protected override void OnStateChanged(EventArgs e)
     {
         base.OnStateChanged(e);
-        RootBorder.CornerRadius = WindowState == WindowState.Maximized
-            ? new CornerRadius(0)
-            : new CornerRadius(12);
+        var maximized = WindowState == WindowState.Maximized;
+        RootBorder.CornerRadius  = maximized ? new CornerRadius(0) : new CornerRadius(12);
+        FullscreenIcon.Data      = Geometry.Parse(maximized ? IconCollapse : IconExpand);
     }
 
     private void CollapseButton_Click(object sender, RoutedEventArgs e) => Hide();
