@@ -72,81 +72,9 @@
                 </ItemsControl>
 
                 <!--  Empty state  -->
-                <StackPanel
+                <views:EmptyRecordingsView
                     Grid.Row="1"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}">
-                    <Grid Width="60" Height="60">
-                        <Ellipse Fill="{StaticResource BrushColor4}" Stroke="{StaticResource BrushBorderColor4}" />
-                        <Path
-                            Width="30"
-                            Height="30"
-                            Data="m14 7v-6.54a6.977 6.977 0 0 1 2.465 1.59l3.484 3.486a6.954 6.954 0 0 1 1.591 2.464h-6.54a1 1 0 0 1 -1-1zm8 3.485v8.515a5.006 5.006 0 0 1 -5 5h-10a5.006 5.006 0 0 1 -5-5v-14a5.006 5.006 0 0 1 5-5h4.515c.163 0 .324.013.485.024v6.976a3 3 0 0 0 3 3h6.976c.011.161.024.322.024.485zm-6 6.515a1 1 0 0 0 -1-1h-2v-2a1 1 0 0 0 -2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 1-1z"
-                            Fill="{StaticResource SubText}"
-                            Stretch="Uniform" />
-                    </Grid>
-                    <TextBlock
-                        Margin="0,12,0,4"
-                        HorizontalAlignment="Center"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="14"
-                        FontWeight="Bold"
-                        Foreground="{StaticResource Text}">
-                        Записів не знайдено
-                    </TextBlock>
-                    <TextBlock
-                        Width="300"
-                        Margin="0,0,0,12"
-                        HorizontalAlignment="Center"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="12"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource SubText}"
-                        TextAlignment="Center"
-                        TextWrapping="Wrap">
-                        Коли відбудеться дзвінок у WhatsApp, Telegram, Viber або інші програми - запис з'явиться тут
-                    </TextBlock>
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                        <Border
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource BrushTelegram}"
-                            CornerRadius="8">
-                            <Image
-                                Width="18"
-                                Height="18"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Source="/Assets/Icons/telegram.png" />
-                        </Border>
-                        <Border
-                            Width="38"
-                            Height="38"
-                            Margin="6,0"
-                            Background="{StaticResource BrushViber}"
-                            CornerRadius="8">
-                            <Image
-                                Width="18"
-                                Height="18"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Source="/Assets/Icons/viber.png" />
-                        </Border>
-                        <Border
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource BrushWhatsApp}"
-                            CornerRadius="8">
-                            <Image
-                                Width="18"
-                                Height="18"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Source="/Assets/Icons/whatsapp.png" />
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
+                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}" />
 
             </Grid>
         </Border>

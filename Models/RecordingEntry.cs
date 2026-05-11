@@ -81,12 +81,10 @@ public class RecordingEntry : INotifyPropertyChanged
         Platform  = platform;
         StartedAt = startedAt;
         OpenInDriveCommand = new RelayCommand(
-            () => Process.Start(new ProcessStartInfo(_driveUrl!) { UseShellExecute = true }),
-            () => !string.IsNullOrEmpty(_driveUrl));
+            () => Process.Start(new ProcessStartInfo(_driveUrl!) { UseShellExecute = true }));
 
         OpenInExplorerCommand = new RelayCommand(
-            () => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_filePath}\"") { UseShellExecute = true }),
-            () => !string.IsNullOrEmpty(_filePath));
+            () => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_filePath}\"") { UseShellExecute = true }));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

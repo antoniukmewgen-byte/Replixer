@@ -1,5 +1,6 @@
 using Replixer.Models;
-using Replixer.Views;
+using Replixer.ViewModels;
+using Replixer.ViewModels.Dialogs;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -178,17 +179,20 @@ public class TelegramUploadService
 
     private static string? AskForInput(string prompt)
     {
-        string? result = null;
+        // ConfigProvider is called from a WTelegramClient background thread.
+        // We post the overlay to the UI thread, then block the background thread
+        // on the TCS until the user confirms or cancels.
+        var tcs = new TaskCompletionSource<string?>();
         Application.Current.Dispatcher.Invoke(() =>
         {
-            var win = new InputWindow(prompt)
+            var mainVm = (MainViewModel)Application.Current.MainWindow.DataContext;
+            var vm = new InputDialogViewModel(prompt, result =>
             {
-                Owner    = Application.Current.MainWindow,
-                Topmost  = true,
-            };
-            win.ShowDialog();
-            result = win.Result;
+                mainVm.HideInputDialog();
+                tcs.TrySetResult(result);
+            });
+            mainVm.ShowInputDialog(vm);
         });
-        return result;
+        return tcs.Task.GetAwaiter().GetResult();
     }
 }

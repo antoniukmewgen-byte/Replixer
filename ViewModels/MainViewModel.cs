@@ -15,8 +15,9 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         private set => SetField(ref _currentViewModel, value);
     }
 
-    private CallDialogViewModel? _dialog;
-    public CallDialogViewModel? Dialog
+    // Holds either CallDialogViewModel or InputDialogViewModel
+    private ViewModelBase? _dialog;
+    public ViewModelBase? Dialog
     {
         get => _dialog;
         private set => SetField(ref _dialog, value);
@@ -40,7 +41,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         _homeVm     = homeVm;
         _settingsVm = settingsVm;
 
-        _homeVm.DialogRequested += OnDialogRequested;
+        _homeVm.DialogRequested += OnCallDialogRequested;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
@@ -49,11 +50,13 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = profileVm);
     }
 
-    private void OnDialogRequested(CallDialogViewModel? vm)
+    // ── Call dialog (from HomeViewModel) ─────────────────────────────────────
+
+    private void OnCallDialogRequested(CallDialogViewModel? vm)
     {
         if (vm is null)
         {
-            Dialog = null;
+            if (Dialog is CallDialogViewModel) Dialog = null;
             CloseToast();
             return;
         }
@@ -77,9 +80,17 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         _toast = null;
     }
 
+    // ── Input dialog (from TelegramUploadService) ─────────────────────────────
+
+    public void ShowInputDialog(InputDialogViewModel vm) => Dialog = vm;
+
+    public void HideInputDialog() => Dialog = null;
+
+    // ── IDisposable ───────────────────────────────────────────────────────────
+
     public void Dispose()
     {
-        _homeVm.DialogRequested -= OnDialogRequested;
+        _homeVm.DialogRequested -= OnCallDialogRequested;
         _homeVm.Dispose();
         _settingsVm.Dispose();
         CloseToast();
