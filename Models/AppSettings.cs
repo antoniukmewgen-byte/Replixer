@@ -20,7 +20,7 @@ public class AppSettings : INotifyPropertyChanged
 
     // ── Properties ───────────────────────────────────────────────────────────
 
-    private MonitorMode _monitorMode = MonitorMode.Window;
+    private MonitorMode _monitorMode = MonitorMode.Microphone;
 
     public MonitorMode MonitorMode
     {
