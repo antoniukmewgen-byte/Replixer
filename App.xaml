@@ -41,6 +41,9 @@
             <DataTemplate DataType="{x:Type dialogs:InputDialogViewModel}">
                 <dialogViews:InputDialogView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type dialogs:CallReportViewModel}">
+                <dialogViews:CallReportView />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Application.Resources>

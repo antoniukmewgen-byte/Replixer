@@ -43,7 +43,8 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _settingsVm = settingsVm;
         _profileVm  = profileVm;
 
-        _homeVm.DialogRequested += OnCallDialogRequested;
+        _homeVm.DialogRequested    += OnCallDialogRequested;
+        _homeVm.CallReportRequested += OnCallReportRequested;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
@@ -82,6 +83,18 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _toast = null;
     }
 
+    // ── Call report dialog (from HomeViewModel) ───────────────────────────────
+
+    private void OnCallReportRequested(CallReportViewModel? vm)
+    {
+        if (vm is null)
+        {
+            if (Dialog is CallReportViewModel) Dialog = null;
+            return;
+        }
+        Dialog = vm;
+    }
+
     // ── Input dialog (from TelegramUploadService) ─────────────────────────────
 
     public void ShowInputDialog(InputDialogViewModel vm) => Dialog = vm;
@@ -92,7 +105,8 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public void Dispose()
     {
-        _homeVm.DialogRequested -= OnCallDialogRequested;
+        _homeVm.DialogRequested     -= OnCallDialogRequested;
+        _homeVm.CallReportRequested -= OnCallReportRequested;
         _homeVm.Dispose();
         _settingsVm.Dispose();
         _profileVm.Dispose();

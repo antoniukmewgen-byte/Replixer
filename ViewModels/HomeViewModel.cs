@@ -17,7 +17,8 @@ namespace Replixer.ViewModels;
 public sealed class HomeViewModel : ViewModelBase, IDisposable
 {
     // MainViewModel subscribes to wire up the dialog overlay.
-    public event Action<CallDialogViewModel?>? DialogRequested;
+    public event Action<CallDialogViewModel?>?  DialogRequested;
+    public event Action<CallReportViewModel?>?  CallReportRequested;
 
     private readonly AppSettings _settings;
     private readonly IUploadOrchestrator _orchestrator;
@@ -187,7 +188,11 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 return;
             }
 
-            var result = await _orchestrator.UploadAsync(path);
+            string? caption = null;
+            if (_orchestrator.IsTelegramReady)
+                caption = await RequestCallReportAsync();
+
+            var result = await _orchestrator.UploadAsync(path, caption);
             entry.DriveUrl = result.DriveUrl;
             entry.FilePath = result.LocalPath;
             entry.Status   = RecordingStatus.Saved;
@@ -199,6 +204,24 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.Status = RecordingStatus.Error;
         }
     }
+
+    // ── Call report form ──────────────────────────────────────────────────────
+
+    private Task<string?> RequestCallReportAsync()
+    {
+        var tcs = new TaskCompletionSource<string?>();
+        var vm  = new CallReportViewModel(
+            onComplete: data =>
+            {
+                DismissCallReport();
+                tcs.TrySetResult(data?.FormatCaption());
+            },
+            managerName: _settings.ManagerName);
+        CallReportRequested?.Invoke(vm);
+        return tcs.Task;
+    }
+
+    private void DismissCallReport() => CallReportRequested?.Invoke(null);
 
     // ── Dialog helpers ────────────────────────────────────────────────────────
 

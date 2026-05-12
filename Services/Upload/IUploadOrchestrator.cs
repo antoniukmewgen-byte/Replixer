@@ -8,5 +8,6 @@ public readonly record struct UploadResult
 
 public interface IUploadOrchestrator
 {
-    Task<UploadResult> UploadAsync(string filePath, CancellationToken ct = default);
+    bool IsTelegramReady { get; }
+    Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, CancellationToken ct = default);
 }

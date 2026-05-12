@@ -1,0 +1,339 @@
+<UserControl
+    x:Class="Replixer.Views.Dialogs.CallReportView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:Replixer.ViewModels.Dialogs">
+
+    <Border
+        Padding="16"
+        Width="500"
+        Background="{StaticResource BrushColor2}"
+        BorderBrush="{StaticResource BrushBorderColor2}"
+        BorderThickness="1"
+        CornerRadius="12">
+        <StackPanel>
+
+            <TextBlock
+                Margin="0,0,0,12"
+                FontFamily="{StaticResource InterFont}"
+                FontSize="12"
+                FontWeight="Bold"
+                Foreground="{StaticResource SubText}">
+                ЗВІТ ПО ДЗВІНКУ
+            </TextBlock>
+
+            <Border
+                Padding="16"
+                Background="{StaticResource BrushColor3}"
+                BorderBrush="{StaticResource BrushBorderColor3}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel>
+
+                    <!--  Тип дзвінка  -->
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}">
+                            Тип дзвінка
+                        </TextBlock>
+                        <ComboBox
+                            Style="{StaticResource AppComboBox}"
+                            Tag="Оберіть..."
+                            ItemsSource="{x:Static vm:CallReportViewModel.CallTypes}"
+                            SelectedItem="{Binding SelectedCallType}" />
+                        <!--  Custom call type input — visible when "Інший" is selected  -->
+                        <Border
+                            Margin="0,8,0,0"
+                            Style="{StaticResource AppInputBorder}"
+                            Visibility="{Binding IsCustomCallTypeVisible, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                                <TextBox
+                                    x:Name="CustomCallTypeBox"
+                                    Style="{StaticResource AppTextBox}"
+                                    Text="{Binding CustomCallType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    Foreground="{StaticResource SubText}"
+                                    IsHitTestVisible="False"
+                                    Text="Введіть тип...">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=CustomCallTypeBox}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!--  Джерело ліда | Оцінка розмови  -->
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}">
+                                Джерело ліда
+                            </TextBlock>
+                            <ComboBox
+                                Style="{StaticResource AppComboBox}"
+                                Tag="Оберіть..."
+                                ItemsSource="{x:Static vm:CallReportViewModel.LeadSources}"
+                                SelectedItem="{Binding SelectedLeadSource}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}">
+                                Оцінка розмови
+                            </TextBlock>
+                            <ComboBox
+                                Style="{StaticResource AppComboBox}"
+                                Tag="Оберіть..."
+                                ItemsSource="{x:Static vm:CallReportViewModel.Ratings}"
+                                SelectedItem="{Binding SelectedRating}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  До чого дійшли | Вірогідність оплати  -->
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}">
+                                До чого дійшли
+                            </TextBlock>
+                            <ComboBox
+                                Style="{StaticResource AppComboBox}"
+                                Tag="Оберіть..."
+                                ItemsSource="{x:Static vm:CallReportViewModel.Outcomes}"
+                                SelectedItem="{Binding SelectedOutcome}" />
+                            <!--  Invoice paid checkbox — visible when "Виставив рахунок" is selected  -->
+                            <CheckBox
+                                Margin="0,8,0,0"
+                                Cursor="Hand"
+                                FocusVisualStyle="{x:Null}"
+                                IsChecked="{Binding IsInvoicePaid}"
+                                Visibility="{Binding IsInvoiceCheckboxVisible, Converter={StaticResource BoolToVis}}">
+                                <CheckBox.Template>
+                                    <ControlTemplate TargetType="CheckBox">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="10,7"
+                                            Background="{StaticResource BrushColor4}"
+                                            BorderBrush="{StaticResource BrushBorderColor4}"
+                                            BorderThickness="1"
+                                            CornerRadius="10">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Border
+                                                    x:Name="Box"
+                                                    Width="16"
+                                                    Height="16"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center"
+                                                    Background="Transparent"
+                                                    BorderBrush="{StaticResource SubText}"
+                                                    BorderThickness="1.5"
+                                                    CornerRadius="4">
+                                                    <Path
+                                                        x:Name="Check"
+                                                        Width="9"
+                                                        Height="7"
+                                                        Data="M 0 3.5 L 3 6.5 L 9 0"
+                                                        Stroke="{StaticResource OtherBrushSubColor1}"
+                                                        StrokeEndLineCap="Round"
+                                                        StrokeLineJoin="Round"
+                                                        StrokeStartLineCap="Round"
+                                                        StrokeThickness="1.5"
+                                                        Visibility="Collapsed" />
+                                                </Border>
+                                                <TextBlock
+                                                    x:Name="Label"
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{StaticResource InterFont}"
+                                                    FontSize="13"
+                                                    Foreground="{StaticResource Text}"
+                                                    Text="Рахунок не оплачено" />
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                                                <Setter TargetName="Box" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                                                <Setter TargetName="Label" Property="Text" Value="Рахунок оплачено" />
+                                                <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </CheckBox.Template>
+                            </CheckBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}">
+                                Вірогідність оплати
+                            </TextBlock>
+                            <ComboBox
+                                Style="{StaticResource AppComboBox}"
+                                Tag="Оберіть..."
+                                ItemsSource="{x:Static vm:CallReportViewModel.Ratings}"
+                                SelectedItem="{Binding SelectedPaymentProbability}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  CRM  -->
+                    <StackPanel Margin="0,12,0,0">
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}">
+                            Посилання на CRM
+                        </TextBlock>
+                        <Border Style="{StaticResource AppInputBorder}">
+                            <Grid>
+                                <TextBox
+                                    x:Name="CrmBox"
+                                    Style="{StaticResource AppTextBox}"
+                                    Text="{Binding CrmUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    Foreground="{StaticResource SubText}"
+                                    IsHitTestVisible="False"
+                                    Text="Введіть посилання...">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=CrmBox}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!--  Примітка  -->
+                    <StackPanel Margin="0,12,0,0">
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}">
+                            Примітки
+                        </TextBlock>
+                        <Border Style="{StaticResource AppInputBorder}">
+                            <Grid>
+                                <TextBox
+                                    x:Name="NotesBox"
+                                    MinHeight="60"
+                                    Style="{StaticResource AppTextBox}"
+                                    VerticalAlignment="Top"
+                                    AcceptsReturn="True"
+                                    Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    TextWrapping="Wrap"
+                                    VerticalScrollBarVisibility="Auto" />
+                                <TextBlock
+                                    VerticalAlignment="Top"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    Foreground="{StaticResource SubText}"
+                                    IsHitTestVisible="False"
+                                    Text="Введіть примітку...">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=NotesBox}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!--  Submit button  -->
+                    <Button
+                        Margin="0,12,0,0"
+                        Padding="12,9"
+                        HorizontalAlignment="Stretch"
+                        Command="{Binding SubmitCommand}"
+                        Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border
+                                    x:Name="Bg"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{StaticResource BrushColor4}"
+                                    BorderBrush="{StaticResource BrushBorderColor4}"
+                                    BorderThickness="1"
+                                    CornerRadius="10">
+                                    <TextBlock
+                                        x:Name="Label"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource SubText}"
+                                        Text="{Binding SubmitLabel}" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

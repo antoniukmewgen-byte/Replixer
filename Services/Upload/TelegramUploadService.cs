@@ -86,7 +86,7 @@ public class TelegramUploadService
 
     // ── Send ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> SendFileAsync(string filePath, long chatId)
+    public async Task<bool> SendFileAsync(string filePath, long chatId, string? caption = null)
     {
         Debug.WriteLine($"[TG] ── SendFileAsync ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
@@ -110,7 +110,7 @@ public class TelegramUploadService
             var inputFile = await _client.UploadFileAsync(filePath);
             var fileName  = Path.GetFileName(filePath);
 
-            await _client.SendMediaAsync(peer, $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg");
+            await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg");
 
             Debug.WriteLine("[TG] ✓ Sent successfully");
             return true;
