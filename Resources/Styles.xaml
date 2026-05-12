@@ -105,9 +105,9 @@
                                 BorderThickness="1"
                                 CornerRadius="8">
                                 <ScrollViewer
-                                    MaxHeight="220"
+                                    MaxHeight="150"
                                     CanContentScroll="True"
-                                    VerticalScrollBarVisibility="Auto">
+                                    VerticalScrollBarVisibility="Hidden">
                                     <ItemsPresenter />
                                 </ScrollViewer>
                             </Border>
