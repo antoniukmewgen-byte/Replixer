@@ -8,7 +8,7 @@ using System.Windows.Threading;
 
 namespace Replixer.Services.Upload;
 
-public class TelegramUploadService
+public class TelegramUploadService : IDisposable
 {
     private const int    ApiId   = 12654804;
     private const string ApiHash = "05c29366d6fcc9c48f3778321ad99656";
@@ -153,6 +153,14 @@ public class TelegramUploadService
         return null;
     }
 
+    // ── IDisposable ───────────────────────────────────────────────────────────
+
+    public void Dispose()
+    {
+        _client?.Dispose();
+        _client = null;
+    }
+
     // ── Private ───────────────────────────────────────────────────────────────
 
     private async Task EnsureClientAsync()
@@ -187,7 +195,7 @@ public class TelegramUploadService
         "api_id"            => ApiId.ToString(),
         "api_hash"          => ApiHash,
         "session_pathname"  => SessionPath,
-        "phone_number"      => _pendingPhone ?? _settings.TelegramPhone,
+        "phone_number"      => _pendingPhone ?? (string.IsNullOrWhiteSpace(_settings.TelegramPhone) ? null : NormalizePhone(_settings.TelegramPhone)),
         "verification_code" => AskForInput("Введіть код підтвердження з Telegram:"),
         "password"          => AskForInput("Введіть пароль двофакторної авторизації:"),
         _                   => null,
