@@ -70,6 +70,15 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     // ── Telegram ──────────────────────────────────────────────────────────────
 
+    public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
+
+    private TelegramChat? _selectedTelegramChat;
+    public TelegramChat? SelectedTelegramChat
+    {
+        get => _selectedTelegramChat;
+        set => SetField(ref _selectedTelegramChat, value);
+    }
+
     private string _telegramPhone = string.Empty;
     public string TelegramPhone
     {
@@ -129,9 +138,11 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         _driveUploader = driveUploader;
         _telegram      = telegram;
 
-        _googleDriveFolderId = settings.GoogleDriveFolderId;
-        _telegramPhone       = settings.TelegramPhone;
-        _isTelegramConnected = telegram.IsAuthorized ? true : (bool?)null;
+        _googleDriveFolderId  = settings.GoogleDriveFolderId;
+        _telegramPhone        = settings.TelegramPhone;
+        _isTelegramConnected  = telegram.IsAuthorized ? true : (bool?)null;
+        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId)
+                                ?? TelegramChats.FirstOrDefault();
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(() => _ = AuthorizeTelegramAsync());
@@ -181,9 +192,11 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
         if (!string.IsNullOrWhiteSpace(_telegramPhone))
         {
-            _settings.TelegramPhone        = _telegramPhone;
-            _settings.IsTelegramEnabled    = _isTelegramConnected == true;
-            _settings.IsTelegramConnected  = _isTelegramConnected;
+            _settings.TelegramPhone       = _telegramPhone;
+            _settings.IsTelegramEnabled   = _isTelegramConnected == true;
+            _settings.IsTelegramConnected = _isTelegramConnected;
+            if (_selectedTelegramChat is not null)
+                _settings.TelegramChatId = _selectedTelegramChat.Id;
         }
 
         _settings.IsSetupComplete = true;

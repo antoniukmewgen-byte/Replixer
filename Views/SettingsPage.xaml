@@ -481,23 +481,11 @@
                                     Чат для відправки
                                 </TextBlock>
 
-                                <Border
+                                <ComboBox
                                     Grid.Column="1"
-                                    Padding="4,2"
-                                    Background="{StaticResource BrushColor4}"
-                                    BorderBrush="{StaticResource BrushBorderColor4}"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                    <ComboBox
-                                        MinWidth="140"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        FontFamily="{StaticResource InterFont}"
-                                        FontSize="13"
-                                        Foreground="{StaticResource Text}"
-                                        ItemsSource="{Binding TelegramChats}"
-                                        SelectedItem="{Binding SelectedTelegramChat, Mode=TwoWay}" />
-                                </Border>
+                                    MinWidth="150"
+                                    ItemsSource="{Binding TelegramChats}"
+                                    SelectedItem="{Binding SelectedTelegramChat, Mode=TwoWay}" />
                             </Grid>
 
                             <!--  Phone + Authorize  -->
