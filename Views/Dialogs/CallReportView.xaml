@@ -268,12 +268,13 @@
                                 <TextBox
                                     x:Name="NotesBox"
                                     MinHeight="60"
+                                    MaxHeight="100"
                                     Style="{StaticResource AppTextBox}"
                                     VerticalAlignment="Top"
                                     AcceptsReturn="True"
                                     Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     TextWrapping="Wrap"
-                                    VerticalScrollBarVisibility="Auto" />
+                                    VerticalScrollBarVisibility="Hidden" />
                                 <TextBlock
                                     VerticalAlignment="Top"
                                     FontFamily="{StaticResource InterFont}"

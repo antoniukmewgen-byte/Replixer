@@ -209,6 +209,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private Task<string?> RequestCallReportAsync()
     {
+        App.WindowManager.ShowMainWindow();
+
         var tcs = new TaskCompletionSource<string?>();
         var vm  = new CallReportViewModel(
             onComplete: data =>

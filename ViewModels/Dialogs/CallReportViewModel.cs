@@ -35,7 +35,10 @@ public record CallReportData(
         sb.AppendLine($"✅ До чого дійшли: {outcome}");
         sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");
         if (!string.IsNullOrWhiteSpace(Note))
-            sb.Append($"📝 Примітка: {Note}");
+            sb.AppendLine($"📝 Примітка: {Note}");
+
+        if (Outcome == "Виставив рахунок" && IsInvoicePaid == true)
+            sb.Append("#оплата");
 
         return sb.ToString().TrimEnd();
     }

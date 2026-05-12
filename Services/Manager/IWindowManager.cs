@@ -4,5 +4,6 @@
     {
         void ShowCheatSheet();
         void CloseCheatSheet();
+        void ShowMainWindow();
     }
 }

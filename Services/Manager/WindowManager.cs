@@ -24,5 +24,15 @@ namespace Replixer.Services.Manager
             _cheatSheet?.Close();
             _cheatSheet = null;
         }
+
+        public void ShowMainWindow()
+        {
+            var win = Application.Current.MainWindow;
+            if (win is null) return;
+            win.Show();
+            if (win.WindowState == WindowState.Minimized)
+                win.WindowState = WindowState.Normal;
+            win.Activate();
+        }
     }
 }
