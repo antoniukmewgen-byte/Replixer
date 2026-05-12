@@ -3,134 +3,132 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-        <StackPanel>
-            <Border
-                Padding="16"
-                Background="{StaticResource BrushColor2}"
-                BorderBrush="{StaticResource BrushBorderColor2}"
-                BorderThickness="1"
-                CornerRadius="12">
-                <StackPanel>
-                    <TextBlock
-                        Margin="0,0,0,12"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="12"
-                        FontWeight="Bold"
-                        Foreground="{StaticResource SubText}">
-                        МЕТОД ВИЯВЛЕННЯ ДЗВІНКІВ
-                    </TextBlock>
+    <StackPanel Margin="16">
+        <Border
+            Padding="16"
+            Background="{StaticResource BrushColor2}"
+            BorderBrush="{StaticResource BrushBorderColor2}"
+            BorderThickness="1"
+            CornerRadius="12">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,12"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource SubText}">
+                    МЕТОД ВИЯВЛЕННЯ ДЗВІНКІВ
+                </TextBlock>
 
-                    <!--  Window Monitor  -->
-                    <Border
-                        Margin="0,0,0,12"
-                        Padding="16"
-                        Background="{StaticResource BrushColor3}"
-                        BorderBrush="{StaticResource BrushBorderColor3}"
-                        BorderThickness="1"
-                        CornerRadius="8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Border
-                                Grid.Column="0"
-                                Width="38"
-                                Height="38"
-                                Background="{StaticResource OtherBrushColor1}"
-                                CornerRadius="8">
-                                <Path
-                                    Width="18"
-                                    Height="18"
-                                    Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
-                                    Fill="{StaticResource OtherBrushSubColor1}"
-                                    Stretch="Uniform" />
-                            </Border>
-                            <StackPanel
-                                Grid.Column="1"
-                                Margin="12,0,12,0"
-                                VerticalAlignment="Center">
-                                <TextBlock
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="14"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource Text}">
-                                    Моніторинг вікон
-                                </TextBlock>
-                                <TextBlock
-                                    Margin="0,4,0,0"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource SubText}"
-                                    TextWrapping="Wrap">
-                                    Відстежує вікна дзвінків через UI Automation
-                                </TextBlock>
-                            </StackPanel>
-                            <ToggleButton
-                                Grid.Column="2"
-                                IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
-                                Style="{StaticResource ToggleSwitch}" />
-                        </Grid>
-                    </Border>
+                <!--  Window Monitor  -->
+                <Border
+                    Margin="0,0,0,12"
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource OtherBrushColor1}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
+                                Fill="{StaticResource OtherBrushSubColor1}"
+                                Stretch="Uniform" />
+                        </Border>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                Моніторинг вікон
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Відстежує вікна дзвінків через UI Automation
+                            </TextBlock>
+                        </StackPanel>
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
+                </Border>
 
-                    <!--  Microphone Monitor  -->
-                    <Border
-                        Padding="16"
-                        Background="{StaticResource BrushColor3}"
-                        BorderBrush="{StaticResource BrushBorderColor3}"
-                        BorderThickness="1"
-                        CornerRadius="8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Border
-                                Grid.Column="0"
-                                Width="38"
-                                Height="38"
-                                Background="{StaticResource OtherBrushColor2}"
-                                CornerRadius="8">
-                                <Path
-                                    Width="18"
-                                    Height="18"
-                                    Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
-                                    Fill="{StaticResource OtherBrushSubColor2}"
-                                    Stretch="Uniform" />
-                            </Border>
-                            <StackPanel
-                                Grid.Column="1"
-                                Margin="12,0,12,0"
-                                VerticalAlignment="Center">
-                                <TextBlock
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="14"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource Text}">
-                                    Моніторинг мікрофонів
-                                </TextBlock>
-                                <TextBlock
-                                    Margin="0,4,0,0"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource SubText}"
-                                    TextWrapping="Wrap">
-                                    Відстежується мікрофон та відтворення аудіо
-                                </TextBlock>
-                            </StackPanel>
-                            <ToggleButton
-                                Grid.Column="2"
-                                IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
-                                Style="{StaticResource ToggleSwitch}" />
-                        </Grid>
-                    </Border>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+                <!--  Microphone Monitor  -->
+                <Border
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource OtherBrushColor2}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
+                                Fill="{StaticResource OtherBrushSubColor2}"
+                                Stretch="Uniform" />
+                        </Border>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                Моніторинг мікрофонів
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Відстежується мікрофон та відтворення аудіо
+                            </TextBlock>
+                        </StackPanel>
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
+    </StackPanel>
 </UserControl>

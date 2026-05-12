@@ -5,6 +5,7 @@
     xmlns:models="clr-namespace:Replixer.Models"
     xmlns:views="clr-namespace:Replixer.Views">
     <Border
+        Margin="16"
         Padding="16,0,16,0"
         Background="{StaticResource BrushColor2}"
         BorderBrush="{StaticResource BrushBorderColor2}"
