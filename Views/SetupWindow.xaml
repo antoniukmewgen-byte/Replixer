@@ -383,6 +383,16 @@
                                                                 <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
                                                                 <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
                                                             </DataTrigger>
+
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                                            </Trigger>
                                                         </ControlTemplate.Triggers>
                                                     </ControlTemplate>
                                                 </Button.Template>
@@ -564,6 +574,16 @@
                                                                     <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
                                                                     <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
+
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsEnabled" Value="False">
+                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                                                </Trigger>
                                                             </ControlTemplate.Triggers>
                                                         </ControlTemplate>
                                                     </Button.Template>
@@ -625,6 +645,16 @@
                                         <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushColor3}" />
                                         <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushBorderColor3}" />
                                         <Setter TargetName="Label" Property="Foreground" Value="{StaticResource SubText}" />
+                                    </Trigger>
+
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
