@@ -30,6 +30,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     private readonly HomeViewModel _homeVm;
     private readonly SettingsViewModel _settingsVm;
+    private readonly ProfileViewModel _profileVm;
     private CallToastWindow? _toast;
 
     public MainViewModel(
@@ -38,8 +39,9 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         SettingsViewModel settingsVm,
         ProfileViewModel profileVm)
     {
-        _homeVm     = homeVm;
+        _homeVm    = homeVm;
         _settingsVm = settingsVm;
+        _profileVm  = profileVm;
 
         _homeVm.DialogRequested += OnCallDialogRequested;
         _currentViewModel = _homeVm;
@@ -93,6 +95,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _homeVm.DialogRequested -= OnCallDialogRequested;
         _homeVm.Dispose();
         _settingsVm.Dispose();
+        _profileVm.Dispose();
         CloseToast();
     }
 }
