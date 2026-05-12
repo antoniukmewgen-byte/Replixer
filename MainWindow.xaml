@@ -11,6 +11,7 @@
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
     TextOptions.TextRenderingMode="ClearType"
+    WindowStartupLocation="CenterScreen"
     WindowStyle="None">
 
     <Window.Resources>
@@ -151,7 +152,10 @@
                         Height="24"
                         Margin="6,0"
                         Fill="{StaticResource BrushBorderColor1}" />
-                    <Button x:Name="CollapseButton" Click="CollapseButton_Click" Style="{StaticResource HeaderButton}">
+                    <Button
+                        x:Name="CollapseButton"
+                        Click="CollapseButton_Click"
+                        Style="{StaticResource HeaderButton}">
                         <Path
                             Width="12"
                             Height="12"
@@ -170,7 +174,10 @@
                             Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                             Stretch="Uniform" />
                     </Button>
-                    <Button x:Name="FullscreenButton" Style="{StaticResource HeaderButton}" Click="FullscreenButton_Click">
+                    <Button
+                        x:Name="FullscreenButton"
+                        Click="FullscreenButton_Click"
+                        Style="{StaticResource HeaderButton}">
                         <Path
                             x:Name="FullscreenIcon"
                             Width="12"

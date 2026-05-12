@@ -9,113 +9,115 @@
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="12">
-        <StackPanel>
-            <TextBlock
-                Margin="0,0,0,12"
-                FontFamily="{StaticResource InterFont}"
-                FontSize="12"
-                FontWeight="Bold"
-                Foreground="{StaticResource SubText}"
-                Text="{Binding Prompt}" />
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,12"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource SubText}"
+                    Text="{Binding Prompt}" />
 
-            <Border
-                Padding="16"
-                Background="{StaticResource BrushColor3}"
-                BorderBrush="{StaticResource BrushBorderColor3}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <StackPanel>
-                    <Border Style="{StaticResource AppInputBorder}">
-                        <Grid>
-                            <TextBox
-                                x:Name="TelegramVerification"
-                                Style="{StaticResource AppTextBox}"
-                                KeyDown="InputBox_KeyDown"
-                                Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                Foreground="{StaticResource SubText}"
-                                IsHitTestVisible="False"
-                                Text="Введіть данні">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Text, ElementName=TelegramVerification}" Value="">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
-                    </Border>
-                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
-                        <Button
-                            Margin="0,0,12,0"
-                            Padding="12,8"
-                            HorizontalAlignment="Center"
-                            Command="{Binding CancelCommand}"
-                            Cursor="Hand">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border
-                                        x:Name="Bg"
-                                        Padding="{TemplateBinding Padding}"
-                                        Background="{StaticResource BrushColor4}"
-                                        BorderBrush="{StaticResource BrushBorderColor4}"
-                                        BorderThickness="1"
-                                        CornerRadius="16">
-                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                            <TextBlock
-                                                x:Name="Label"
-                                                VerticalAlignment="Center"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="14"
-                                                FontWeight="Medium"
-                                                Foreground="{StaticResource SubText}">
-                                                Скасувати
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
+                <Border
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel>
+                        <Border Style="{StaticResource AppInputBorder}">
+                            <Grid>
+                                <TextBox
+                                    x:Name="TelegramVerification"
+                                    KeyDown="InputBox_KeyDown"
+                                    Style="{StaticResource AppTextBox}"
+                                    Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    Foreground="{StaticResource SubText}"
+                                    IsHitTestVisible="False"
+                                    Text="Введіть данні">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=TelegramVerification}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                        <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                            <Button
+                                Margin="0,0,12,0"
+                                Padding="12,8"
+                                HorizontalAlignment="Center"
+                                Command="{Binding CancelCommand}"
+                                Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="{StaticResource BrushColor4}"
+                                            BorderBrush="{StaticResource BrushBorderColor4}"
+                                            BorderThickness="1"
+                                            CornerRadius="16">
+                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                <TextBlock
+                                                    x:Name="Label"
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{StaticResource InterFont}"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource SubText}">
+                                                    Скасувати
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
 
-                        <Button
-                            Padding="12,8"
-                            HorizontalAlignment="Center"
-                            Command="{Binding ConfirmCommand}"
-                            Cursor="Hand">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border
-                                        x:Name="Bg"
-                                        Padding="{TemplateBinding Padding}"
-                                        Background="{StaticResource OtherBrushColor1}"
-                                        BorderBrush="{StaticResource OtherBrushSubColor1}"
-                                        BorderThickness="1"
-                                        CornerRadius="16">
-                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                            <TextBlock
-                                                x:Name="Label"
-                                                VerticalAlignment="Center"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="14"
-                                                FontWeight="Medium"
-                                                Foreground="{StaticResource OtherBrushSubColor1}">
-                                                Підтвердити номер
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
+                            <Button
+                                Padding="12,8"
+                                HorizontalAlignment="Center"
+                                Command="{Binding ConfirmCommand}"
+                                Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="{StaticResource OtherBrushColor1}"
+                                            BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                            BorderThickness="1"
+                                            CornerRadius="16">
+                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                <TextBlock
+                                                    x:Name="Label"
+                                                    VerticalAlignment="Center"
+                                                    FontFamily="{StaticResource InterFont}"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="{StaticResource OtherBrushSubColor1}">
+                                                    Підтвердити номер
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
-        </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Border>
 </UserControl>

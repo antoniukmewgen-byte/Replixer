@@ -12,7 +12,7 @@ public partial class SetupWindow : Window
         DataContext = vm;
     }
 
-    private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+    private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
             DragMove();

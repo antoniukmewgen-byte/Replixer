@@ -20,6 +20,21 @@ public class TelegramUploadService
     public static readonly IReadOnlyList<TelegramChat> Chats = new[]
     {
         new TelegramChat("Test", 3805068290L),
+        new TelegramChat("Test2", 3805068290L),
+        new TelegramChat("Test3", 3805068290L),
+        new TelegramChat("Test4", 3805068290L),
+        new TelegramChat("Test5", 3805068290L),
+        new TelegramChat("Test6", 3805068290L),
+        new TelegramChat("Test7", 3805068290L),
+        new TelegramChat("Test8", 3805068290L),
+        new TelegramChat("Test9", 3805068290L),
+        new TelegramChat("Test10", 3805068290L),
+        new TelegramChat("Test11", 3805068290L),
+        new TelegramChat("Test12", 3805068290L),
+        new TelegramChat("Test13", 3805068290L),
+        new TelegramChat("Test14", 3805068290L),
+
+
     };
 
     private readonly AppSettings _settings;
