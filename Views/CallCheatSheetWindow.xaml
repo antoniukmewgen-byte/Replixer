@@ -16,61 +16,97 @@
     Topmost="True"
     WindowStyle="None">
 
-    <Border Background="{StaticResource BrushColor2}"
-            CornerRadius="12"
-            BorderThickness="1"
-            BorderBrush="{StaticResource BrushBorderColor2}">
+    <Border
+        Background="{StaticResource BrushColor2}"
+        BorderBrush="{StaticResource BrushBorderColor2}"
+        BorderThickness="1"
+        CornerRadius="12">
         <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="24" ShadowDepth="6" Opacity="0.6"/>
+            <DropShadowEffect
+                BlurRadius="24"
+                Opacity="0.6"
+                ShadowDepth="6"
+                Color="Black" />
         </Border.Effect>
 
         <StackPanel>
 
-            <!-- Header (drag zone only) -->
-            <Border x:Name="DragHeader"
-                    Background="{StaticResource BrushColor3}"
-                    CornerRadius="11,11,0,0"
-                    Padding="12,10"
-                    MouseLeftButtonDown="Header_MouseDown"
-                    Cursor="SizeAll">
+            <!--  Header (drag zone only)  -->
+            <Border
+                x:Name="DragHeader"
+                Padding="12,10"
+                Background="{StaticResource BrushColor3}"
+                CornerRadius="11,11,0,0"
+                Cursor="SizeAll"
+                MouseLeftButtonDown="Header_MouseDown">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Drag grip dots -->
-                    <UniformGrid Rows="3" Columns="2" Width="12" VerticalAlignment="Center" Margin="0,0,10,0">
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
-                        <Ellipse Width="2.5" Height="2.5" Fill="{StaticResource BrushBorderColor4}" Margin="1.5"/>
+                    <!--  Drag grip dots  -->
+                    <UniformGrid
+                        Width="12"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center"
+                        Columns="2"
+                        Rows="3">
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
                     </UniformGrid>
 
-                    <TextBlock Grid.Column="1"
-                               Text="ШПАРГАЛКА"
-                               FontSize="10"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource SubText}"
-                               VerticalAlignment="Center"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontSize="10"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}"
+                        Text="ШПАРГАЛКА" />
                 </Grid>
             </Border>
 
-            <Rectangle Height="1" Fill="{StaticResource BrushBorderColor2}"/>
+            <Rectangle Height="1" Fill="{StaticResource BrushBorderColor2}" />
 
-            <!-- Items list -->
+            <!--  Items list  -->
             <StackPanel Margin="10,10,10,10">
                 <StackPanel.Resources>
                     <Style x:Key="HintRow" TargetType="Border">
-                        <Setter Property="CornerRadius" Value="7"/>
-                        <Setter Property="Padding" Value="8,6"/>
-                        <Setter Property="Margin" Value="0,0,0,2"/>
-                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="CornerRadius" Value="7" />
+                        <Setter Property="Padding" Value="8,6" />
+                        <Setter Property="Margin" Value="0,0,0,2" />
+                        <Setter Property="Background" Value="Transparent" />
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource BrushColor4}"/>
+                                <Setter Property="Background" Value="{StaticResource BrushColor4}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -78,28 +114,31 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="CheckBox">
-                                    <Border x:Name="Box"
-                                            Width="14" Height="14"
-                                            CornerRadius="4"
-                                            BorderThickness="1.5"
-                                            BorderBrush="{StaticResource BrushBorderColor3}"
-                                            Background="Transparent">
-                                        <Path x:Name="CheckMark"
-                                              Data="M2.5,7 L5.5,10 L11.5,3.5"
-                                              Stroke="{StaticResource OtherBrushSubColor1}"
-                                              StrokeThickness="1.8"
-                                              StrokeStartLineCap="Round"
-                                              StrokeEndLineCap="Round"
-                                              Visibility="Collapsed"/>
+                                    <Border
+                                        x:Name="Box"
+                                        Width="14"
+                                        Height="14"
+                                        Background="Transparent"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1.5"
+                                        CornerRadius="4">
+                                        <Path
+                                            x:Name="CheckMark"
+                                            Data="M2.5,7 L5.5,10 L11.5,3.5"
+                                            Stroke="{StaticResource OtherBrushSubColor1}"
+                                            StrokeEndLineCap="Round"
+                                            StrokeStartLineCap="Round"
+                                            StrokeThickness="1.8"
+                                            Visibility="Collapsed" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                                            <Setter TargetName="Box" Property="Background" Value="{StaticResource OtherBrushColor1}"/>
-                                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}"/>
+                                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="Box" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}"/>
+                                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -107,75 +146,131 @@
                         </Setter>
                     </Style>
                     <Style x:Key="HintText" TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="{StaticResource Text}"/>
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="TextWrapping" Value="Wrap"/>
-                        <Setter Property="VerticalAlignment" Value="Center"/>
-                        <Setter Property="Margin" Value="6,0,0,0"/>
-                        <Setter Property="LineHeight" Value="17"/>
+                        <Setter Property="Foreground" Value="{StaticResource Text}" />
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="6,0,0,0" />
+                        <Setter Property="LineHeight" Value="17" />
                     </Style>
                 </StackPanel.Resources>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="1. Привітання, тест на дебіла та встановлення рамок"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="1. Привітання, тест на дебіла та встановлення рамок" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="2. Первинний анамнез та підводимо лінію"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="2. Первинний анамнез та підводимо лінію" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="3. Вторинний анамнез, розкриваємо досвід клієнта через техніку &quot;ближче-далі&quot;"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="3. Вторинний анамнез, розкриваємо досвід клієнта через техніку &quot;ближче-далі&quot;" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="4. Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="5. Прийом &quot;чашка чаю&quot; + &quot;ваш кейс унікальний, антиприклад щойно був порожній кейс&quot;"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="5. Прийом &quot;чашка чаю&quot; + &quot;ваш кейс унікальний, антиприклад щойно був порожній кейс&quot;" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="6. Ставимо дедлайн, вибираємо день і час"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="6. Ставимо дедлайн, вибираємо день і час" />
                     </Grid>
                 </Border>
 
                 <Border Style="{StaticResource HintRow}">
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <CheckBox Style="{StaticResource HintCheck}" VerticalAlignment="Top" Margin="0,3,0,0"/>
-                        <TextBlock Grid.Column="1" Style="{StaticResource HintText}"
-                                   Text="7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource HintCheck}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource HintText}"
+                            Text="7. Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити" />
                     </Grid>
                 </Border>
 

@@ -72,9 +72,7 @@
                 </ItemsControl>
 
                 <!--  Empty state  -->
-                <views:EmptyRecordingsView
-                    Grid.Row="1"
-                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}" />
+                <views:EmptyRecordingsView Grid.Row="1" Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}" />
 
             </Grid>
         </Border>

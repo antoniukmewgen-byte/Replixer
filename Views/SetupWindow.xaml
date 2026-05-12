@@ -7,8 +7,8 @@
     AllowsTransparency="True"
     Background="Transparent"
     Icon="/Assets/Icons/IconApp.png"
-    ResizeMode="NoResize"
     RenderOptions.BitmapScalingMode="NearestNeighbor"
+    ResizeMode="NoResize"
     SnapsToDevicePixels="True"
     TextOptions.TextFormattingMode="Display"
     TextOptions.TextRenderingMode="ClearType"
@@ -608,9 +608,7 @@
             </ScrollViewer>
 
             <!--  Modal overlay (Telegram verification code dialog)  -->
-            <Grid
-                Grid.RowSpan="2"
-                Visibility="{Binding Dialog, Converter={StaticResource NullToVisibility}}">
+            <Grid Grid.RowSpan="2" Visibility="{Binding Dialog, Converter={StaticResource NullToVisibility}}">
                 <Rectangle
                     Fill="{StaticResource BrushColor1}"
                     Opacity="0.88"

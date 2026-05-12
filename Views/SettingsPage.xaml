@@ -223,15 +223,14 @@
                                         <TextBox
                                             x:Name="PhoneBox"
                                             Style="{StaticResource AppTextBox}"
-                                            Text="{Binding TelegramPhone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            ToolTip="Наприклад: +380991234567 або 0991234567" />
+                                            Text="{Binding TelegramPhone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         <TextBlock
                                             VerticalAlignment="Center"
                                             FontFamily="{StaticResource InterFont}"
                                             FontSize="14"
                                             Foreground="{StaticResource SubText}"
                                             IsHitTestVisible="False"
-                                            Text="Номер телефону (+380... або 09...)">
+                                            Text="Номер телефону">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -431,8 +430,7 @@
                                     <TextBox
                                         x:Name="FolderIdBox"
                                         Style="{StaticResource AppTextBox}"
-                                        Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        ToolTip="Вставте ID Shared Drive або папки з URL" />
+                                        Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock
                                         VerticalAlignment="Center"
                                         FontFamily="{StaticResource InterFont}"

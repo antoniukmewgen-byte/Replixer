@@ -25,9 +25,7 @@
                     Foreground="{StaticResource SubText}">
                     ВСІ ВАШІ ЗАПИСИ
                 </TextBlock>
-                <views:EmptyRecordingsView
-                    Grid.Row="1"
-                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}" />
+                <views:EmptyRecordingsView Grid.Row="1" Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}" />
 
                 <ItemsControl
                     Grid.Row="1"
