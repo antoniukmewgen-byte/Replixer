@@ -4,6 +4,7 @@ using Replixer.Models;
 using Replixer.Services.Manager;
 using Replixer.Services.Upload;
 using Replixer.ViewModels;
+using Replixer.Views;
 using System.Windows;
 
 namespace Replixer;
@@ -14,6 +15,7 @@ public partial class App : Application
 
     private ServiceProvider? _services;
     private TaskbarIcon? _notifyIcon;
+    private bool _mainWindowStarted;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -21,8 +23,41 @@ public partial class App : Application
 
         _services = BuildServices();
 
-        var mainWindow = _services.GetRequiredService<MainWindow>();
-        MainWindow = mainWindow;
+        var settings = _services.GetRequiredService<AppSettings>();
+        if (!settings.IsSetupComplete)
+            ShowSetupWindow();
+        else
+            ShowMainWindow();
+    }
+
+    private void ShowSetupWindow()
+    {
+        var setupVm     = _services!.GetRequiredService<SetupViewModel>();
+        var setupWindow = _services.GetRequiredService<SetupWindow>();
+
+        Application.Current.MainWindow = setupWindow;
+
+        setupVm.SetupCompleted += () =>
+        {
+            setupWindow.Close();
+            ShowMainWindow();
+        };
+
+        setupWindow.Closed += (_, _) =>
+        {
+            if (!_services!.GetRequiredService<AppSettings>().IsSetupComplete)
+                Shutdown();
+        };
+
+        setupWindow.Show();
+    }
+
+    private void ShowMainWindow()
+    {
+        _mainWindowStarted = true;
+
+        var mainWindow = _services!.GetRequiredService<MainWindow>();
+        Application.Current.MainWindow = mainWindow;
         mainWindow.Show();
 
         _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -36,7 +71,8 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _services?.GetService<AppSettings>()?.Flush();
-        _services?.GetService<MainViewModel>()?.Dispose();
+        if (_mainWindowStarted)
+            _services?.GetService<MainViewModel>()?.Dispose();
         _notifyIcon?.Dispose();
         _services?.Dispose();
         base.OnExit(e);
@@ -53,6 +89,10 @@ public partial class App : Application
         services.AddSingleton<GoogleDriveUploadService>();
         services.AddSingleton<TelegramUploadService>();
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
+
+        // Setup
+        services.AddSingleton<SetupViewModel>();
+        services.AddSingleton<SetupWindow>();
 
         // ViewModels
         services.AddSingleton<RecordingsViewModel>();

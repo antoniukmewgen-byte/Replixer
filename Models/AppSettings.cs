@@ -113,6 +113,20 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_userFolderId == value) return; _userFolderId = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isSetupComplete = false;
+    public bool IsSetupComplete
+    {
+        get => _isSetupComplete;
+        set { if (_isSetupComplete == value) return; _isSetupComplete = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _managerName = string.Empty;
+    public string ManagerName
+    {
+        get => _managerName;
+        set { if (_managerName == value) return; _managerName = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()

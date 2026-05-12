@@ -4,6 +4,7 @@ using Replixer.ViewModels.Dialogs;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Replixer.Services.Upload;
 
@@ -185,13 +186,13 @@ public class TelegramUploadService
         var tcs = new TaskCompletionSource<string?>();
         Application.Current.Dispatcher.Invoke(() =>
         {
-            var mainVm = (MainViewModel)Application.Current.MainWindow.DataContext;
+            var host = (IDialogHost)Application.Current.MainWindow.DataContext;
             var vm = new InputDialogViewModel(prompt, result =>
             {
-                mainVm.HideInputDialog();
+                host.HideInputDialog();
                 tcs.TrySetResult(result);
             });
-            mainVm.ShowInputDialog(vm);
+            host.ShowInputDialog(vm);
         });
         return tcs.Task.GetAwaiter().GetResult();
     }

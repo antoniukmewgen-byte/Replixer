@@ -26,7 +26,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
         if (_settings.IsGoogleDriveEnabled)
         {
-            string? folderId = ResolveTargetFolder();
+            string? folderId = await ResolveTargetFolderAsync(ct);
             string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
 
             await telegramTask;
@@ -47,13 +47,26 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return new UploadResult { LocalPath = MoveToRecordingsFolder(filePath) };
     }
 
-    private string? ResolveTargetFolder()
+    private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)
     {
         if (!string.IsNullOrWhiteSpace(_settings.UserFolderId))
             return _settings.UserFolderId;
-        if (!string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId))
-            return _settings.GoogleDriveFolderId;
-        return null;
+
+        if (!string.IsNullOrWhiteSpace(_settings.UserFolderName) &&
+            !string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId))
+        {
+            var id = await _drive.GetOrCreateUserFolderAsync(
+                _settings.GoogleDriveFolderId, _settings.UserFolderName, ct);
+            if (id is not null)
+            {
+                _settings.UserFolderId = id;
+                return id;
+            }
+        }
+
+        return string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
+            ? null
+            : _settings.GoogleDriveFolderId;
     }
 
     private string? MoveToRecordingsFolder(string tempPath)

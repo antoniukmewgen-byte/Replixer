@@ -41,12 +41,20 @@ public class AudioRecordingService : IDisposable
         try
         {
             string tempFolder = Path.GetTempPath();
-            string timestamp  = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            string safeName   = string.Concat(appName.Split(Path.GetInvalidFileNameChars()));
+            var    now        = DateTime.Now;
+            string manager    = Sanitize(string.IsNullOrWhiteSpace(_settings.ManagerName) ? "Менеджер" : _settings.ManagerName);
+            string platform   = Sanitize(LocalizePlatform(appName));
+            string baseName   = $"{manager}_{platform}_{now:yy.MM.dd}_{now:HH.mm}";
 
-            _loopbackTempPath = Path.Combine(tempFolder, $"ev_loopback_{timestamp}.wav");
-            _micTempPath      = Path.Combine(tempFolder, $"ev_mic_{timestamp}.wav");
-            _finalMp3Path     = Path.Combine(tempFolder, $"ev_{safeName}_{timestamp}.mp3");
+            // avoid collision when two recordings start in the same minute
+            string mp3Path = Path.Combine(tempFolder, $"{baseName}.mp3");
+            if (File.Exists(mp3Path))
+                mp3Path = Path.Combine(tempFolder, $"{baseName}_{now:ss}.mp3");
+
+            string uid = now.ToString("HHmmss");
+            _loopbackTempPath = Path.Combine(tempFolder, $"ev_loopback_{uid}.wav");
+            _micTempPath      = Path.Combine(tempFolder, $"ev_mic_{uid}.wav");
+            _finalMp3Path     = mp3Path;
 
             _loopbackCapture = new WasapiLoopbackCapture();
             _loopbackCapture.DataAvailable += (_, e) => _loopbackWriter?.Write(e.Buffer, 0, e.BytesRecorded);
@@ -205,6 +213,18 @@ public class AudioRecordingService : IDisposable
         if (!string.IsNullOrEmpty(path) && File.Exists(path))
             try { File.Delete(path); } catch { }
     }
+
+    private static string LocalizePlatform(string name) => name switch
+    {
+        "Telegram"  => "Телеграм",
+        "WhatsApp"  => "WhatsApp",
+        "Viber"     => "Viber",
+        "Ringostat" => "Ringostat",
+        _           => name,
+    };
+
+    private static string Sanitize(string name)
+        => string.Concat(name.Trim().Split(Path.GetInvalidFileNameChars()));
 
     public void Dispose()
     {

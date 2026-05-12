@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace Replixer.ViewModels;
 
-public sealed class MainViewModel : ViewModelBase, IDisposable
+public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 {
     private ViewModelBase _currentViewModel;
     public ViewModelBase CurrentViewModel
