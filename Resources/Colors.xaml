@@ -1,5 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <FontFamily x:Key="InterFont">pack://application:,,,/Fonts/#Inter</FontFamily>
+
     <Color x:Key="ColorBorder">#343438</Color>
     <Color x:Key="ColorToggleActive">#22C679</Color>
     <Color x:Key="ColorSubtext">#FFFFFF</Color>

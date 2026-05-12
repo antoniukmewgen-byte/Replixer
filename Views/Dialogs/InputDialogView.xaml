@@ -25,30 +25,11 @@
                 BorderThickness="1"
                 CornerRadius="8">
                 <StackPanel>
-                    <Border Background="{StaticResource BrushColor4}" CornerRadius="16">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
-                                <Setter Property="BorderThickness" Value="1" />
-                                <Setter Property="Padding" Value="12,8" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                        <Setter Property="BorderThickness" Value="2" />
-                                        <Setter Property="Padding" Value="11,7" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
+                    <Border Style="{StaticResource AppInputBorder}">
                         <Grid>
                             <TextBox
                                 x:Name="TelegramVerification"
-                                VerticalAlignment="Center"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                CaretBrush="{StaticResource Text}"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                Foreground="{StaticResource Text}"
+                                Style="{StaticResource AppTextBox}"
                                 KeyDown="InputBox_KeyDown"
                                 Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
