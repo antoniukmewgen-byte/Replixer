@@ -46,7 +46,10 @@
                                     Fill="{StaticResource OtherBrushSubColor2}"
                                     Stretch="Uniform" />
                             </Border>
-                            <Border Grid.Column="1" Margin="12,0,0,0" Style="{StaticResource AppInputBorder}">
+                            <Border
+                                Grid.Column="1"
+                                Margin="12,0,0,0"
+                                Style="{StaticResource AppInputBorder}">
                                 <Grid>
                                     <TextBox
                                         x:Name="NameBox"
@@ -79,7 +82,7 @@
 
             <!--  Telegram  -->
             <Border
-                Margin="0,16,0,0"
+                Margin="0,12,0,0"
                 Padding="16"
                 Background="{StaticResource BrushColor2}"
                 BorderBrush="{StaticResource BrushBorderColor2}"
@@ -322,7 +325,7 @@
 
             <!--  Хмарне сховище  -->
             <Border
-                Margin="0,16,0,0"
+                Margin="0,12,0,0"
                 Padding="16"
                 Background="{StaticResource BrushColor2}"
                 BorderBrush="{StaticResource BrushBorderColor2}"
@@ -522,7 +525,7 @@
 
             <!--  Небезпечна зона  -->
             <Border
-                Margin="0,16,0,0"
+                Margin="0,12,0,0"
                 Padding="16"
                 Background="{StaticResource BrushColor2}"
                 BorderBrush="{StaticResource BrushBorderColor2}"
