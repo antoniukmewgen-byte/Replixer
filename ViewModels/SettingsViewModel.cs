@@ -133,11 +133,7 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
 
         _isDriveConnected     = settings.IsGoogleDriveConnected;
         _isTelegramConnected  = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
-        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId)
-                                ?? TelegramChats.FirstOrDefault();
-
-        if (_selectedTelegramChat != null && settings.TelegramChatId == 0)
-            settings.TelegramChatId = _selectedTelegramChat.Id;
+        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId);
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(TelegramAction);

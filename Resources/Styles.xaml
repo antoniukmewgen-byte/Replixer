@@ -39,15 +39,26 @@
                             Background="{StaticResource BrushColor4}"
                             BorderBrush="{StaticResource BrushBorderColor4}"
                             BorderThickness="1"
-                            CornerRadius="8">
+                            CornerRadius="10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="30" />
                                 </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    x:Name="Placeholder"
+                                    Grid.Column="0"
+                                    Margin="12,8,0,8"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    Foreground="{StaticResource SubText}"
+                                    IsHitTestVisible="False"
+                                    Text="{TemplateBinding Tag}"
+                                    Visibility="Collapsed" />
                                 <ContentPresenter
                                     Grid.Column="0"
-                                    Margin="12,7,0,7"
+                                    Margin="12,8,0,8"
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding SelectionBoxItem}"
                                     ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
@@ -103,9 +114,8 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource BrushBorderColor4}" />
-                            <Setter TargetName="Bg" Property="Opacity" Value="0.85" />
+                        <Trigger Property="SelectedItem" Value="{x:Null}">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsDropDownOpen" Value="True">
                             <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />

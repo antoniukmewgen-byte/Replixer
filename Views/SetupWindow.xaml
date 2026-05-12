@@ -428,7 +428,8 @@
                                     MinWidth="160"
                                     ItemsSource="{Binding TelegramChats}"
                                     SelectedItem="{Binding SelectedTelegramChat, Mode=TwoWay}"
-                                    Style="{StaticResource AppComboBox}" />
+                                    Style="{StaticResource AppComboBox}"
+                                    Tag="Оберіть групу" />
                             </Grid>
 
                             <!--  Phone + authorize  -->
