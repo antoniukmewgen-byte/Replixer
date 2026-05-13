@@ -4,19 +4,21 @@ namespace Replixer.Services.Window.Detectors;
 
 public class WhatsAppCallDetector : ICallDetector
 {
+    private static readonly HashSet<string> CallNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Аудіодзвінок", "Відеодзвінок",
+        "Аудіовиклик", "Відеовиклик",
+        "Аудиозвонок", "Видеозвонок",
+        "Audio call",  "Video call",
+        "Anruf",       "Videoanruf",
+        "Appel audio", "Appel vidéo",
+        "Llamada de audio", "Llamada de video",
+        "Połączenie audio", "Połączenie wideo",
+        "Chiamata audio",   "Chiamata video",
+    };
+
     public string ProcessName => "WhatsApp.Root";
 
     public bool IsCallWindow(AutomationElement element)
-    {
-        return element.Name is
-    "Аудіодзвінок" or "Відеодзвінок" or         
-    "Аудіовиклик" or "Відеовиклик" or            
-    "Аудиозвонок" or "Видеозвонок" or          
-    "Audio call" or "Video call" or        
-    "Anruf" or "Videoanruf" or               
-    "Appel audio" or "Appel vidéo" or          
-    "Llamada de audio" or "Llamada de video" or 
-    "Połączenie audio" or "Połączenie wideo" or
-    "Chiamata audio" or "Chiamata video";       
-    }
+        => CallNames.Contains(element.Name);
 }
