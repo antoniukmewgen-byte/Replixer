@@ -21,6 +21,13 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        if (e.Args.Contains("--uninstall"))
+        {
+            AutoStartManager.SetState(false);
+            Shutdown();
+            return;
+        }
+
         bool startInTray = e.Args.Contains("--tray");
 
         _services = BuildServices();

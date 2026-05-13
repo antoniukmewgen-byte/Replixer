@@ -85,8 +85,22 @@ public class MicrophoneMonitorService : IMonitorService
             var match = _targetProcesses.FirstOrDefault(p =>
                 subKeyName.Contains(p, StringComparison.OrdinalIgnoreCase));
 
-            if (match != null && IsMicActiveInSubKey(rootKey.OpenSubKey(subKeyName)))
+            if (match == null) continue;
+
+            using var pkgKey = rootKey.OpenSubKey(subKeyName);
+            if (pkgKey == null) continue;
+
+            // Check values directly in the package key
+            var directStop = pkgKey.GetValue("LastUsedTimeStop");
+            if (directStop is long t0 && t0 == 0)
                 return match;
+
+            // MSIX packaged apps (e.g. WhatsApp) store usage in a per-app-id child subkey
+            foreach (var childName in pkgKey.GetSubKeyNames())
+            {
+                if (IsMicActiveInSubKey(pkgKey.OpenSubKey(childName)))
+                    return match;
+            }
         }
 
         return null;
@@ -109,29 +123,40 @@ public class MicrophoneMonitorService : IMonitorService
         try
         {
             using var enumerator = new MMDeviceEnumerator();
-            using var device     = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-            var sessions = device.AudioSessionManager.Sessions;
-
-            for (int i = 0; i < sessions.Count; i++)
+            // Check both Multimedia and Communications render endpoints.
+            // WhatsApp calls route audio through the Communications device, which
+            // may differ from the Multimedia device when headphones are connected.
+            var roles = new[] { Role.Multimedia, Role.Communications };
+            foreach (var role in roles)
             {
-                var session = sessions[i];
-                if (session.State != AudioSessionState.AudioSessionStateActive) continue;
+                MMDevice? device = null;
+                try { device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, role); }
+                catch { continue; }
 
-                try
+                using (device)
                 {
-                    var process = Process.GetProcessById((int)session.GetProcessID);
-
-                    var match = _targetProcesses.FirstOrDefault(p =>
-                        process.ProcessName.Contains(p, StringComparison.OrdinalIgnoreCase));
-
-                    if (match != null)
+                    var sessions = device.AudioSessionManager.Sessions;
+                    for (int i = 0; i < sessions.Count; i++)
                     {
-                        Debug.WriteLine($"[AudioMonitor] Output session active: {process.ProcessName}");
-                        return match;
+                        var session = sessions[i];
+                        if (session.State != AudioSessionState.AudioSessionStateActive) continue;
+
+                        try
+                        {
+                            var process = Process.GetProcessById((int)session.GetProcessID);
+                            var match   = _targetProcesses.FirstOrDefault(p =>
+                                process.ProcessName.Contains(p, StringComparison.OrdinalIgnoreCase));
+
+                            if (match != null)
+                            {
+                                Debug.WriteLine($"[AudioMonitor] Output session active: {process.ProcessName} (role={role})");
+                                return match;
+                            }
+                        }
+                        catch { /* process may have exited */ }
                     }
                 }
-                catch { /* process may have exited */ }
             }
         }
         catch (Exception ex)
