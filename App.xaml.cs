@@ -21,13 +21,15 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        bool startInTray = e.Args.Contains("--tray");
+
         _services = BuildServices();
 
         var settings = _services.GetRequiredService<AppSettings>();
         if (!settings.IsSetupComplete)
             ShowSetupWindow();
         else
-            ShowMainWindow();
+            ShowMainWindow(startInTray);
     }
 
     private void ShowSetupWindow()
@@ -52,13 +54,18 @@ public partial class App : Application
         setupWindow.Show();
     }
 
-    private void ShowMainWindow()
+    private void ShowMainWindow(bool startInTray = false)
     {
         _mainWindowStarted = true;
 
-        var mainWindow = _services!.GetRequiredService<MainWindow>();
+        var settings = _services!.GetRequiredService<AppSettings>();
+        AutoStartManager.SetState(settings.IsAutoStartEnabled);
+
+        var mainWindow = _services.GetRequiredService<MainWindow>();
         Application.Current.MainWindow = mainWindow;
-        mainWindow.Show();
+
+        if (!startInTray)
+            mainWindow.Show();
 
         _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 

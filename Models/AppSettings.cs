@@ -120,6 +120,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_userFolderId == value) return; _userFolderId = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isAutoStartEnabled = true;
+    public bool IsAutoStartEnabled
+    {
+        get => _isAutoStartEnabled;
+        set { if (_isAutoStartEnabled == value) return; _isAutoStartEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
     private bool _isSetupComplete = false;
     public bool IsSetupComplete
     {

@@ -193,7 +193,7 @@
                         </StackPanel>
                         <ToggleButton
                             Grid.Column="2"
-                            IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
+                            IsChecked="{Binding IsAutoStartEnabled, Mode=TwoWay}"
                             Style="{StaticResource ToggleSwitch}" />
                     </Grid>
                 </Border>

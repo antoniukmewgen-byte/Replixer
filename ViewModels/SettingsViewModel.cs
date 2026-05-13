@@ -1,4 +1,5 @@
 using Replixer.Models;
+using Replixer.Services.Manager;
 using System.ComponentModel;
 
 namespace Replixer.ViewModels;
@@ -27,6 +28,16 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public bool IsAutoStartEnabled
+    {
+        get => _settings.IsAutoStartEnabled;
+        set
+        {
+            _settings.IsAutoStartEnabled = value;
+            AutoStartManager.SetState(value);
+        }
+    }
+
     public SettingsViewModel(AppSettings settings)
     {
         _settings = settings;
@@ -41,6 +52,10 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         {
             OnPropertyChanged(nameof(IsWindowMonitorActive));
             OnPropertyChanged(nameof(IsMicrophoneMonitorActive));
+        }
+        else if (e.PropertyName == nameof(AppSettings.IsAutoStartEnabled))
+        {
+            OnPropertyChanged(nameof(IsAutoStartEnabled));
         }
     }
 }

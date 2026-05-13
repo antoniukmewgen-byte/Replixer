@@ -19,7 +19,7 @@ public static class AutoStartManager
         if (key is null) return;
 
         if (enable)
-            key.SetValue(AppName, $"\"{exePath}\"");
+            key.SetValue(AppName, $"\"{exePath}\" --tray");
         else if (key.GetValue(AppName) is not null)
             key.DeleteValue(AppName);
     }
