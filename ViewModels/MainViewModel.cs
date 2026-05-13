@@ -64,6 +64,8 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
             return;
         }
 
+        RestoreIfMinimized();
+
         if (Application.Current.MainWindow?.IsVisible == true)
             Dialog = vm;
         else
@@ -92,14 +94,31 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
             if (Dialog is CallReportViewModel) Dialog = null;
             return;
         }
+        RestoreIfMinimized();
         Dialog = vm;
     }
 
     // ── Input dialog (from TelegramUploadService) ─────────────────────────────
 
-    public void ShowInputDialog(InputDialogViewModel vm) => Dialog = vm;
+    public void ShowInputDialog(InputDialogViewModel vm)
+    {
+        RestoreIfMinimized();
+        Dialog = vm;
+    }
 
     public void HideInputDialog() => Dialog = null;
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static void RestoreIfMinimized()
+    {
+        var window = Application.Current.MainWindow;
+        if (window is { WindowState: WindowState.Minimized })
+        {
+            window.WindowState = WindowState.Normal;
+            window.Activate();
+        }
+    }
 
     // ── IDisposable ───────────────────────────────────────────────────────────
 
