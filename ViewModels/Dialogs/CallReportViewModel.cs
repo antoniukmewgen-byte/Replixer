@@ -48,12 +48,12 @@ public class CallReportViewModel : ViewModelBase
 {
     public static IReadOnlyList<string> CallTypes { get; } = new[]
     {
-        "Вхідний", "Вихідний", "Пропущений", "Холодний", "Інший"
+        "Перший дзвінок", "Передзвін (перший дзвінок)", "Дзвінок після (подумаю/пораджуся)", "Дзвінок КК", "Інший"
     };
 
     public static IReadOnlyList<string> LeadSources { get; } = new[]
     {
-        "Instagram", "Facebook", "Сайт", "Рекомендація", "Google", "Ringostat", "Інше"
+        "Лідформа Фейсбук", "Рекомендація", "Лідформа Тікток", "Реактивація", "Вторинне опрацювання", "Листування в соцмережах", "Квіз", "FB + WA", "YouTube", "Кваліфікація Реакт", "Кваліфікація Гаряч", "WA"
     };
 
     public static IReadOnlyList<string> Ratings { get; } =
@@ -61,7 +61,7 @@ public class CallReportViewModel : ViewModelBase
 
     public static IReadOnlyList<string> Outcomes { get; } = new[]
     {
-        "Відмова", "Потребує часу", "Передзвонимо", "Виставив рахунок", "Повторна покупка", "Інше"
+       "Виставив рахунок", "Пішов думати", "Потрібно порадитися", "Не підходять умови", "Не цільовий", "Вже не актуально", "Неадекват", "Хоче оплатити в кінці роботи", "Вирішив виїжджати зі США", "Хоче зайнятися пізніше"
     };
 
     private readonly string _managerName;
