@@ -23,7 +23,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     {
         // Telegram runs in parallel with Drive upload — both read the file, neither deletes it.
         var telegramTask = IsTelegramReady
-            ? _telegram.SendFileAsync(filePath, _settings.TelegramChatId, telegramCaption)
+            ? _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
             : Task.FromResult(false);
 
         if (_settings.IsGoogleDriveEnabled)

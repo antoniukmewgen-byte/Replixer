@@ -83,7 +83,11 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         set
         {
             SetField(ref _selectedTelegramChat, value);
-            if (value != null) _settings.TelegramChatId = value.Id;
+            if (value != null)
+            {
+                _settings.TelegramChatId = value.Id;
+                _settings.TelegramTopicId = value.TopicId;
+            }
         }
     }
 
@@ -130,7 +134,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
         _isDriveConnected    = settings.IsGoogleDriveConnected;
         _isTelegramConnected = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
-        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId);
+        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(TelegramAction);
@@ -200,6 +204,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         _settings.IsTelegramEnabled      = false;
         _settings.TelegramPhone          = string.Empty;
         _settings.TelegramChatId         = 0;
+        _settings.TelegramTopicId = null;
         _settings.IsGoogleDriveEnabled   = false;
         _settings.GoogleDriveFolderId    = string.Empty;
         _settings.IsGoogleDriveConnected = null;

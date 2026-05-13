@@ -141,7 +141,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         _googleDriveFolderId  = settings.GoogleDriveFolderId;
         _telegramPhone        = settings.TelegramPhone;
         _isTelegramConnected  = telegram.IsAuthorized ? true : (bool?)null;
-        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId);
+        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(() => _ = AuthorizeTelegramAsync());
@@ -196,6 +196,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             _settings.IsTelegramConnected = _isTelegramConnected;
             if (_selectedTelegramChat is not null)
                 _settings.TelegramChatId = _selectedTelegramChat.Id;
+                _settings.TelegramTopicId = _selectedTelegramChat?.TopicId;
         }
 
         _settings.IsSetupComplete = true;

@@ -92,6 +92,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_telegramChatId == value) return; _telegramChatId = value; OnPropertyChanged(); Save(); }
     }
 
+    private int? _telegramTopicId;
+    public int? TelegramTopicId
+    {
+        get => _telegramTopicId;
+        set {if (_telegramTopicId == value) return; _telegramTopicId = value; OnPropertyChanged(); Save(); }
+    }
+
     private bool? _isTelegramConnected;
     public bool? IsTelegramConnected
     {

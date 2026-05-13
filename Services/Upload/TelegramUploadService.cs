@@ -19,22 +19,11 @@ public class TelegramUploadService : IDisposable
 
     public static readonly IReadOnlyList<TelegramChat> Chats = new[]
     {
-        new TelegramChat("Test", 3805068290L),
-        new TelegramChat("Test2", 3805068290L),
-        new TelegramChat("Test3", 3805068290L),
-        new TelegramChat("Test4", 3805068290L),
-        new TelegramChat("Test5", 3805068290L),
-        new TelegramChat("Test6", 3805068290L),
-        new TelegramChat("Test7", 3805068290L),
-        new TelegramChat("Test8", 3805068290L),
-        new TelegramChat("Test9", 3805068290L),
-        new TelegramChat("Test10", 3805068290L),
-        new TelegramChat("Test11", 3805068290L),
-        new TelegramChat("Test12", 3805068290L),
-        new TelegramChat("Test13", 3805068290L),
-        new TelegramChat("Test14", 3805068290L),
-
-
+        new TelegramChat("Записи разговоров Тим лидов", 3688506342L),
+        new TelegramChat("Записи разговоров Адама", 3891343034L),
+        new TelegramChat("Стажування Move Nation", 3600976908L,261),
+        new TelegramChat("Чат Avangard Team", 3865749650L,2),
+        new TelegramChat("Чат Prime Team", 3991400384L,7),
     };
 
     private readonly AppSettings _settings;
@@ -86,7 +75,7 @@ public class TelegramUploadService : IDisposable
 
     // ── Send ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> SendFileAsync(string filePath, long chatId, string? caption = null)
+    public async Task<bool> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null)
     {
         Debug.WriteLine($"[TG] ── SendFileAsync ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
@@ -110,7 +99,7 @@ public class TelegramUploadService : IDisposable
             var inputFile = await _client.UploadFileAsync(filePath);
             var fileName  = Path.GetFileName(filePath);
 
-            await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg");
+            await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg", reply_to_msg_id: topicId ?? 0);
 
             Debug.WriteLine("[TG] ✓ Sent successfully");
             return true;
