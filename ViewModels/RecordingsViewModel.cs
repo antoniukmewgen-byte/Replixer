@@ -1,4 +1,5 @@
 using Replixer.Models;
+using Replixer.ViewModels.Dialogs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
@@ -71,9 +72,13 @@ public class RecordingsViewModel : ViewModelBase
             {
                 var entry = new RecordingEntry(dto.Platform, dto.StartedAt)
                 {
-                    Status   = dto.Status,
-                    DriveUrl = dto.DriveUrl,
-                    FilePath = dto.FilePath,
+                    Status            = dto.Status,
+                    DriveUrl          = dto.DriveUrl,
+                    FilePath          = dto.FilePath,
+                    TelegramMessageId = dto.TelegramMessageId,
+                    TelegramChatId    = dto.TelegramChatId,
+                    TelegramTopicId   = dto.TelegramTopicId,
+                    ReportData        = dto.ReportData,
                 };
                 SubscribeEntry(entry);
                 Recordings.Add(entry);
@@ -92,7 +97,9 @@ public class RecordingsViewModel : ViewModelBase
 
         // Snapshot on the UI thread; SaveAsync picks up the latest snapshot.
         _pendingSave = Recordings
-            .Select(e => new RecordingDto(e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath))
+            .Select(e => new RecordingDto(
+                e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath,
+                e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.ReportData))
             .ToList();
 
         _ = SaveAsync();
@@ -124,5 +131,9 @@ public class RecordingsViewModel : ViewModelBase
         DateTime        StartedAt,
         RecordingStatus Status,
         string?         DriveUrl,
-        string?         FilePath);
+        string?         FilePath,
+        int?            TelegramMessageId,
+        long            TelegramChatId,
+        int?            TelegramTopicId,
+        CallReportData? ReportData);
 }

@@ -8,6 +8,7 @@ public record CallReportData(
     string Manager,
     string CallType,
     string? CustomCallType,
+    string LeadSource,
     string CrmUrl,
     string Rating,
     string Outcome,
@@ -77,6 +78,7 @@ public class CallReportViewModel : ViewModelBase
     private string _note = string.Empty;
 
     private readonly Action<CallReportData?> _onComplete;
+    private readonly bool _isEditing;
 
     public string? SelectedCallType
     {
@@ -144,14 +146,29 @@ public class CallReportViewModel : ViewModelBase
         set => SetField(ref _note, value);
     }
 
-    public string SubmitLabel => "Відправити";
+    public string SubmitLabel => _isEditing ? "Зберегти" : "Відправити";
 
     public ICommand SubmitCommand { get; }
 
-    public CallReportViewModel(Action<CallReportData?> onComplete, string? managerName = null)
+    public CallReportViewModel(Action<CallReportData?> onComplete, string? managerName = null, CallReportData? existing = null)
     {
-        _onComplete   = onComplete;
-        _managerName  = managerName ?? string.Empty;
+        _onComplete  = onComplete;
+        _managerName = managerName ?? string.Empty;
+        _isEditing   = existing is not null;
+
+        if (existing is not null)
+        {
+            _selectedCallType           = existing.CallType;
+            _customCallType             = existing.CustomCallType ?? string.Empty;
+            _selectedLeadSource         = existing.LeadSource;
+            _selectedRating             = existing.Rating;
+            _selectedOutcome            = existing.Outcome;
+            _isInvoicePaid              = existing.IsInvoicePaid ?? false;
+            _selectedPaymentProbability = existing.PaymentProbability;
+            _crmUrl                     = existing.CrmUrl;
+            _note                       = existing.Note;
+        }
+
         SubmitCommand = new RelayCommand(OnSubmit, CanSubmit);
     }
 
@@ -164,13 +181,14 @@ public class CallReportViewModel : ViewModelBase
 
     private void OnSubmit() =>
         _onComplete(new CallReportData(
-            Manager:             _managerName,
-            CallType:            _selectedCallType!,
-            CustomCallType:      IsCustomCallTypeVisible ? _customCallType : null,
-            CrmUrl:              _crmUrl,
-            Rating:              _selectedRating!,
-            Outcome:             _selectedOutcome!,
-            IsInvoicePaid:       IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
-            PaymentProbability:  _selectedPaymentProbability!,
-            Note:                _note));
+            Manager:            _managerName,
+            CallType:           _selectedCallType!,
+            CustomCallType:     IsCustomCallTypeVisible ? _customCallType : null,
+            LeadSource:         _selectedLeadSource!,
+            CrmUrl:             _crmUrl,
+            Rating:             _selectedRating!,
+            Outcome:            _selectedOutcome!,
+            IsInvoicePaid:      IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
+            PaymentProbability: _selectedPaymentProbability!,
+            Note:               _note));
 }

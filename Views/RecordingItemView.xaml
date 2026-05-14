@@ -120,6 +120,20 @@
             <!--  Status  -->
             <StackPanel Grid.Column="2" Orientation="Horizontal">
 
+                <!--  Edit Telegram report  -->
+                <Button
+                    Margin="0,0,12,0"
+                    Command="{Binding EditReportCommand}"
+                    Style="{StaticResource IconButton}"
+                    Visibility="{Binding HasTelegramMessage, Converter={StaticResource BoolToVis}}">
+                    <Path
+                        Width="17"
+                        Height="17"
+                        Data="M1.172,19.119A4,4,0,0,0,0,21.947V24H2.053a4,4,0,0,0,2.828-1.172L18.224,9.485,14.515,5.776Z M23.145.855a2.622,2.622,0,0,0-3.71,0L15.929,4.362l3.709,3.709,3.507-3.506A2.622,2.622,0,0,0,23.145.855Z"
+                        Fill="{StaticResource SubText}"
+                        Stretch="Uniform" />
+                </Button>
+
                 <!--  Open in Explorer (manual recordings)  -->
                 <Button
                     Margin="0,0,12,0"

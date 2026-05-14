@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Audio;
@@ -7,6 +8,7 @@ using Replixer.Services.Window;
 using Replixer.Services.Window.Detectors;
 using Replixer.ViewModels.Call;
 using Replixer.ViewModels.Dialogs;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -71,6 +73,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _activeMonitor.Start();
 
         _settings.PropertyChanged += OnSettingsChanged;
+
+        // Wire edit commands for entries already loaded from disk.
+        foreach (var entry in _recordingsVm.Recordings)
+            WireEntryEditCommand(entry);
+
+        _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
     }
 
     // ── Monitor switching ─────────────────────────────────────────────────────
@@ -177,6 +185,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         CallContent         = new IdleCallViewModel(StartRecording);
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
+        WireEntryEditCommand(entry);
         try
         {
             string? path = await _recorder.StopRecordingAsync();
@@ -188,14 +197,24 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 return;
             }
 
+            CallReportData? reportData = null;
             string? caption = null;
             if (_orchestrator.IsTelegramReady)
-                caption = await RequestCallReportAsync();
+            {
+                var result = await RequestCallReportAsync();
+                caption    = result?.FormatCaption();
+                reportData = result;
+            }
 
-            var result = await _orchestrator.UploadAsync(path, caption);
-            entry.DriveUrl = result.DriveUrl;
-            entry.FilePath = result.LocalPath;
-            entry.Status   = RecordingStatus.Saved;
+            var upload = await _orchestrator.UploadAsync(path, caption);
+            entry.DriveUrl          = upload.DriveUrl;
+            entry.FilePath          = upload.LocalPath;
+            entry.TelegramMessageId = upload.TelegramMessageId;
+            entry.TelegramChatId    = upload.TelegramChatId;
+            entry.TelegramTopicId   = upload.TelegramTopicId;
+            entry.ReportData        = reportData;
+            entry.Status            = RecordingStatus.Saved;
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
         catch (Exception ex)
         {
@@ -207,23 +226,63 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     // ── Call report form ──────────────────────────────────────────────────────
 
-    private Task<string?> RequestCallReportAsync()
+    private Task<CallReportData?> RequestCallReportAsync(CallReportData? existing = null)
     {
         App.WindowManager.ShowMainWindow();
 
-        var tcs = new TaskCompletionSource<string?>();
+        var tcs = new TaskCompletionSource<CallReportData?>();
         var vm  = new CallReportViewModel(
             onComplete: data =>
             {
                 DismissCallReport();
-                tcs.TrySetResult(data?.FormatCaption());
+                tcs.TrySetResult(data);
             },
-            managerName: _settings.ManagerName);
+            managerName: _settings.ManagerName,
+            existing:    existing);
         CallReportRequested?.Invoke(vm);
         return tcs.Task;
     }
 
     private void DismissCallReport() => CallReportRequested?.Invoke(null);
+
+    // ── Edit report ───────────────────────────────────────────────────────────
+
+    private void WireEntryEditCommand(RecordingEntry entry)
+    {
+        entry.EditReportCommand = new RelayCommand(
+            execute:  () => _ = EditEntryReportAsync(entry),
+            canExecute: () => entry.HasTelegramMessage);
+    }
+
+    private async Task EditEntryReportAsync(RecordingEntry entry)
+    {
+        var newData = await RequestCallReportAsync(existing: entry.ReportData);
+        if (newData is null) return;
+
+        var caption = newData.FormatCaption();
+        var ok = await _orchestrator.EditTelegramCaptionAsync(
+            entry.TelegramMessageId!.Value,
+            entry.TelegramChatId,
+            entry.TelegramTopicId,
+            caption);
+
+        if (ok)
+            entry.ReportData = newData;
+        else
+            Debug.WriteLine("[HomeVM] EditTelegramCaptionAsync returned false");
+    }
+
+    private void OnRecordingsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Wire commands only for newly inserted entries not already wired (e.g. added via AddEntry).
+        // Entries loaded from disk are handled in the constructor.
+        if (e.NewItems is null) return;
+        foreach (RecordingEntry entry in e.NewItems)
+        {
+            if (entry.EditReportCommand is null)
+                WireEntryEditCommand(entry);
+        }
+    }
 
     // ── Dialog helpers ────────────────────────────────────────────────────────
 
@@ -244,6 +303,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     public void Dispose()
     {
         _settings.PropertyChanged -= OnSettingsChanged;
+        _recordingsVm.Recordings.CollectionChanged -= OnRecordingsChanged;
         Unsubscribe(_activeMonitor);
         _activeMonitor.Stop();
         _windowMonitor.Dispose();

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using TL;
 
 namespace Replixer.Services.Upload;
 
@@ -75,11 +76,51 @@ public class TelegramUploadService : IDisposable
 
     // ── Send ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null)
+    public async Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null)
     {
         Debug.WriteLine($"[TG] ── SendFileAsync ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
         Debug.WriteLine($"[TG] ChatId : {chatId}");
+        try
+        {
+            await EnsureClientAsync();
+            if (_client == null)
+            {
+                Debug.WriteLine("[TG] ✗ No client — not authorized");
+                return null;
+            }
+
+            TL.InputPeer? peer = await ResolvePeerAsync(chatId);
+            if (peer == null)
+                return null;
+
+            Debug.WriteLine($"[TG] Peer resolved: {peer}");
+            Debug.WriteLine("[TG] Uploading file…");
+
+            var inputFile = await _client.UploadFileAsync(filePath);
+            var fileName  = Path.GetFileName(filePath);
+
+            var msg = await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg", reply_to_msg_id: topicId ?? 0);
+
+            Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msg?.id}");
+            return msg?.id;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[TG] ✗ Send failed: {ex.Message}");
+            return null;
+        }
+        finally
+        {
+            Debug.WriteLine("[TG] ───────────────────────────────────────────");
+        }
+    }
+
+    // ── Edit ──────────────────────────────────────────────────────────────────
+
+    public async Task<bool> EditMessageAsync(int messageId, long chatId, int? topicId, string caption)
+    {
+        Debug.WriteLine($"[TG] ── EditMessageAsync (msgId={messageId}) ───────");
         try
         {
             await EnsureClientAsync();
@@ -93,20 +134,13 @@ public class TelegramUploadService : IDisposable
             if (peer == null)
                 return false;
 
-            Debug.WriteLine($"[TG] Peer resolved: {peer}");
-            Debug.WriteLine("[TG] Uploading file…");
-
-            var inputFile = await _client.UploadFileAsync(filePath);
-            var fileName  = Path.GetFileName(filePath);
-
-            await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg", reply_to_msg_id: topicId ?? 0);
-
-            Debug.WriteLine("[TG] ✓ Sent successfully");
+            await _client.Messages_EditMessage(peer, messageId, message: caption);
+            Debug.WriteLine("[TG] ✓ Edited successfully");
             return true;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[TG] ✗ Send failed: {ex.Message}");
+            Debug.WriteLine($"[TG] ✗ Edit failed: {ex.Message}");
             return false;
         }
         finally

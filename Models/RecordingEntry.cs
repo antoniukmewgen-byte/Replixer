@@ -1,4 +1,5 @@
 using Replixer.Infrastructure;
+using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -27,8 +28,34 @@ public class RecordingEntry : INotifyPropertyChanged
         set { if (_filePath == value) return; _filePath = value; OnPropertyChanged(); }
     }
 
+    private int? _telegramMessageId;
+    public int? TelegramMessageId
+    {
+        get => _telegramMessageId;
+        set { if (_telegramMessageId == value) return; _telegramMessageId = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasTelegramMessage)); }
+    }
+
+    public long TelegramChatId  { get; set; }
+    public int? TelegramTopicId { get; set; }
+
+    private CallReportData? _reportData;
+    public CallReportData? ReportData
+    {
+        get => _reportData;
+        set { if (_reportData == value) return; _reportData = value; OnPropertyChanged(); }
+    }
+
+    public bool HasTelegramMessage => _telegramMessageId.HasValue;
+
     public ICommand OpenInDriveCommand    { get; }
     public ICommand OpenInExplorerCommand { get; }
+
+    private ICommand? _editReportCommand;
+    public ICommand? EditReportCommand
+    {
+        get => _editReportCommand;
+        set { if (_editReportCommand == value) return; _editReportCommand = value; OnPropertyChanged(); }
+    }
 
     private RecordingStatus _status = RecordingStatus.Loading;
     public RecordingStatus Status
