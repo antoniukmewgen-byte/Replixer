@@ -81,8 +81,7 @@
                     <Grid Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock
@@ -99,7 +98,11 @@
                                 Style="{StaticResource AppComboBox}"
                                 Tag="Оберіть..." />
                         </StackPanel>
-                        <StackPanel Grid.Column="2">
+                        <StackPanel
+                            Grid.Column="1"
+                            MinWidth="140"
+                            Margin="12,0,0,0"
+                            Visibility="{Binding IsRatingVisible, Converter={StaticResource BoolToVis}}">
                             <TextBlock
                                 Margin="0,0,0,4"
                                 FontFamily="{StaticResource InterFont}"
@@ -117,7 +120,9 @@
                     </Grid>
 
                     <!--  До чого дійшли | Вірогідність оплати  -->
-                    <Grid Margin="0,12,0,0">
+                    <Grid
+                        Margin="0,12,0,0"
+                        Visibility="{Binding IsOutcomeVisible, Converter={StaticResource BoolToVis}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -257,7 +262,9 @@
                     </StackPanel>
 
                     <!--  Примітка  -->
-                    <StackPanel Margin="0,12,0,0">
+                    <StackPanel
+                        Margin="0,12,0,0"
+                        Visibility="{Binding IsNoteVisible, Converter={StaticResource BoolToVis}}">
                         <TextBlock
                             Margin="0,0,0,4"
                             FontFamily="{StaticResource InterFont}"

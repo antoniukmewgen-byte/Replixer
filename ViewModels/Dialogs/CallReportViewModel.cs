@@ -34,8 +34,10 @@ public record CallReportData(
         sb.AppendLine($"👤 {Position}: {Manager}");
         sb.AppendLine($"📞 Тип дзвінка: {callType}");
         sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
-        sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
-        sb.AppendLine($"✅ До чого дійшли: {outcome}");
+        if (!string.IsNullOrEmpty(Rating))
+            sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
+        if (!string.IsNullOrEmpty(outcome))
+            sb.AppendLine($"✅ До чого дійшли: {outcome}");
         if (!string.IsNullOrEmpty(PaymentProbability))
             sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");
         if (!string.IsNullOrWhiteSpace(Note))
@@ -55,7 +57,7 @@ public class CallReportViewModel : ViewModelBase
 {
     public static IReadOnlyList<string> CallTypes { get; } = new[]
     {
-        "Перший дзвінок", "Передзвін (перший дзвінок)", "Дзвінок після (подумаю/пораджуся)", "Дзвінок КК", "Інший"
+        "Перший дзвінок", "Передзвін (перший дзвінок)", "Дзвінок після (подумаю/пораджуся)", "Дзвінок КК", "Недозвін", "Інший"
     };
 
     public static IReadOnlyList<string> LeadSources { get; } = new[]
@@ -97,11 +99,22 @@ public class CallReportViewModel : ViewModelBase
         set
         {
             if (SetField(ref _selectedCallType, value))
+            {
                 OnPropertyChanged(nameof(IsCustomCallTypeVisible));
+                OnPropertyChanged(nameof(IsRatingVisible));
+                OnPropertyChanged(nameof(IsOutcomeVisible));
+                OnPropertyChanged(nameof(IsNoteVisible));
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
 
+    private bool IsNedozvon => _selectedCallType == "Недозвін";
+
     public bool IsCustomCallTypeVisible => _selectedCallType == "Інший";
+    public bool IsRatingVisible         => !IsNedozvon;
+    public bool IsOutcomeVisible        => !IsNedozvon;
+    public bool IsNoteVisible           => !IsNedozvon;
 
     public string CustomCallType
     {
@@ -197,8 +210,8 @@ public class CallReportViewModel : ViewModelBase
     private bool CanSubmit() =>
         _selectedCallType   is not null &&
         _selectedLeadSource is not null &&
-        _selectedRating     is not null &&
-        _selectedOutcome    is not null &&
+        (!IsRatingVisible  || _selectedRating  is not null) &&
+        (!IsOutcomeVisible || _selectedOutcome is not null) &&
         (!IsPaymentProbabilityVisible || _selectedPaymentProbability is not null) &&
         !string.IsNullOrWhiteSpace(_crmUrl);
 
@@ -209,8 +222,8 @@ public class CallReportViewModel : ViewModelBase
             CustomCallType:     IsCustomCallTypeVisible ? _customCallType : null,
             LeadSource:         _selectedLeadSource!,
             CrmUrl:             _crmUrl,
-            Rating:             _selectedRating!,
-            Outcome:            _selectedOutcome!,
+            Rating:             IsRatingVisible  ? _selectedRating!  : string.Empty,
+            Outcome:            IsOutcomeVisible ? _selectedOutcome! : string.Empty,
             IsInvoicePaid:      IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
             PaymentProbability: IsPaymentProbabilityVisible ? _selectedPaymentProbability! : string.Empty,
             Note:               _note)
