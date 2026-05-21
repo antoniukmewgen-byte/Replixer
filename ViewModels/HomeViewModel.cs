@@ -179,7 +179,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private async void StopRecording()
     {
         DismissDialog();
-        _isRecording        = false;
+        _isRecording = false;
+        var callStartTime   = _recordingStartedAt;   // capture before clearing
         _recordingStartedAt = null;
         OnPropertyChanged(nameof(IsRecording));
         CallContent         = new IdleCallViewModel(StartRecording);
@@ -199,14 +200,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
             CallReportData? reportData = null;
             string? caption = null;
-            if (_orchestrator.IsTelegramReady)
+            if (_orchestrator.IsTelegramReady || _orchestrator.IsKommoEnabled)
             {
                 var result = await RequestCallReportAsync();
                 caption    = result?.FormatCaption();
                 reportData = result;
             }
 
-            var upload = await _orchestrator.UploadAsync(path, caption);
+            bool isRingostat = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
+            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;

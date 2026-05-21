@@ -102,6 +102,7 @@ public partial class App : Application
         // Upload
         services.AddSingleton<GoogleDriveUploadService>();
         services.AddSingleton<TelegramUploadService>();
+        services.AddSingleton<KommoService>();
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
 
         // Setup

@@ -13,6 +13,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _uploader;
     private readonly TelegramUploadService _telegram;
+    private readonly KommoService _kommo;
     private readonly RecordingsViewModel _recordings;
 
     // ── Manager name ──────────────────────────────────────────────────────────
@@ -115,6 +116,49 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     public RelayCommand TelegramActionCommand { get; }
     public RelayCommand LogoutTelegramCommand { get; }
 
+    // ── Kommo ─────────────────────────────────────────────────────────────────
+
+    public bool IsKommoEnabled
+    {
+        get => _settings.IsKommoEnabled;
+        set => _settings.IsKommoEnabled = value;
+    }
+
+    public string KommoSubdomain
+    {
+        get => _settings.KommoSubdomain;
+        set => _settings.KommoSubdomain = value;
+    }
+
+    public string KommoApiToken
+    {
+        get => _settings.KommoApiToken;
+        set => _settings.KommoApiToken = value;
+    }
+
+    private bool? _isKommoConnected;
+    public bool? IsKommoConnected
+    {
+        get => _isKommoConnected;
+        private set { SetField(ref _isKommoConnected, value); _settings.IsKommoConnected = value; }
+    }
+
+    private bool _isCheckingKommo;
+    public bool IsCheckingKommo
+    {
+        get => _isCheckingKommo;
+        private set => SetField(ref _isCheckingKommo, value);
+    }
+
+    private string? _kommoConnectionError;
+    public string? KommoConnectionError
+    {
+        get => _kommoConnectionError;
+        private set => SetField(ref _kommoConnectionError, value);
+    }
+
+    public AsyncRelayCommand TestKommoConnectionCommand { get; }
+
     // ── Clear all data ────────────────────────────────────────────────────────
 
     public RelayCommand ClearAllDataCommand { get; }
@@ -125,20 +169,24 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         AppSettings settings,
         GoogleDriveUploadService uploader,
         TelegramUploadService telegram,
+        KommoService kommo,
         RecordingsViewModel recordings)
     {
         _settings   = settings;
         _uploader   = uploader;
         _telegram   = telegram;
+        _kommo      = kommo;
         _recordings = recordings;
 
         _isDriveConnected    = settings.IsGoogleDriveConnected;
         _isTelegramConnected = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
+        _isKommoConnected    = settings.IsKommoConnected;
         _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(TelegramAction);
         LogoutTelegramCommand      = new RelayCommand(LogoutTelegram);
+        TestKommoConnectionCommand = new AsyncRelayCommand(TestKommoConnectionAsync);
         ClearAllDataCommand        = new RelayCommand(ClearAllData);
 
         _settings.PropertyChanged += OnSettingsChanged;
@@ -157,6 +205,20 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             IsCheckingDrive      = false;
             IsDriveConnected     = error is null;
             DriveConnectionError = error;
+        });
+    }
+
+    private async Task TestKommoConnectionAsync()
+    {
+        IsKommoConnected     = null;
+        KommoConnectionError = null;
+        IsCheckingKommo      = true;
+        string? error = await _kommo.TestConnectionAsync(_settings.KommoSubdomain, _settings.KommoApiToken);
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsCheckingKommo      = false;
+            IsKommoConnected     = error is null;
+            KommoConnectionError = error;
         });
     }
 
@@ -211,7 +273,11 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         _settings.ManagerName            = string.Empty;
         _settings.UserFolderName         = string.Empty;
         _settings.UserFolderId           = string.Empty;
-        _settings.IsSetupComplete        = false;
+        _settings.IsKommoEnabled   = false;
+        _settings.KommoSubdomain   = string.Empty;
+        _settings.KommoApiToken    = string.Empty;
+        _settings.IsKommoConnected = null;
+        _settings.IsSetupComplete = false;
         _settings.Flush();
 
         var exe = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
@@ -250,6 +316,21 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
                 OnPropertyChanged(nameof(TelegramPhone));
                 IsTelegramConnected = null;
                 TelegramAuthError   = null;
+                break;
+            case nameof(AppSettings.IsKommoEnabled):
+                OnPropertyChanged(nameof(IsKommoEnabled));
+                break;
+            case nameof(AppSettings.KommoSubdomain):
+                OnPropertyChanged(nameof(KommoSubdomain));
+                IsKommoConnected     = null;
+                KommoConnectionError = null;
+                IsCheckingKommo      = false;
+                break;
+            case nameof(AppSettings.KommoApiToken):
+                OnPropertyChanged(nameof(KommoApiToken));
+                IsKommoConnected     = null;
+                KommoConnectionError = null;
+                IsCheckingKommo      = false;
                 break;
         }
     }

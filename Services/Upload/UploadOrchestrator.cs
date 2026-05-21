@@ -9,17 +9,20 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _drive;
     private readonly TelegramUploadService _telegram;
+    private readonly KommoService _kommo;
 
-    public UploadOrchestrator(AppSettings settings, GoogleDriveUploadService drive, TelegramUploadService telegram)
+    public UploadOrchestrator(AppSettings settings, GoogleDriveUploadService drive, TelegramUploadService telegram, KommoService kommo)
     {
         _settings = settings;
         _drive    = drive;
         _telegram = telegram;
+        _kommo    = kommo;
     }
 
     public bool IsTelegramReady => _settings.IsTelegramEnabled && _telegram.IsAuthorized;
+    public bool IsKommoEnabled => _kommo.IsEnabled;
 
-    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, CancellationToken ct = default)
+    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, CancellationToken ct = default)
     {
         // Telegram runs in parallel with Drive upload — both read the file, neither deletes it.
         var telegramTask = IsTelegramReady
@@ -32,6 +35,10 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
 
             int? msgId = await telegramTask;
+
+            // Post to Kommo before deleting the file
+            if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
+                await _kommo.ProcessLeadAsync(kommoLeadUrl, telegramCaption ?? string.Empty, callStartTime);
 
             if (driveUrl is not null)
             {
@@ -50,6 +57,10 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         else
         {
             int? msgId = await telegramTask;
+
+            if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
+                await _kommo.ProcessLeadAsync(kommoLeadUrl, telegramCaption ?? string.Empty, callStartTime);
+
             return new UploadResult
             {
                 LocalPath         = MoveToRecordingsFolder(filePath),

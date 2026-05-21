@@ -141,6 +141,34 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_managerName == value) return; _managerName = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isKommoEnabled = false;
+    public bool IsKommoEnabled
+    {
+        get => _isKommoEnabled;
+        set { if (_isKommoEnabled == value) return; _isKommoEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _kommoSubdomain = string.Empty;
+    public string KommoSubdomain
+    {
+        get => _kommoSubdomain;
+        set { if (_kommoSubdomain == value) return; _kommoSubdomain = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _kommoApiToken = string.Empty;
+    public string KommoApiToken
+    {
+        get => _kommoApiToken;
+        set { if (_kommoApiToken == value) return; _kommoApiToken = value; OnPropertyChanged(); Save(); }
+    }
+
+    private bool? _isKommoConnected;
+    public bool? IsKommoConnected
+    {
+        get => _isKommoConnected;
+        set { if (_isKommoConnected == value) return; _isKommoConnected = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     public static AppSettings Load()
