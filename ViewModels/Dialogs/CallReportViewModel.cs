@@ -57,7 +57,7 @@ public class CallReportViewModel : ViewModelBase
 {
     public static IReadOnlyList<string> CallTypes { get; } = new[]
     {
-        "Перший дзвінок", "Передзвін (перший дзвінок)", "Дзвінок після (подумаю/пораджуся)", "Дзвінок КК", "Недозвін", "Інший"
+        "Перший дзвінок", "Передзвін (перший дзвінок)","Перший контакт", "Повторний контакт", "Дзвінок після (подумаю/пораджуся)", "Дзвінок КК", "Недодзвон (ще не було спілкування)", "Недодзвон (вже було спілкування)", "Інший"
     };
 
     public static IReadOnlyList<string> LeadSources { get; } = new[]
@@ -100,7 +100,9 @@ public class CallReportViewModel : ViewModelBase
         {
             if (SetField(ref _selectedCallType, value))
             {
+                OnPropertyChanged(nameof(IsCallTypeVisible));
                 OnPropertyChanged(nameof(IsCustomCallTypeVisible));
+                OnPropertyChanged(nameof(IsLeadSourceVisible));
                 OnPropertyChanged(nameof(IsRatingVisible));
                 OnPropertyChanged(nameof(IsOutcomeVisible));
                 OnPropertyChanged(nameof(IsNoteVisible));
@@ -109,12 +111,15 @@ public class CallReportViewModel : ViewModelBase
         }
     }
 
-    private bool IsNedozvon => _selectedCallType == "Недозвін";
+    private bool IsNedozvon  => _selectedCallType is "Недодзвон (ще не було спілкування)" or "Недодзвон (вже було спілкування)";
+    private bool IsManager   => _position == "Менеджер";
 
-    public bool IsCustomCallTypeVisible => _selectedCallType == "Інший";
-    public bool IsRatingVisible         => !IsNedozvon;
-    public bool IsOutcomeVisible        => !IsNedozvon;
-    public bool IsNoteVisible           => !IsNedozvon;
+    public bool IsCallTypeVisible       => IsManager;
+    public bool IsCustomCallTypeVisible => IsManager && _selectedCallType == "Інший";
+    public bool IsLeadSourceVisible     => _position != "Діагност";
+    public bool IsRatingVisible         => IsManager && !IsNedozvon;
+    public bool IsOutcomeVisible        => IsManager && !IsNedozvon;
+    public bool IsNoteVisible           => !IsManager || !IsNedozvon;
 
     public string CustomCallType
     {
@@ -176,7 +181,11 @@ public class CallReportViewModel : ViewModelBase
     public string Note
     {
         get => _note;
-        set => SetField(ref _note, value);
+        set
+        {
+            if (SetField(ref _note, value))
+                CommandManager.InvalidateRequerySuggested();
+        }
     }
 
     public string SubmitLabel => _isEditing ? "Зберегти" : "Відправити";
@@ -207,20 +216,25 @@ public class CallReportViewModel : ViewModelBase
         SubmitCommand = new RelayCommand(OnSubmit, CanSubmit);
     }
 
-    private bool CanSubmit() =>
-        _selectedCallType   is not null &&
-        _selectedLeadSource is not null &&
-        (!IsRatingVisible  || _selectedRating  is not null) &&
-        (!IsOutcomeVisible || _selectedOutcome is not null) &&
-        (!IsPaymentProbabilityVisible || _selectedPaymentProbability is not null) &&
-        !string.IsNullOrWhiteSpace(_crmUrl);
+    private bool CanSubmit() => _position switch
+    {
+        "Діагност"     => !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
+        "Кваліфікатор" => _selectedLeadSource is not null && !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
+        _ =>   // Менеджер
+            _selectedCallType   is not null &&
+            _selectedLeadSource is not null &&
+            (!IsRatingVisible  || _selectedRating  is not null) &&
+            (!IsOutcomeVisible || _selectedOutcome is not null) &&
+            (!IsPaymentProbabilityVisible || _selectedPaymentProbability is not null) &&
+            !string.IsNullOrWhiteSpace(_crmUrl),
+    };
 
     private void OnSubmit() =>
         _onComplete(new CallReportData(
             Manager:            _managerName,
-            CallType:           _selectedCallType!,
+            CallType:           IsCallTypeVisible ? _selectedCallType! : string.Empty,
             CustomCallType:     IsCustomCallTypeVisible ? _customCallType : null,
-            LeadSource:         _selectedLeadSource!,
+            LeadSource:         IsLeadSourceVisible ? _selectedLeadSource! : string.Empty,
             CrmUrl:             _crmUrl,
             Rating:             IsRatingVisible  ? _selectedRating!  : string.Empty,
             Outcome:            IsOutcomeVisible ? _selectedOutcome! : string.Empty,

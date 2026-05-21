@@ -31,7 +31,7 @@
                 <StackPanel>
 
                     <!--  Тип дзвінка  -->
-                    <StackPanel>
+                    <StackPanel Visibility="{Binding IsCallTypeVisible, Converter={StaticResource BoolToVis}}">
                         <TextBlock
                             Margin="0,0,0,4"
                             FontFamily="{StaticResource InterFont}"
@@ -78,7 +78,7 @@
                     </StackPanel>
 
                     <!--  Джерело ліда | Оцінка розмови  -->
-                    <Grid Margin="0,12,0,0">
+                    <Grid Margin="0,12,0,0" Visibility="{Binding IsLeadSourceVisible, Converter={StaticResource BoolToVis}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
