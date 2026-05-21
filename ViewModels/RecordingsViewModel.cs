@@ -78,6 +78,7 @@ public class RecordingsViewModel : ViewModelBase
                     TelegramMessageId = dto.TelegramMessageId,
                     TelegramChatId    = dto.TelegramChatId,
                     TelegramTopicId   = dto.TelegramTopicId,
+                    KommoNoteId       = dto.KommoNoteId,
                     ReportData        = dto.ReportData,
                 };
                 SubscribeEntry(entry);
@@ -99,7 +100,7 @@ public class RecordingsViewModel : ViewModelBase
         _pendingSave = Recordings
             .Select(e => new RecordingDto(
                 e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath,
-                e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.ReportData))
+                e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.KommoNoteId, e.ReportData))
             .ToList();
 
         _ = SaveAsync();
@@ -135,5 +136,6 @@ public class RecordingsViewModel : ViewModelBase
         int?            TelegramMessageId,
         long            TelegramChatId,
         int?            TelegramTopicId,
+        long?           KommoNoteId,
         CallReportData? ReportData);
 }

@@ -51,10 +51,10 @@ public class KommoService
         catch (Exception ex) { return ex.Message; }
     }
 
-    /// <summary>Posts note + conditionally sets first-contact date.</summary>
-    public async Task ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null)
+    /// <summary>Posts note + conditionally sets first-contact date. Returns the created note ID.</summary>
+    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null)
     {
-        if (!IsEnabled) return;
+        if (!IsEnabled) return null;
 
         var (subdomain, leadId) = ParseLeadUrl(leadUrl);
         subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
@@ -62,24 +62,66 @@ public class KommoService
         if (leadId is null || string.IsNullOrEmpty(subdomain))
         {
             Debug.WriteLine($"[Kommo] Cannot parse lead URL: {leadUrl}");
-            return;
+            return null;
         }
 
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
         string token   = _settings.KommoApiToken;
 
-        // Fire note and first-contact check in parallel
         var noteTask = PostNoteAsync(baseUrl, token, leadId, noteText);
         var dateTask = callStartTime.HasValue
             ? TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime.Value)
             : Task.CompletedTask;
 
         await Task.WhenAll(noteTask, dateTask);
+        return await noteTask;
+    }
+
+    /// <summary>Updates the text of an existing note.</summary>
+    public async Task<bool> EditNoteAsync(string leadUrl, long noteId, string noteText)
+    {
+        if (!IsEnabled) return false;
+
+        var (subdomain, leadId) = ParseLeadUrl(leadUrl);
+        subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
+
+        if (leadId is null || string.IsNullOrEmpty(subdomain))
+        {
+            Debug.WriteLine($"[Kommo] Cannot parse lead URL: {leadUrl}");
+            return false;
+        }
+
+        string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
+        string token   = _settings.KommoApiToken;
+
+        try
+        {
+            var payload = JsonSerializer.Serialize(new[]
+            {
+                new { id = noteId, note_type = "common", @params = new { text = noteText } }
+            });
+
+            using var req = new HttpRequestMessage(HttpMethod.Patch, $"{baseUrl}/leads/{leadId}/notes")
+            {
+                Content = new StringContent(payload, Encoding.UTF8, "application/json")
+            };
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
+            Debug.WriteLine($"[Kommo] Note PATCH → {(int)res.StatusCode}  {body[..Math.Min(500, body.Length)]}");
+            return res.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] EditNote failed: {ex.Message}");
+            return false;
+        }
     }
 
     // ── Private: note ─────────────────────────────────────────────────────────
 
-    private async Task PostNoteAsync(string baseUrl, string token, string leadId, string text)
+    private async Task<long?> PostNoteAsync(string baseUrl, string token, string leadId, string text)
     {
         try
         {
@@ -94,10 +136,21 @@ public class KommoService
             };
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var res = await _http.SendAsync(req);
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
             Debug.WriteLine($"[Kommo] Note POST → {(int)res.StatusCode}");
+
+            if (!res.IsSuccessStatusCode) return null;
+
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("_embedded", out var emb) &&
+                emb.TryGetProperty("notes", out var notes) &&
+                notes.GetArrayLength() > 0 &&
+                notes[0].TryGetProperty("id", out var idProp))
+                return idProp.GetInt64();
         }
         catch (Exception ex) { Debug.WriteLine($"[Kommo] PostNote failed: {ex.Message}"); }
+        return null;
     }
 
     // ── Private: first-contact date ───────────────────────────────────────────

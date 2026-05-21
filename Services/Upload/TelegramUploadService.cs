@@ -172,11 +172,8 @@ public class TelegramUploadService : IDisposable
             }
         }
 
-        const string label = "💾 Google Drive";
-        var text   = body + "\n" + label + tagSuffix;
-        var offset = body.Length + 1;
-        var entity = new TL.MessageEntityTextUrl { offset = offset, length = label.Length, url = driveUrl };
-        return (text, [entity]);
+        var text = body + $"\n💾 Google Drive: {driveUrl}" + tagSuffix;
+        return (text, null);
     }
 
     private async Task<TL.InputPeer?> ResolvePeerAsync(long chatId)

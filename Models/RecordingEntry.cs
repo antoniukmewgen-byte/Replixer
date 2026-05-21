@@ -35,8 +35,9 @@ public class RecordingEntry : INotifyPropertyChanged
         set { if (_telegramMessageId == value) return; _telegramMessageId = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasTelegramMessage)); }
     }
 
-    public long TelegramChatId  { get; set; }
-    public int? TelegramTopicId { get; set; }
+    public long  TelegramChatId  { get; set; }
+    public int?  TelegramTopicId { get; set; }
+    public long? KommoNoteId     { get; set; }
 
     private CallReportData? _reportData;
     public CallReportData? ReportData

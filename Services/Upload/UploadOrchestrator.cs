@@ -34,8 +34,15 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 : null;
 
             // Post to Kommo before deleting the file
+            long? kommoNoteId = null;
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-                await _kommo.ProcessLeadAsync(kommoLeadUrl, telegramCaption ?? string.Empty, callStartTime);
+            {
+                var kommoBase = StripHashtags(telegramCaption ?? string.Empty);
+                var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
+                    ? kommoBase
+                    : kommoBase + $"\n💾 Google Drive: {driveUrl}";
+                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime);
+            }
 
             if (driveUrl is not null)
             {
@@ -46,6 +53,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                     TelegramMessageId = msgId,
                     TelegramChatId    = _settings.TelegramChatId,
                     TelegramTopicId   = _settings.TelegramTopicId,
+                    KommoNoteId       = kommoNoteId,
                 };
             }
 
@@ -57,8 +65,9 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
                 : null;
 
+            long? kommoNoteId = null;
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-                await _kommo.ProcessLeadAsync(kommoLeadUrl, telegramCaption ?? string.Empty, callStartTime);
+                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, StripHashtags(telegramCaption ?? string.Empty), callStartTime);
 
             return new UploadResult
             {
@@ -66,6 +75,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 TelegramMessageId = msgId,
                 TelegramChatId    = _settings.TelegramChatId,
                 TelegramTopicId   = _settings.TelegramTopicId,
+                KommoNoteId       = kommoNoteId,
             };
         }
 
@@ -74,6 +84,9 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
     public Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
         => _telegram.EditMessageAsync(messageId, chatId, topicId, caption, driveUrl);
+
+    public Task<bool> EditKommoNoteAsync(string leadUrl, long noteId, string noteText)
+        => _kommo.EditNoteAsync(leadUrl, noteId, noteText);
 
     private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)
     {
@@ -95,6 +108,13 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
             ? null
             : _settings.GoogleDriveFolderId;
+    }
+
+    private static string StripHashtags(string text)
+    {
+        var t = text.TrimEnd();
+        var nl = t.LastIndexOf('\n');
+        return nl >= 0 && t[(nl + 1)..].TrimStart('\r').StartsWith('#') ? t[..nl].TrimEnd() : t;
     }
 
     private string? MoveToRecordingsFolder(string tempPath)

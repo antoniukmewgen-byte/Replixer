@@ -214,6 +214,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramMessageId = upload.TelegramMessageId;
             entry.TelegramChatId    = upload.TelegramChatId;
             entry.TelegramTopicId   = upload.TelegramTopicId;
+            entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
             entry.Status            = RecordingStatus.Saved;
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
@@ -262,17 +263,37 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         if (newData is null) return;
 
         var caption = newData.FormatCaption();
-        var ok = await _orchestrator.EditTelegramCaptionAsync(
-            entry.TelegramMessageId!.Value,
-            entry.TelegramChatId,
-            entry.TelegramTopicId,
-            caption,
-            entry.DriveUrl);
 
-        if (ok)
+        var tgTask = entry.TelegramMessageId.HasValue
+            ? _orchestrator.EditTelegramCaptionAsync(
+                entry.TelegramMessageId.Value,
+                entry.TelegramChatId,
+                entry.TelegramTopicId,
+                caption,
+                entry.DriveUrl)
+            : Task.FromResult(false);
+
+        var kommoBase = StripHashtags(caption);
+        var kommoNote = string.IsNullOrWhiteSpace(entry.DriveUrl)
+            ? kommoBase
+            : kommoBase + $"\n💾 Google Drive: {entry.DriveUrl}";
+        var kommoTask = entry.KommoNoteId.HasValue && !string.IsNullOrWhiteSpace(newData.CrmUrl)
+            ? _orchestrator.EditKommoNoteAsync(newData.CrmUrl, entry.KommoNoteId.Value, kommoNote)
+            : Task.FromResult(false);
+
+        await Task.WhenAll(tgTask, kommoTask);
+
+        if (await tgTask || await kommoTask)
             entry.ReportData = newData;
         else
-            Debug.WriteLine("[HomeVM] EditTelegramCaptionAsync returned false");
+            Debug.WriteLine("[HomeVM] Both EditTelegramCaptionAsync and EditKommoNoteAsync returned false");
+    }
+
+    private static string StripHashtags(string text)
+    {
+        var t = text.TrimEnd();
+        var nl = t.LastIndexOf('\n');
+        return nl >= 0 && t[(nl + 1)..].TrimStart('\r').StartsWith('#') ? t[..nl].TrimEnd() : t;
     }
 
     private void OnRecordingsChanged(object? sender, NotifyCollectionChangedEventArgs e)
