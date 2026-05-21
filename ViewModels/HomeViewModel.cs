@@ -31,6 +31,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private IMonitorService _activeMonitor;
 
     private bool _isRecording;
+    private bool _isStopping;
     private bool _hasActiveDialog;
 
     public bool IsRecording => _isRecording;
@@ -151,7 +152,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     public void ManualStartRecording()
     {
-        if (_isRecording) return;
+        if (_isRecording || _isStopping) return;
         if (string.IsNullOrEmpty(_lastDetectedApp))
             _lastDetectedApp = "Ручний запис";
         StartRecording();
@@ -164,6 +165,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private void StartRecording()
     {
+        if (_isStopping) return;
         DismissDialog();
         _isRecording        = true;
         _recordingStartedAt = DateTime.Now;
@@ -180,6 +182,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         DismissDialog();
         _isRecording = false;
+        _isStopping  = true;
         var callStartTime   = _recordingStartedAt;   // capture before clearing
         _recordingStartedAt = null;
         var callDuration    = callStartTime.HasValue ? DateTime.Now - callStartTime.Value : TimeSpan.Zero;
@@ -227,6 +230,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             Debug.WriteLine($"[HomeVM] StopRecording error: {ex.Message}");
             App.WindowManager.CloseCheatSheet();
             entry.Status = RecordingStatus.Error;
+        }
+        finally
+        {
+            _isStopping = false;
         }
     }
 

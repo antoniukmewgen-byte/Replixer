@@ -36,7 +36,9 @@ public class AudioRecordingService : IDisposable
 
     public bool StartRecording(string appName)
     {
-        if (IsRecording) return false;
+        // Guard against starting while a previous StopRecordingAsync is still tearing down:
+        // IsRecording is cleared early, but captures are still alive until CleanupCaptures().
+        if (IsRecording || _loopbackCapture != null || _micCapture != null) return false;
 
         try
         {
