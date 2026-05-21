@@ -21,6 +21,8 @@ public class TelegramUploadService : IDisposable
     public static readonly IReadOnlyList<TelegramChat> Chats = new[]
     {
         new TelegramChat("TestGroup", 3805068290L),
+
+        new TelegramChat("Чат Kvalifikatory Team", 3836828860L,5),
         new TelegramChat("Записи разговоров Тим лидов", 3688506342L),
         new TelegramChat("Записи разговоров Адама", 3891343034L),
         new TelegramChat("Стажування Move Nation", 3600976908L,261),

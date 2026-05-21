@@ -85,6 +85,11 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
 
+    public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
+        _settings.Position == "Кваліфікатор"
+            ? TelegramChats.Where(c => c.Name == "Чат Kvalifikatory Team").ToList()
+            : TelegramChats;
+
     private TelegramChat? _selectedTelegramChat;
     public TelegramChat? SelectedTelegramChat
     {
@@ -189,7 +194,9 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         _isDriveConnected    = settings.IsGoogleDriveConnected;
         _isTelegramConnected = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
         _isKommoConnected    = settings.IsKommoConnected;
-        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
+        _selectedTelegramChat = settings.Position == "Кваліфікатор"
+            ? TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team")
+            : TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(TelegramAction);
@@ -311,6 +318,12 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
                 break;
             case nameof(AppSettings.Position):
                 OnPropertyChanged(nameof(Position));
+                OnPropertyChanged(nameof(FilteredTelegramChats));
+                if (_settings.Position == "Кваліфікатор")
+                {
+                    var kChat = TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team");
+                    if (kChat is not null) SelectedTelegramChat = kChat;
+                }
                 break;
             case nameof(AppSettings.IsGoogleDriveEnabled):
                 OnPropertyChanged(nameof(IsGoogleDriveEnabled));

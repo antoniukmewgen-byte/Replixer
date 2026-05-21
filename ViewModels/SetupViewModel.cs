@@ -36,7 +36,13 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     public string Position
     {
         get => _position;
-        set => SetField(ref _position, value);
+        set
+        {
+            if (!SetField(ref _position, value)) return;
+            OnPropertyChanged(nameof(FilteredTelegramChats));
+            if (_position == "Кваліфікатор")
+                SelectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team");
+        }
     }
 
     public bool CanFinish => !string.IsNullOrWhiteSpace(_managerName);
@@ -81,6 +87,11 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     // ── Telegram ──────────────────────────────────────────────────────────────
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
+
+    public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
+        _position == "Кваліфікатор"
+            ? TelegramChats.Where(c => c.Name == "Чат Kvalifikatory Team").ToList()
+            : TelegramChats;
 
     private TelegramChat? _selectedTelegramChat;
     public TelegramChat? SelectedTelegramChat
@@ -201,7 +212,9 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         _googleDriveFolderId  = settings.GoogleDriveFolderId;
         _telegramPhone        = settings.TelegramPhone;
         _isTelegramConnected  = telegram.IsAuthorized ? true : (bool?)null;
-        _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
+        _selectedTelegramChat = _position == "Кваліфікатор"
+            ? TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team")
+            : TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
         _kommoSubdomain       = settings.KommoSubdomain;
         _kommoApiToken        = settings.KommoApiToken;
 
