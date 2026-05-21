@@ -36,7 +36,8 @@ public record CallReportData(
         sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
         sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
         sb.AppendLine($"✅ До чого дійшли: {outcome}");
-        sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");
+        if (!string.IsNullOrEmpty(PaymentProbability))
+            sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");
         if (!string.IsNullOrWhiteSpace(Note))
             sb.AppendLine($"📝 Примітка: {Note}");
 
@@ -126,11 +127,16 @@ public class CallReportViewModel : ViewModelBase
         set
         {
             if (SetField(ref _selectedOutcome, value))
+            {
                 OnPropertyChanged(nameof(IsInvoiceCheckboxVisible));
+                OnPropertyChanged(nameof(IsPaymentProbabilityVisible));
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
 
-    public bool IsInvoiceCheckboxVisible => _selectedOutcome == "Виставив рахунок";
+    public bool IsInvoiceCheckboxVisible       => _selectedOutcome == "Виставив рахунок";
+    public bool IsPaymentProbabilityVisible    => _selectedOutcome == "Виставив рахунок";
 
     public bool IsInvoicePaid
     {
@@ -189,11 +195,11 @@ public class CallReportViewModel : ViewModelBase
     }
 
     private bool CanSubmit() =>
-        _selectedCallType           is not null &&
-        _selectedLeadSource         is not null &&
-        _selectedRating             is not null &&
-        _selectedOutcome            is not null &&
-        _selectedPaymentProbability is not null &&
+        _selectedCallType   is not null &&
+        _selectedLeadSource is not null &&
+        _selectedRating     is not null &&
+        _selectedOutcome    is not null &&
+        (!IsPaymentProbabilityVisible || _selectedPaymentProbability is not null) &&
         !string.IsNullOrWhiteSpace(_crmUrl);
 
     private void OnSubmit() =>
@@ -206,7 +212,7 @@ public class CallReportViewModel : ViewModelBase
             Rating:             _selectedRating!,
             Outcome:            _selectedOutcome!,
             IsInvoicePaid:      IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
-            PaymentProbability: _selectedPaymentProbability!,
+            PaymentProbability: IsPaymentProbabilityVisible ? _selectedPaymentProbability! : string.Empty,
             Note:               _note)
         {
             Position = _position,
