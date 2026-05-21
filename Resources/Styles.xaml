@@ -119,7 +119,9 @@
                                 Background="{StaticResource BrushColor2}"
                                 BorderBrush="{StaticResource BrushBorderColor2}"
                                 BorderThickness="1"
-                                CornerRadius="8">
+                                CornerRadius="8"
+                                TextOptions.TextFormattingMode="Ideal"
+                                TextOptions.TextRenderingMode="ClearType">
                                 <ScrollViewer
                                     MaxHeight="150"
                                     CanContentScroll="True"

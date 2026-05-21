@@ -208,6 +208,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             if (telegramMatters || _orchestrator.IsKommoEnabled)
             {
                 var result = await RequestCallReportAsync();
+                if (result is not null)
+                    result = result with
+                    {
+                        AppName  = _lastDetectedApp,
+                        Duration = callDuration,
+                    };
                 caption    = result?.FormatCaption();
                 reportData = result;
             }

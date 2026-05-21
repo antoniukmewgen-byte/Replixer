@@ -141,6 +141,36 @@
                                 SelectedItem="{Binding SelectedOutcome}"
                                 Style="{StaticResource AppComboBox}"
                                 Tag="Оберіть..." />
+                            <!--  Custom outcome input — visible when "Інший" is selected  -->
+                            <Border
+                                Margin="0,8,0,0"
+                                Style="{StaticResource AppInputBorder}"
+                                Visibility="{Binding IsCustomOutcomeVisible, Converter={StaticResource BoolToVis}}">
+                                <Grid>
+                                    <TextBox
+                                        x:Name="CustomOutcomeBox"
+                                        Style="{StaticResource AppTextBox}"
+                                        Text="{Binding CustomOutcome, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="14"
+                                        Foreground="{StaticResource SubText}"
+                                        IsHitTestVisible="False"
+                                        Text="Введіть результат...">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=CustomOutcomeBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
                             <!--  Invoice paid checkbox — visible when "Виставив рахунок" is selected  -->
                             <CheckBox
                                 Margin="0,8,0,0"
