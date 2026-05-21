@@ -16,12 +16,20 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     private readonly KommoService _kommo;
     private readonly RecordingsViewModel _recordings;
 
-    // ── Manager name ──────────────────────────────────────────────────────────
+    // ── Manager name & position ───────────────────────────────────────────────
+
+    public static IReadOnlyList<string> Positions => Dialogs.CallReportViewModel.Positions;
 
     public string ManagerName
     {
         get => _settings.ManagerName;
         set => _settings.ManagerName = value;
+    }
+
+    public string Position
+    {
+        get => _settings.Position;
+        set => _settings.Position = value;
     }
 
     // ── Google Drive ──────────────────────────────────────────────────────────
@@ -271,6 +279,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         _settings.GoogleDriveFolderId    = string.Empty;
         _settings.IsGoogleDriveConnected = null;
         _settings.ManagerName            = string.Empty;
+        _settings.Position               = "Менеджер";
         _settings.UserFolderName         = string.Empty;
         _settings.UserFolderId           = string.Empty;
         _settings.IsKommoEnabled   = false;
@@ -299,6 +308,9 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         {
             case nameof(AppSettings.ManagerName):
                 OnPropertyChanged(nameof(ManagerName));
+                break;
+            case nameof(AppSettings.Position):
+                OnPropertyChanged(nameof(Position));
                 break;
             case nameof(AppSettings.IsGoogleDriveEnabled):
                 OnPropertyChanged(nameof(IsGoogleDriveEnabled));

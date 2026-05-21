@@ -12,10 +12,13 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _driveUploader;
     private readonly TelegramUploadService _telegram;
+    private readonly KommoService _kommo;
 
     public event Action? SetupCompleted;
 
-    // ── Manager name ──────────────────────────────────────────────────────────
+    // ── Manager name & position ───────────────────────────────────────────────
+
+    public static IReadOnlyList<string> Positions => Dialogs.CallReportViewModel.Positions;
 
     private string _managerName = string.Empty;
     public string ManagerName
@@ -27,6 +30,13 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             OnPropertyChanged(nameof(CanFinish));
             CommandManager.InvalidateRequerySuggested();
         }
+    }
+
+    private string _position = "Менеджер";
+    public string Position
+    {
+        get => _position;
+        set => SetField(ref _position, value);
     }
 
     public bool CanFinish => !string.IsNullOrWhiteSpace(_managerName);
@@ -114,6 +124,55 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public RelayCommand TelegramActionCommand { get; }
 
+    // ── Kommo CRM ─────────────────────────────────────────────────────────────
+
+    private string _kommoSubdomain = string.Empty;
+    public string KommoSubdomain
+    {
+        get => _kommoSubdomain;
+        set
+        {
+            SetField(ref _kommoSubdomain, value);
+            IsKommoConnected     = null;
+            KommoConnectionError = null;
+        }
+    }
+
+    private string _kommoApiToken = string.Empty;
+    public string KommoApiToken
+    {
+        get => _kommoApiToken;
+        set
+        {
+            SetField(ref _kommoApiToken, value);
+            IsKommoConnected     = null;
+            KommoConnectionError = null;
+        }
+    }
+
+    private bool? _isKommoConnected;
+    public bool? IsKommoConnected
+    {
+        get => _isKommoConnected;
+        private set => SetField(ref _isKommoConnected, value);
+    }
+
+    private bool _isCheckingKommo;
+    public bool IsCheckingKommo
+    {
+        get => _isCheckingKommo;
+        private set => SetField(ref _isCheckingKommo, value);
+    }
+
+    private string? _kommoConnectionError;
+    public string? KommoConnectionError
+    {
+        get => _kommoConnectionError;
+        private set => SetField(ref _kommoConnectionError, value);
+    }
+
+    public AsyncRelayCommand TestKommoConnectionCommand { get; }
+
     // ── Dialog overlay (for Telegram verification code) ───────────────────────
 
     private ViewModelBase? _dialog;
@@ -132,19 +191,23 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    public SetupViewModel(AppSettings settings, GoogleDriveUploadService driveUploader, TelegramUploadService telegram)
+    public SetupViewModel(AppSettings settings, GoogleDriveUploadService driveUploader, TelegramUploadService telegram, KommoService kommo)
     {
         _settings      = settings;
         _driveUploader = driveUploader;
         _telegram      = telegram;
+        _kommo         = kommo;
 
         _googleDriveFolderId  = settings.GoogleDriveFolderId;
         _telegramPhone        = settings.TelegramPhone;
         _isTelegramConnected  = telegram.IsAuthorized ? true : (bool?)null;
         _selectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
+        _kommoSubdomain       = settings.KommoSubdomain;
+        _kommoApiToken        = settings.KommoApiToken;
 
         TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
         TelegramActionCommand      = new RelayCommand(() => _ = AuthorizeTelegramAsync());
+        TestKommoConnectionCommand = new AsyncRelayCommand(TestKommoConnectionAsync);
         FinishCommand              = new RelayCommand(Finish, () => CanFinish);
     }
 
@@ -177,9 +240,24 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         });
     }
 
+    private async Task TestKommoConnectionAsync()
+    {
+        IsKommoConnected     = null;
+        KommoConnectionError = null;
+        IsCheckingKommo      = true;
+        string? error = await _kommo.TestConnectionAsync(_kommoSubdomain, _kommoApiToken);
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            IsCheckingKommo      = false;
+            IsKommoConnected     = error is null;
+            KommoConnectionError = error;
+        });
+    }
+
     private void Finish()
     {
         _settings.ManagerName    = _managerName.Trim();
+        _settings.Position       = _position;
         _settings.UserFolderName = _managerName.Trim();
 
         if (!string.IsNullOrWhiteSpace(_googleDriveFolderId))
@@ -197,6 +275,14 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             if (_selectedTelegramChat is not null)
                 _settings.TelegramChatId = _selectedTelegramChat.Id;
                 _settings.TelegramTopicId = _selectedTelegramChat?.TopicId;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_kommoSubdomain) || !string.IsNullOrWhiteSpace(_kommoApiToken))
+        {
+            _settings.KommoSubdomain   = _kommoSubdomain;
+            _settings.KommoApiToken    = _kommoApiToken;
+            _settings.IsKommoEnabled   = _isKommoConnected == true;
+            _settings.IsKommoConnected = _isKommoConnected;
         }
 
         _settings.IsSetupComplete = true;

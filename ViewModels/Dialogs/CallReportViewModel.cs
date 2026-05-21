@@ -16,6 +16,9 @@ public record CallReportData(
     string PaymentProbability,
     string Note)
 {
+    // Not a positional parameter — keeps old serialised records compatible (defaults to "Менеджер").
+    public string Position { get; init; } = "Менеджер";
+
     public string FormatCaption()
     {
         var callType = CallType == "Інший" && !string.IsNullOrWhiteSpace(CustomCallType)
@@ -28,7 +31,7 @@ public record CallReportData(
         var sb = new StringBuilder();
         sb.AppendLine("📋 Звіт по дзвінку");
         sb.AppendLine();
-        sb.AppendLine($"👤 Менеджер: {Manager}");
+        sb.AppendLine($"👤 {Position}: {Manager}");
         sb.AppendLine($"📞 Тип дзвінка: {callType}");
         sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
         sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
@@ -67,7 +70,13 @@ public class CallReportViewModel : ViewModelBase
        "Виставив рахунок", "Пішов думати", "Потрібно порадитися", "Не підходять умови", "Не цільовий", "Вже не актуально", "Неадекват", "Хоче оплатити в кінці роботи", "Вирішив виїжджати зі США", "Хоче зайнятися пізніше"
     };
 
+    public static IReadOnlyList<string> Positions { get; } = new[]
+    {
+        "Менеджер", "Діагност", "Кваліфікатор"
+    };
+
     private readonly string _managerName;
+    private readonly string _position;
     private string? _selectedCallType;
     private string _customCallType = string.Empty;
     private string? _selectedLeadSource;
@@ -155,14 +164,16 @@ public class CallReportViewModel : ViewModelBase
 
     public ICommand SubmitCommand { get; }
 
-    public CallReportViewModel(Action<CallReportData?> onComplete, string? managerName = null, CallReportData? existing = null)
+    public CallReportViewModel(Action<CallReportData?> onComplete, string? managerName = null, string? position = null, CallReportData? existing = null)
     {
         _onComplete  = onComplete;
         _managerName = managerName ?? string.Empty;
+        _position    = position ?? "Менеджер";
         _isEditing   = existing is not null;
 
         if (existing is not null)
         {
+            _position = existing.Position;
             _selectedCallType           = existing.CallType;
             _customCallType             = existing.CustomCallType ?? string.Empty;
             _selectedLeadSource         = existing.LeadSource;
@@ -196,5 +207,8 @@ public class CallReportViewModel : ViewModelBase
             Outcome:            _selectedOutcome!,
             IsInvoicePaid:      IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
             PaymentProbability: _selectedPaymentProbability!,
-            Note:               _note));
+            Note:               _note)
+        {
+            Position = _position,
+        });
 }

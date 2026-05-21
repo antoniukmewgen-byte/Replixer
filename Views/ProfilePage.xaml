@@ -46,35 +46,40 @@
                                     Fill="{StaticResource OtherBrushSubColor1}"
                                     Stretch="Uniform" />
                             </Border>
-                            <Border
-                                Grid.Column="1"
-                                Margin="12,0,0,0"
-                                Style="{StaticResource AppInputBorder}">
-                                <Grid>
-                                    <TextBox
-                                        x:Name="NameBox"
-                                        Style="{StaticResource AppTextBox}"
-                                        Text="{Binding ManagerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontFamily="{StaticResource InterFont}"
-                                        FontSize="14"
-                                        Foreground="{StaticResource SubText}"
-                                        IsHitTestVisible="False"
-                                        Text="Ім'я менеджера">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Text, ElementName=NameBox}" Value="">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Grid>
-                            </Border>
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Orientation="Vertical">
+                                <Border Style="{StaticResource AppInputBorder}">
+                                    <Grid>
+                                        <TextBox
+                                            x:Name="NameBox"
+                                            Style="{StaticResource AppTextBox}"
+                                            Text="{Binding ManagerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="14"
+                                            Foreground="{StaticResource SubText}"
+                                            IsHitTestVisible="False"
+                                            Text="Ім'я менеджера">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=NameBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                                <ComboBox
+                                    Margin="0,8,0,0"
+                                    ItemsSource="{Binding Positions}"
+                                    SelectedItem="{Binding Position, Mode=TwoWay}"
+                                    Style="{StaticResource AppComboBox}"
+                                    Tag="Посада" />
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </StackPanel>

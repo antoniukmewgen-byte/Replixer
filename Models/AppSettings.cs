@@ -141,6 +141,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_managerName == value) return; _managerName = value; OnPropertyChanged(); Save(); }
     }
 
+    private string _position = "Менеджер";
+    public string Position
+    {
+        get => _position;
+        set { if (_position == value) return; _position = value; OnPropertyChanged(); Save(); }
+    }
+
     private bool _isKommoEnabled = false;
     public bool IsKommoEnabled
     {

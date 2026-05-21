@@ -241,6 +241,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 tcs.TrySetResult(data);
             },
             managerName: _settings.ManagerName,
+            position:    _settings.Position,
             existing:    existing);
         CallReportRequested?.Invoke(vm);
         return tcs.Task;
