@@ -11,6 +11,7 @@ using Replixer.ViewModels.Dialogs;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using RecordingStatus = Replixer.Models.RecordingStatus;
 
@@ -75,9 +76,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _settings.PropertyChanged += OnSettingsChanged;
 
-        // Wire edit commands for entries already loaded from disk.
+        // Wire commands for entries already loaded from disk.
         foreach (var entry in _recordingsVm.Recordings)
+        {
             WireEntryEditCommand(entry);
+            WireEntryRetryCommand(entry);
+        }
 
         _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
     }
@@ -202,6 +206,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 return;
             }
 
+            // Store before upload — enables retry if upload fails or app closes mid-flight.
+            entry.SourcePath = path;
+
             CallReportData? reportData = null;
             string? caption = null;
             bool telegramMatters = _orchestrator.IsTelegramReady && _settings.Position != "Діагност";
@@ -270,8 +277,58 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private void WireEntryEditCommand(RecordingEntry entry)
     {
         entry.EditReportCommand = new RelayCommand(
-            execute:  () => _ = EditEntryReportAsync(entry),
+            execute:    () => _ = EditEntryReportAsync(entry),
             canExecute: () => entry.HasTelegramMessage);
+    }
+
+    private void WireEntryRetryCommand(RecordingEntry entry)
+    {
+        entry.RetryCommand = new RelayCommand(
+            execute:    () => _ = RetryEntryAsync(entry),
+            canExecute: () => entry.Status == RecordingStatus.Error && entry.HasRetryableFile);
+    }
+
+    private async Task RetryEntryAsync(RecordingEntry entry)
+    {
+        var retryPath = (!string.IsNullOrEmpty(entry.FilePath)   && File.Exists(entry.FilePath))   ? entry.FilePath
+                      : (!string.IsNullOrEmpty(entry.SourcePath) && File.Exists(entry.SourcePath)) ? entry.SourcePath
+                      : null;
+        if (retryPath is null) return;
+
+        // Show call report form (pre-filled with existing data if available).
+        var reportData = await RequestCallReportAsync(existing: entry.ReportData);
+        if (reportData is not null)
+            reportData = reportData with { AppName = entry.Platform, Duration = TimeSpan.Zero };
+
+        entry.Status = RecordingStatus.Loading;
+        try
+        {
+            var caption      = reportData?.FormatCaption();
+            var crmUrl       = reportData?.CrmUrl;
+            bool isRingostat = entry.Platform.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
+
+            var upload = await _orchestrator.UploadAsync(
+                retryPath,
+                caption,
+                isRingostat ? null : crmUrl,
+                entry.StartedAt,
+                reportData?.LeadSource);
+
+            entry.DriveUrl          = upload.DriveUrl;
+            entry.FilePath          = upload.LocalPath ?? entry.FilePath;
+            entry.TelegramMessageId = upload.TelegramMessageId;
+            entry.TelegramChatId    = upload.TelegramChatId;
+            entry.TelegramTopicId   = upload.TelegramTopicId;
+            entry.KommoNoteId       = upload.KommoNoteId;
+            entry.ReportData        = reportData;
+            entry.Status            = RecordingStatus.Saved;
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[HomeVM] Retry failed: {ex.Message}");
+            entry.Status = RecordingStatus.Error;
+        }
     }
 
     private async Task EditEntryReportAsync(RecordingEntry entry)
@@ -327,8 +384,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         if (e.NewItems is null) return;
         foreach (RecordingEntry entry in e.NewItems)
         {
-            if (entry.EditReportCommand is null)
-                WireEntryEditCommand(entry);
+            if (entry.EditReportCommand is null) WireEntryEditCommand(entry);
+            if (entry.RetryCommand      is null) WireEntryRetryCommand(entry);
         }
     }
 

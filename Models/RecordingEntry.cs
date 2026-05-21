@@ -2,6 +2,7 @@ using Replixer.Infrastructure;
 using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
@@ -27,6 +28,19 @@ public class RecordingEntry : INotifyPropertyChanged
         get => _filePath;
         set { if (_filePath == value) return; _filePath = value; OnPropertyChanged(); }
     }
+
+    // Path to the original MP3 before upload (temp folder). Set immediately after recording,
+    // before any upload attempt — allows retry even if upload never completed.
+    private string? _sourcePath;
+    public string? SourcePath
+    {
+        get => _sourcePath;
+        set { if (_sourcePath == value) return; _sourcePath = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasRetryableFile)); }
+    }
+
+    public bool HasRetryableFile =>
+        (!string.IsNullOrEmpty(_sourcePath) && File.Exists(_sourcePath)) ||
+        (!string.IsNullOrEmpty(_filePath)   && File.Exists(_filePath));
 
     private int? _telegramMessageId;
     public int? TelegramMessageId
@@ -58,6 +72,13 @@ public class RecordingEntry : INotifyPropertyChanged
         set { if (_editReportCommand == value) return; _editReportCommand = value; OnPropertyChanged(); }
     }
 
+    private ICommand? _retryCommand;
+    public ICommand? RetryCommand
+    {
+        get => _retryCommand;
+        set { if (_retryCommand == value) return; _retryCommand = value; OnPropertyChanged(); }
+    }
+
     private RecordingStatus _status = RecordingStatus.Loading;
     public RecordingStatus Status
     {
@@ -68,8 +89,11 @@ public class RecordingEntry : INotifyPropertyChanged
             _status = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(StatusText));
+            OnPropertyChanged(nameof(IsError));
         }
     }
+
+    public bool IsError => _status == RecordingStatus.Error;
 
     public bool IsManual => Platform is not ("Telegram" or "Viber" or "WhatsApp.Root" or "Ringostat Smart Phone");
 
