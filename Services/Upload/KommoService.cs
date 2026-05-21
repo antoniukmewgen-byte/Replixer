@@ -18,7 +18,7 @@ public class KommoService
     };
 
     private readonly AppSettings _settings;
-    private readonly HttpClient  _http = new();
+    private readonly HttpClient  _http = new() { Timeout = TimeSpan.FromSeconds(30) };
 
     // Simple in-memory cache per session
     private Dictionary<(long pid, long sid), (string pipeline, string status)>? _pipelineCache;
@@ -349,20 +349,20 @@ public class KommoService
         return cache;
     }
 
+    // Dictionary already uses OrdinalIgnoreCase for keys and the value sets too.
     private static bool ShouldSetFirstContact(string pipelineName, string statusName)
-    {
-        foreach (var (pipeline, allowedStatuses) in FirstContactRules)
-        {
-            if (pipelineName.Equals(pipeline, StringComparison.OrdinalIgnoreCase) &&
-                allowedStatuses.Contains(statusName))
-                return true;
-        }
-        return false;
-    }
+        => FirstContactRules.TryGetValue(pipelineName, out var statuses) && statuses.Contains(statusName);
 
-    private async Task<long?> GetFirstContactFieldIdAsync(string baseUrl, string token)
+    // ── Custom field lookup ───────────────────────────────────────────────────
+
+    /// <summary>
+    /// Paginates /leads/custom_fields and returns the ID of the first field
+    /// whose name satisfies <paramref name="match"/>. Result is NOT cached here —
+    /// callers cache it in their own nullable field.
+    /// </summary>
+    private async Task<long?> FindCustomFieldIdAsync(
+        string baseUrl, string token, Func<string, bool> match, string logLabel)
     {
-        if (_firstContactFieldId.HasValue) return _firstContactFieldId;
         try
         {
             int page = 1;
@@ -373,7 +373,7 @@ public class KommoService
                 req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var res  = await _http.SendAsync(req);
                 var body = await res.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[Kommo] CustomFields GET page={page} → {(int)res.StatusCode}");
+                Debug.WriteLine($"[Kommo] CustomFields GET '{logLabel}' page={page} → {(int)res.StatusCode}");
                 if (!res.IsSuccessStatusCode) break;
 
                 using var doc = JsonDocument.Parse(body);
@@ -386,115 +386,55 @@ public class KommoService
                     anyField = true;
                     var name = field.TryGetProperty("name", out var n) ? n.GetString() : null;
                     if (name is null) continue;
-                    Debug.WriteLine($"[Kommo]   Field id={field.GetProperty("id").GetInt64()} name='{name}'");
 
-                    if (name.Contains("первого касания",  StringComparison.OrdinalIgnoreCase) ||
-                        name.Contains("першого контакту", StringComparison.OrdinalIgnoreCase) ||
-                        name.Contains("першого касання",  StringComparison.OrdinalIgnoreCase))
+                    if (match(name))
                     {
-                        _firstContactFieldId = field.GetProperty("id").GetInt64();
-                        Debug.WriteLine($"[Kommo] ✓ Found first-contact field id={_firstContactFieldId}");
-                        return _firstContactFieldId;
+                        long id = field.GetProperty("id").GetInt64();
+                        Debug.WriteLine($"[Kommo] ✓ Found '{logLabel}' field id={id} name='{name}'");
+                        return id;
                     }
                 }
 
                 if (!anyField) break; // no more pages
                 page++;
             }
-            Debug.WriteLine("[Kommo] ✗ First-contact field not found in any page");
+            Debug.WriteLine($"[Kommo] ✗ '{logLabel}' field not found");
         }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] GetFirstContactField failed: {ex.Message}"); }
+        catch (Exception ex) { Debug.WriteLine($"[Kommo] FindCustomField('{logLabel}') failed: {ex.Message}"); }
         return null;
+    }
+
+    private async Task<long?> GetFirstContactFieldIdAsync(string baseUrl, string token)
+    {
+        if (_firstContactFieldId.HasValue) return _firstContactFieldId;
+        _firstContactFieldId = await FindCustomFieldIdAsync(baseUrl, token,
+            name => name.Contains("первого касания",  StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("першого контакту", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("першого касання",  StringComparison.OrdinalIgnoreCase),
+            "first-contact date");
+        return _firstContactFieldId;
     }
 
     private async Task<long?> GetProcessingSpeedFieldIdAsync(string baseUrl, string token)
     {
         if (_processingSpeedFieldId.HasValue) return _processingSpeedFieldId;
-        try
-        {
-            int page = 1;
-            while (true)
-            {
-                using var req = new HttpRequestMessage(HttpMethod.Get,
-                    $"{baseUrl}/leads/custom_fields?limit=250&page={page}");
-                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var res  = await _http.SendAsync(req);
-                var body = await res.Content.ReadAsStringAsync();
-                if (!res.IsSuccessStatusCode) break;
-
-                using var doc = JsonDocument.Parse(body);
-                if (!doc.RootElement.TryGetProperty("_embedded", out var emb)) break;
-                if (!emb.TryGetProperty("custom_fields", out var fields))      break;
-
-                bool anyField = false;
-                foreach (var field in fields.EnumerateArray())
-                {
-                    anyField = true;
-                    var name = field.TryGetProperty("name", out var n) ? n.GetString() : null;
-                    if (name is null) continue;
-
-                    if (name.Contains("Скорость обработки", StringComparison.OrdinalIgnoreCase) ||
-                        name.Contains("Швидкість обробки",  StringComparison.OrdinalIgnoreCase))
-                    {
-                        _processingSpeedFieldId = field.GetProperty("id").GetInt64();
-                        Debug.WriteLine($"[Kommo] ✓ Found processing-speed field id={_processingSpeedFieldId} name='{name}'");
-                        return _processingSpeedFieldId;
-                    }
-                }
-
-                if (!anyField) break;
-                page++;
-            }
-            Debug.WriteLine("[Kommo] ✗ Processing-speed field not found in any page");
-        }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] GetProcessingSpeedField failed: {ex.Message}"); }
-        return null;
+        _processingSpeedFieldId = await FindCustomFieldIdAsync(baseUrl, token,
+            name => name.Contains("Скорость обработки", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Швидкість обробки",  StringComparison.OrdinalIgnoreCase),
+            "processing speed");
+        return _processingSpeedFieldId;
     }
 
     private async Task<long?> GetLeadSourceFieldIdAsync(string baseUrl, string token)
     {
         if (_leadSourceFieldId.HasValue) return _leadSourceFieldId;
-        try
-        {
-            int page = 1;
-            while (true)
-            {
-                using var req = new HttpRequestMessage(HttpMethod.Get,
-                    $"{baseUrl}/leads/custom_fields?limit=250&page={page}");
-                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var res  = await _http.SendAsync(req);
-                var body = await res.Content.ReadAsStringAsync();
-                if (!res.IsSuccessStatusCode) break;
-
-                using var doc = JsonDocument.Parse(body);
-                if (!doc.RootElement.TryGetProperty("_embedded", out var emb)) break;
-                if (!emb.TryGetProperty("custom_fields", out var fields))      break;
-
-                bool anyField = false;
-                foreach (var field in fields.EnumerateArray())
-                {
-                    anyField = true;
-                    var name = field.TryGetProperty("name", out var n) ? n.GetString() : null;
-                    if (name is null) continue;
-
-                    if (name.Equals("Источник",       StringComparison.OrdinalIgnoreCase) ||
-                        name.Equals("Джерело",        StringComparison.OrdinalIgnoreCase) ||
-                        name.Equals("Источник лида",  StringComparison.OrdinalIgnoreCase) ||
-                        name.Equals("Джерело ліда",   StringComparison.OrdinalIgnoreCase))
-                    {
-                        _leadSourceFieldId = field.GetProperty("id").GetInt64();
-                        Debug.WriteLine($"[Kommo] ✓ Found lead-source field id={_leadSourceFieldId} name='{name}'");
-                        return _leadSourceFieldId;
-                    }
-                }
-
-                if (!anyField) break;
-                page++;
-            }
-            Debug.WriteLine("[Kommo] ✗ Lead-source field not found in any page");
-        }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] GetLeadSourceField failed: {ex.Message}"); }
-        return null;
+        _leadSourceFieldId = await FindCustomFieldIdAsync(baseUrl, token,
+            name => name.Equals("Источник",      StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Джерело",       StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Источник лида", StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Джерело ліда",  StringComparison.OrdinalIgnoreCase),
+            "lead source");
+        return _leadSourceFieldId;
     }
 
     private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, long unixTimestamp)

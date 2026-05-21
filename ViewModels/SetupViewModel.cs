@@ -220,6 +220,13 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         _telegram      = telegram;
         _kommo         = kommo;
 
+        // When re-opening setup (not first run), restore what the user already configured.
+        if (settings.IsSetupComplete)
+        {
+            _managerName = settings.ManagerName;
+            _position    = string.IsNullOrWhiteSpace(settings.Position) ? null : settings.Position;
+        }
+
         _googleDriveFolderId  = settings.GoogleDriveFolderId;
         _telegramPhone        = settings.TelegramPhone;
         _isTelegramConnected  = telegram.IsAuthorized ? true : (bool?)null;
@@ -297,8 +304,10 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             _settings.IsTelegramEnabled   = _isTelegramConnected == true;
             _settings.IsTelegramConnected = _isTelegramConnected;
             if (_selectedTelegramChat is not null)
-                _settings.TelegramChatId = _selectedTelegramChat.Id;
-                _settings.TelegramTopicId = _selectedTelegramChat?.TopicId;
+            {
+                _settings.TelegramChatId  = _selectedTelegramChat.Id;
+                _settings.TelegramTopicId = _selectedTelegramChat.TopicId;
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(_kommoSubdomain) || !string.IsNullOrWhiteSpace(_kommoApiToken))

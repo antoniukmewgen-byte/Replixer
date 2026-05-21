@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.ViewModels;
 using Replixer.ViewModels.Dialogs;
@@ -159,22 +160,10 @@ public class TelegramUploadService : IDisposable
         if (string.IsNullOrWhiteSpace(driveUrl))
             return (caption, null);
 
-        // Pull trailing hashtag lines out so they go after the Drive link
-        var trimmed   = caption.TrimEnd();
-        var lastNl    = trimmed.LastIndexOf('\n');
-        var body      = trimmed;
-        var tagSuffix = string.Empty;
-        if (lastNl >= 0)
-        {
-            var lastLine = trimmed[(lastNl + 1)..].TrimStart('\r');
-            if (lastLine.StartsWith('#'))
-            {
-                body      = trimmed[..lastNl].TrimEnd();
-                tagSuffix = "\n" + lastLine;
-            }
-        }
-
-        var text = body + $"\n💾 Google Drive: {driveUrl}" + tagSuffix;
+        // Pull trailing hashtag line out so it goes after the Drive link
+        var (body, hashtagLine) = CaptionHelper.SplitHashtagSuffix(caption);
+        var text = body + $"\n💾 Google Drive: {driveUrl}"
+                       + (hashtagLine is null ? string.Empty : "\n" + hashtagLine);
         return (text, null);
     }
 

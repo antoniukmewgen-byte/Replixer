@@ -181,7 +181,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         App.WindowManager.ShowCheatSheet();
     }
 
-    private async void StopRecording()
+    private void StopRecording() => _ = StopRecordingAsync();
+
+    private async Task StopRecordingAsync()
     {
         DismissDialog();
         _isRecording = false;
@@ -346,7 +348,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 entry.DriveUrl)
             : Task.FromResult(false);
 
-        var kommoBase = StripHashtags(caption);
+        var kommoBase = CaptionHelper.StripHashtags(caption);
         var kommoNote = string.IsNullOrWhiteSpace(entry.DriveUrl)
             ? kommoBase
             : kommoBase + $"\n💾 Google Drive: {entry.DriveUrl}";
@@ -368,13 +370,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         "Менеджер"     => duration < TimeSpan.FromMinutes(10),
         _              => true,   // Діагност and any unknown — never send
     };
-
-    private static string StripHashtags(string text)
-    {
-        var t = text.TrimEnd();
-        var nl = t.LastIndexOf('\n');
-        return nl >= 0 && t[(nl + 1)..].TrimStart('\r').StartsWith('#') ? t[..nl].TrimEnd() : t;
-    }
 
     private void OnRecordingsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {

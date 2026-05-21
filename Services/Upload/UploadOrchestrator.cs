@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using System.Diagnostics;
 using System.IO;
@@ -38,7 +39,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             long? kommoNoteId = null;
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
             {
-                var kommoBase = StripHashtags(telegramCaption ?? string.Empty);
+                var kommoBase = CaptionHelper.StripHashtags(telegramCaption ?? string.Empty);
                 var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
                     ? kommoBase
                     : kommoBase + $"\n💾 Google Drive: {driveUrl}";
@@ -68,7 +69,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
             long? kommoNoteId = null;
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, StripHashtags(telegramCaption ?? string.Empty), callStartTime, leadSource);
+                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, CaptionHelper.StripHashtags(telegramCaption ?? string.Empty), callStartTime, leadSource);
 
             return new UploadResult
             {
@@ -109,13 +110,6 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
             ? null
             : _settings.GoogleDriveFolderId;
-    }
-
-    private static string StripHashtags(string text)
-    {
-        var t = text.TrimEnd();
-        var nl = t.LastIndexOf('\n');
-        return nl >= 0 && t[(nl + 1)..].TrimStart('\r').StartsWith('#') ? t[..nl].TrimEnd() : t;
     }
 
     private string? MoveToRecordingsFolder(string tempPath)

@@ -95,25 +95,27 @@ public class RecordingEntry : INotifyPropertyChanged
 
     public bool IsError => _status == RecordingStatus.Error;
 
-    public bool IsManual => Platform is not ("Telegram" or "Viber" or "WhatsApp.Root" or "Ringostat Smart Phone");
-
-    public string PlatformDisplayName => Platform switch
+    // Single source of truth for all platform-specific data.
+    // Adding a new platform only requires a new entry in each dictionary.
+    private static readonly Dictionary<string, string> s_displayNames = new()
     {
-        "WhatsApp.Root"        => "WhatsApp",
-        "Telegram"             => "Telegram",
-        "Viber"                => "Viber",
-        "Ringostat Smart Phone" => "Ringostat",
-        _                      => "Ручний запис"
+        ["Telegram"]              = "Telegram",
+        ["Viber"]                 = "Viber",
+        ["WhatsApp.Root"]         = "WhatsApp",
+        ["Ringostat Smart Phone"] = "Ringostat",
     };
 
-    public string? IconPath => Platform switch
+    private static readonly Dictionary<string, string> s_iconPaths = new()
     {
-        "Telegram"              => "/Assets/Icons/telegram.png",
-        "Viber"                 => "/Assets/Icons/viber.png",
-        "WhatsApp.Root"         => "/Assets/Icons/whatsapp.png",
-        "Ringostat Smart Phone" => "/Assets/Icons/ringostat.png",
-        _                       => null
+        ["Telegram"]              = "/Assets/Icons/telegram.png",
+        ["Viber"]                 = "/Assets/Icons/viber.png",
+        ["WhatsApp.Root"]         = "/Assets/Icons/whatsapp.png",
+        ["Ringostat Smart Phone"] = "/Assets/Icons/ringostat.png",
     };
+
+    public bool    IsManual           => !s_displayNames.ContainsKey(Platform);
+    public string  PlatformDisplayName => s_displayNames.TryGetValue(Platform, out var n) ? n : "Ручний запис";
+    public string? IconPath            => s_iconPaths.TryGetValue(Platform, out var p) ? p : null;
 
     public string DateDisplay      => StartedAt.ToString("dd.MM.yyyy");
     public string TimeOfDayDisplay => StartedAt.ToString("HH:mm");
