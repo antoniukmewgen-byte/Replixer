@@ -24,17 +24,14 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
     public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, CancellationToken ct = default)
     {
-        // Telegram runs in parallel with Drive upload — both read the file, neither deletes it.
-        var telegramTask = IsTelegramReady
-            ? _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
-            : Task.FromResult<int?>(null);
-
         if (_settings.IsGoogleDriveEnabled)
         {
             string? folderId = await ResolveTargetFolderAsync(ct);
             string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
 
-            int? msgId = await telegramTask;
+            int? msgId = IsTelegramReady
+                ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption, driveUrl)
+                : null;
 
             // Post to Kommo before deleting the file
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
@@ -56,7 +53,9 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         }
         else
         {
-            int? msgId = await telegramTask;
+            int? msgId = IsTelegramReady
+                ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
+                : null;
 
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
                 await _kommo.ProcessLeadAsync(kommoLeadUrl, telegramCaption ?? string.Empty, callStartTime);
@@ -73,8 +72,8 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return new UploadResult { LocalPath = MoveToRecordingsFolder(filePath) };
     }
 
-    public Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption)
-        => _telegram.EditMessageAsync(messageId, chatId, topicId, caption);
+    public Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
+        => _telegram.EditMessageAsync(messageId, chatId, topicId, caption, driveUrl);
 
     private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)
     {

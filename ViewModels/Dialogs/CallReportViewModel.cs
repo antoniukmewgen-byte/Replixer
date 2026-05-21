@@ -30,6 +30,7 @@ public record CallReportData(
         sb.AppendLine();
         sb.AppendLine($"👤 Менеджер: {Manager}");
         sb.AppendLine($"📞 Тип дзвінка: {callType}");
+        sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
         sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
         sb.AppendLine($"✅ До чого дійшли: {outcome}");
         sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");

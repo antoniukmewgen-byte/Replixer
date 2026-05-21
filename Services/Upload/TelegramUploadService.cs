@@ -20,6 +20,7 @@ public class TelegramUploadService : IDisposable
 
     public static readonly IReadOnlyList<TelegramChat> Chats = new[]
     {
+        new TelegramChat("TestGroup", 3805068290L),
         new TelegramChat("Записи разговоров Тим лидов", 3688506342L),
         new TelegramChat("Записи разговоров Адама", 3891343034L),
         new TelegramChat("Стажування Move Nation", 3600976908L,261),
@@ -76,7 +77,7 @@ public class TelegramUploadService : IDisposable
 
     // ── Send ──────────────────────────────────────────────────────────────────
 
-    public async Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null)
+    public async Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null)
     {
         Debug.WriteLine($"[TG] ── SendFileAsync ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
@@ -100,7 +101,8 @@ public class TelegramUploadService : IDisposable
             var inputFile = await _client.UploadFileAsync(filePath);
             var fileName  = Path.GetFileName(filePath);
 
-            var msg = await _client.SendMediaAsync(peer, caption ?? $"Запис дзвінку: {fileName}", inputFile, "audio/mpeg", reply_to_msg_id: topicId ?? 0);
+            var (msgText, entities) = BuildCaption(caption ?? $"Запис дзвінку: {fileName}", driveUrl);
+            var msg = await _client.SendMediaAsync(peer, msgText, inputFile, "audio/mpeg", entities: entities, reply_to_msg_id: topicId ?? 0);
 
             Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msg?.id}");
             return msg?.id;
@@ -118,7 +120,7 @@ public class TelegramUploadService : IDisposable
 
     // ── Edit ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> EditMessageAsync(int messageId, long chatId, int? topicId, string caption)
+    public async Task<bool> EditMessageAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
     {
         Debug.WriteLine($"[TG] ── EditMessageAsync (msgId={messageId}) ───────");
         try
@@ -134,7 +136,8 @@ public class TelegramUploadService : IDisposable
             if (peer == null)
                 return false;
 
-            await _client.Messages_EditMessage(peer, messageId, message: caption);
+            var (msgText, entities) = BuildCaption(caption, driveUrl);
+            await _client.Messages_EditMessage(peer, messageId, message: msgText, entities: entities);
             Debug.WriteLine("[TG] ✓ Edited successfully");
             return true;
         }
@@ -147,6 +150,33 @@ public class TelegramUploadService : IDisposable
         {
             Debug.WriteLine("[TG] ───────────────────────────────────────────");
         }
+    }
+
+    private static (string text, TL.MessageEntity[]? entities) BuildCaption(string caption, string? driveUrl)
+    {
+        if (string.IsNullOrWhiteSpace(driveUrl))
+            return (caption, null);
+
+        // Pull trailing hashtag lines out so they go after the Drive link
+        var trimmed   = caption.TrimEnd();
+        var lastNl    = trimmed.LastIndexOf('\n');
+        var body      = trimmed;
+        var tagSuffix = string.Empty;
+        if (lastNl >= 0)
+        {
+            var lastLine = trimmed[(lastNl + 1)..].TrimStart('\r');
+            if (lastLine.StartsWith('#'))
+            {
+                body      = trimmed[..lastNl].TrimEnd();
+                tagSuffix = "\n" + lastLine;
+            }
+        }
+
+        const string label = "💾 Google Drive";
+        var text   = body + "\n" + label + tagSuffix;
+        var offset = body.Length + 1;
+        var entity = new TL.MessageEntityTextUrl { offset = offset, length = label.Length, url = driveUrl };
+        return (text, [entity]);
     }
 
     private async Task<TL.InputPeer?> ResolvePeerAsync(long chatId)

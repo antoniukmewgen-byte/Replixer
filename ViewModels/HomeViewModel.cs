@@ -266,7 +266,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramMessageId!.Value,
             entry.TelegramChatId,
             entry.TelegramTopicId,
-            caption);
+            caption,
+            entry.DriveUrl);
 
         if (ok)
             entry.ReportData = newData;

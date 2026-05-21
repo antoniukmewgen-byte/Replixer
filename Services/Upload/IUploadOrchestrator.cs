@@ -14,5 +14,5 @@ public interface IUploadOrchestrator
     bool IsTelegramReady { get; }
     bool IsKommoEnabled  { get; }
     Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, CancellationToken ct = default);
-    Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption);
+    Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null);
 }
