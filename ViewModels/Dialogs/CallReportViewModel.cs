@@ -41,10 +41,12 @@ public record CallReportData(
         sb.AppendLine(header);
         sb.AppendLine();
         sb.AppendLine($"👤 {Position}: {Manager}");
-        sb.AppendLine($"📞 Тип дзвінка: {callType}");
+        if (!string.IsNullOrWhiteSpace(callType))
+            sb.AppendLine($"📞 Тип дзвінка: {callType}");
         if (durationStr is not null)
             sb.AppendLine($"⏱ Тривалість: {durationStr}");
-        sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
+        if (!string.IsNullOrWhiteSpace(LeadSource))
+            sb.AppendLine($"📣 Джерело ліда: {LeadSource}");
         if (!string.IsNullOrEmpty(Rating))
             sb.AppendLine($"⭐ Оцінка розмови: {Rating}/10");
         if (!string.IsNullOrEmpty(outcome))
@@ -53,7 +55,6 @@ public record CallReportData(
             sb.AppendLine($"💰 Вірогідність оплати: {PaymentProbability}/10");
         if (!string.IsNullOrWhiteSpace(Note))
             sb.AppendLine($"📝 Примітка: {Note}");
-
         if (!string.IsNullOrWhiteSpace(CrmUrl))
             sb.AppendLine($"🔗 CRM: {CrmUrl}");
 

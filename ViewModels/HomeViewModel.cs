@@ -157,8 +157,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     public void ManualStartRecording()
     {
         if (_isRecording || _isStopping) return;
-        if (string.IsNullOrEmpty(_lastDetectedApp))
-            _lastDetectedApp = "Ручний запис";
+        _lastDetectedApp = "Ручний запис";
         StartRecording();
     }
 
@@ -218,7 +217,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 if (result is not null)
                     result = result with
                     {
-                        AppName  = _lastDetectedApp,
+                        AppName  = entry.PlatformDisplayName,
                         Duration = callDuration,
                     };
                 caption    = result?.FormatCaption();
@@ -298,7 +297,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         // Show call report form (pre-filled with existing data if available).
         var reportData = await RequestCallReportAsync(existing: entry.ReportData);
         if (reportData is not null)
-            reportData = reportData with { AppName = entry.Platform, Duration = TimeSpan.Zero };
+            reportData = reportData with { AppName = entry.PlatformDisplayName, Duration = TimeSpan.Zero };
 
         entry.Status = RecordingStatus.Loading;
         try

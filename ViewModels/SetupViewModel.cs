@@ -32,8 +32,8 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         }
     }
 
-    private string _position = "Менеджер";
-    public string Position
+    private string? _position = null;
+    public string? Position
     {
         get => _position;
         set
@@ -41,6 +41,8 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             if (!SetField(ref _position, value)) return;
             OnPropertyChanged(nameof(FilteredTelegramChats));
             OnPropertyChanged(nameof(IsTelegramVisible));
+            OnPropertyChanged(nameof(CanFinish));
+            CommandManager.InvalidateRequerySuggested();
             if (_position == "Кваліфікатор")
                 SelectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team");
             if (_position == "Діагност")
@@ -52,7 +54,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         }
     }
 
-    public bool CanFinish => !string.IsNullOrWhiteSpace(_managerName);
+    public bool CanFinish => !string.IsNullOrWhiteSpace(_managerName) && !string.IsNullOrWhiteSpace(_position);
 
     // ── Google Drive ──────────────────────────────────────────────────────────
 
@@ -279,7 +281,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     private void Finish()
     {
         _settings.ManagerName    = _managerName.Trim();
-        _settings.Position       = _position;
+        _settings.Position       = _position!;
         _settings.UserFolderName = _managerName.Trim();
 
         if (!string.IsNullOrWhiteSpace(_googleDriveFolderId))
