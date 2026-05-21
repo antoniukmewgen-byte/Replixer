@@ -644,7 +644,8 @@
                                     Background="{StaticResource BrushColor3}"
                                     BorderBrush="{StaticResource BrushBorderColor3}"
                                     BorderThickness="1"
-                                    CornerRadius="8">
+                                    CornerRadius="8"
+                                    Visibility="{Binding IsTelegramVisible, Converter={StaticResource BoolToVis}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />

@@ -92,7 +92,8 @@
                 Background="{StaticResource BrushColor2}"
                 BorderBrush="{StaticResource BrushBorderColor2}"
                 BorderThickness="1"
-                CornerRadius="12">
+                CornerRadius="12"
+                Visibility="{Binding IsTelegramVisible, Converter={StaticResource BoolToVis}}">
                 <StackPanel>
                     <TextBlock
                         Margin="0,0,0,12"

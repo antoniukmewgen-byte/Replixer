@@ -22,14 +22,15 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     public bool IsTelegramReady => _settings.IsTelegramEnabled && _telegram.IsAuthorized;
     public bool IsKommoEnabled => _kommo.IsEnabled;
 
-    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, string? leadSource = null, CancellationToken ct = default)
+    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, string? leadSource = null, bool skipTelegram = false, CancellationToken ct = default)
     {
+        bool sendTelegram = IsTelegramReady && !skipTelegram;
         if (_settings.IsGoogleDriveEnabled)
         {
             string? folderId = await ResolveTargetFolderAsync(ct);
             string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
 
-            int? msgId = IsTelegramReady
+            int? msgId = sendTelegram
                 ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption, driveUrl)
                 : null;
 
@@ -61,7 +62,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         }
         else
         {
-            int? msgId = IsTelegramReady
+            int? msgId = sendTelegram
                 ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
                 : null;
 

@@ -85,6 +85,8 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
 
+    public bool IsTelegramVisible => _settings.Position != "Діагност";
+
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _settings.Position == "Кваліфікатор"
             ? TelegramChats.Where(c => c.Name == "Чат Kvalifikatory Team").ToList()
@@ -319,10 +321,18 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             case nameof(AppSettings.Position):
                 OnPropertyChanged(nameof(Position));
                 OnPropertyChanged(nameof(FilteredTelegramChats));
+                OnPropertyChanged(nameof(IsTelegramVisible));
                 if (_settings.Position == "Кваліфікатор")
                 {
                     var kChat = TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team");
                     if (kChat is not null) SelectedTelegramChat = kChat;
+                }
+                if (_settings.Position == "Діагност")
+                {
+                    _telegram.Logout();
+                    _settings.IsTelegramEnabled   = false;
+                    _settings.IsTelegramConnected = null;
+                    IsTelegramConnected           = null;
                 }
                 break;
             case nameof(AppSettings.IsGoogleDriveEnabled):

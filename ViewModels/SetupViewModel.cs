@@ -40,8 +40,15 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         {
             if (!SetField(ref _position, value)) return;
             OnPropertyChanged(nameof(FilteredTelegramChats));
+            OnPropertyChanged(nameof(IsTelegramVisible));
             if (_position == "Кваліфікатор")
                 SelectedTelegramChat = TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team");
+            if (_position == "Діагност")
+            {
+                _telegram.Logout();
+                IsTelegramConnected = null;
+                TelegramAuthError   = null;
+            }
         }
     }
 
@@ -87,6 +94,8 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     // ── Telegram ──────────────────────────────────────────────────────────────
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
+
+    public bool IsTelegramVisible => _position != "Діагност";
 
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _position == "Кваліфікатор"

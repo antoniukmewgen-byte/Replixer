@@ -182,6 +182,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _isRecording = false;
         var callStartTime   = _recordingStartedAt;   // capture before clearing
         _recordingStartedAt = null;
+        var callDuration    = callStartTime.HasValue ? DateTime.Now - callStartTime.Value : TimeSpan.Zero;
         OnPropertyChanged(nameof(IsRecording));
         CallContent         = new IdleCallViewModel(StartRecording);
 
@@ -200,15 +201,17 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
             CallReportData? reportData = null;
             string? caption = null;
-            if (_orchestrator.IsTelegramReady || _orchestrator.IsKommoEnabled)
+            bool telegramMatters = _orchestrator.IsTelegramReady && _settings.Position != "Діагност";
+            if (telegramMatters || _orchestrator.IsKommoEnabled)
             {
                 var result = await RequestCallReportAsync();
                 caption    = result?.FormatCaption();
                 reportData = result;
             }
 
-            bool isRingostat = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
-            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource);
+            bool isRingostat   = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
+            bool skipTelegram  = ShouldSkipTelegram(_settings.Position, callDuration);
+            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;
@@ -289,6 +292,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         else
             Debug.WriteLine("[HomeVM] Both EditTelegramCaptionAsync and EditKommoNoteAsync returned false");
     }
+
+    private static bool ShouldSkipTelegram(string position, TimeSpan duration) => position switch
+    {
+        "Кваліфікатор" => duration < TimeSpan.FromMinutes(1),
+        "Менеджер"     => duration < TimeSpan.FromMinutes(10),
+        _              => true,   // Діагност and any unknown — never send
+    };
 
     private static string StripHashtags(string text)
     {
