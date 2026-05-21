@@ -208,7 +208,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             }
 
             bool isRingostat = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
-            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime);
+            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;

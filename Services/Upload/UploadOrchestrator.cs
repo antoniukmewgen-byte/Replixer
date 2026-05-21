@@ -22,7 +22,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     public bool IsTelegramReady => _settings.IsTelegramEnabled && _telegram.IsAuthorized;
     public bool IsKommoEnabled => _kommo.IsEnabled;
 
-    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, CancellationToken ct = default)
+    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, string? leadSource = null, CancellationToken ct = default)
     {
         if (_settings.IsGoogleDriveEnabled)
         {
@@ -41,7 +41,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
                     ? kommoBase
                     : kommoBase + $"\n💾 Google Drive: {driveUrl}";
-                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime);
+                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource);
             }
 
             if (driveUrl is not null)
@@ -67,7 +67,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
             long? kommoNoteId = null;
             if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, StripHashtags(telegramCaption ?? string.Empty), callStartTime);
+                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, StripHashtags(telegramCaption ?? string.Empty), callStartTime, leadSource);
 
             return new UploadResult
             {

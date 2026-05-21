@@ -138,7 +138,11 @@ public class CallReportViewModel : ViewModelBase
     public string CrmUrl
     {
         get => _crmUrl;
-        set => SetField(ref _crmUrl, value);
+        set
+        {
+            if (SetField(ref _crmUrl, value))
+                System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
     }
 
     public string Note
@@ -178,7 +182,8 @@ public class CallReportViewModel : ViewModelBase
         _selectedLeadSource         is not null &&
         _selectedRating             is not null &&
         _selectedOutcome            is not null &&
-        _selectedPaymentProbability is not null;
+        _selectedPaymentProbability is not null &&
+        !string.IsNullOrWhiteSpace(_crmUrl);
 
     private void OnSubmit() =>
         _onComplete(new CallReportData(

@@ -24,6 +24,7 @@ public class KommoService
     private Dictionary<(long pid, long sid), (string pipeline, string status)>? _pipelineCache;
     private long? _firstContactFieldId;
     private long? _processingSpeedFieldId;
+    private long? _leadSourceFieldId;
 
     public KommoService(AppSettings settings) => _settings = settings;
 
@@ -51,8 +52,16 @@ public class KommoService
         catch (Exception ex) { return ex.Message; }
     }
 
+    // Lead sources for which first-contact date and processing speed should NOT be set
+    private static readonly HashSet<string> SkipFirstContactSources = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Рекомендація",        "Рекомендация",
+        "Реактивація",         "Реактивация",
+        "Вторинне опрацювання","Вторичная проработка",
+    };
+
     /// <summary>Posts note + conditionally sets first-contact date. Returns the created note ID.</summary>
-    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null)
+    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? leadSource = null)
     {
         if (!IsEnabled) return null;
 
@@ -68,8 +77,12 @@ public class KommoService
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
         string token   = _settings.KommoApiToken;
 
+        bool skipDates = leadSource is not null && SkipFirstContactSources.Contains(leadSource);
+        if (skipDates)
+            Debug.WriteLine($"[Kommo] Skipping first-contact/speed fields for source '{leadSource}'");
+
         var noteTask = PostNoteAsync(baseUrl, token, leadId, noteText);
-        var dateTask = callStartTime.HasValue
+        var dateTask = callStartTime.HasValue && !skipDates
             ? TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime.Value)
             : Task.CompletedTask;
 
@@ -167,9 +180,17 @@ public class KommoService
                 return;
             }
 
-            // 2. Get lead details: pipeline, status, createdAt, and current field value — one request
-            var (pipelineId, statusId, createdAt, isFieldAlreadySet) =
-                await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value);
+            // 2. Get lead details: pipeline, status, createdAt, field value, and CRM source — one request
+            long? sourceFieldId = await GetLeadSourceFieldIdAsync(baseUrl, token);
+            var (pipelineId, statusId, createdAt, isFieldAlreadySet, crmSource) =
+                await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value, sourceFieldId);
+
+            // Check CRM-side source (regardless of what was selected in the app)
+            if (crmSource is not null && SkipFirstContactSources.Contains(crmSource))
+            {
+                Debug.WriteLine($"[Kommo] Skipping first-contact/speed — CRM source '{crmSource}' is excluded");
+                return;
+            }
 
             if (isFieldAlreadySet)
             {
@@ -219,8 +240,8 @@ public class KommoService
         catch (Exception ex) { Debug.WriteLine($"[Kommo] TrySetFirstContact failed: {ex.Message}"); }
     }
 
-    private async Task<(long? pipelineId, long? statusId, long? createdAt, bool isFieldSet)> GetLeadDetailsAsync(
-        string baseUrl, string token, string leadId, long fieldId)
+    private async Task<(long? pipelineId, long? statusId, long? createdAt, bool isFieldSet, string? sourceValue)> GetLeadDetailsAsync(
+        string baseUrl, string token, string leadId, long fieldId, long? sourceFieldId = null)
     {
         try
         {
@@ -229,7 +250,7 @@ public class KommoService
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var res  = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode) return (null, null, null, false);
+            if (!res.IsSuccessStatusCode) return (null, null, null, false, null);
 
             using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
@@ -237,40 +258,42 @@ public class KommoService
             long? sid       = root.TryGetProperty("status_id",   out var s)  ? s.GetInt64()  : null;
             long? createdAt = root.TryGetProperty("created_at",  out var ca) ? ca.GetInt64() : null;
 
-            // Check if first-contact field already has a value
-            bool isFieldSet = false;
+            bool    isFieldSet  = false;
+            string? sourceValue = null;
+
             if (root.TryGetProperty("custom_fields_values", out var fields) &&
                 fields.ValueKind == JsonValueKind.Array)
             {
                 foreach (var field in fields.EnumerateArray())
                 {
                     if (!field.TryGetProperty("field_id", out var fid)) continue;
-                    if (fid.GetInt64() != fieldId) continue;
+                    long fldId = fid.GetInt64();
 
-                    if (field.TryGetProperty("values", out var vals) &&
-                        vals.ValueKind == JsonValueKind.Array)
+                    if (fldId == fieldId)
                     {
-                        foreach (var v in vals.EnumerateArray())
-                        {
-                            if (v.TryGetProperty("value", out var val) &&
-                                val.ValueKind != JsonValueKind.Null &&
-                                !(val.ValueKind == JsonValueKind.Number && val.GetInt64() == 0))
-                            {
-                                isFieldSet = true;
-                                break;
-                            }
-                        }
+                        if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                            foreach (var v in vals.EnumerateArray())
+                                if (v.TryGetProperty("value", out var val) &&
+                                    val.ValueKind != JsonValueKind.Null &&
+                                    !(val.ValueKind == JsonValueKind.Number && val.GetInt64() == 0))
+                                { isFieldSet = true; break; }
                     }
-                    break;
+                    else if (sourceFieldId.HasValue && fldId == sourceFieldId.Value)
+                    {
+                        if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                            foreach (var v in vals.EnumerateArray())
+                                if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String)
+                                { sourceValue = val.GetString(); break; }
+                    }
                 }
             }
 
-            return (pid, sid, createdAt, isFieldSet);
+            return (pid, sid, createdAt, isFieldSet, sourceValue);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
-            return (null, null, null, false);
+            return (null, null, null, false, null);
         }
     }
 
@@ -425,6 +448,52 @@ public class KommoService
             Debug.WriteLine("[Kommo] ✗ Processing-speed field not found in any page");
         }
         catch (Exception ex) { Debug.WriteLine($"[Kommo] GetProcessingSpeedField failed: {ex.Message}"); }
+        return null;
+    }
+
+    private async Task<long?> GetLeadSourceFieldIdAsync(string baseUrl, string token)
+    {
+        if (_leadSourceFieldId.HasValue) return _leadSourceFieldId;
+        try
+        {
+            int page = 1;
+            while (true)
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Get,
+                    $"{baseUrl}/leads/custom_fields?limit=250&page={page}");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                if (!res.IsSuccessStatusCode) break;
+
+                using var doc = JsonDocument.Parse(body);
+                if (!doc.RootElement.TryGetProperty("_embedded", out var emb)) break;
+                if (!emb.TryGetProperty("custom_fields", out var fields))      break;
+
+                bool anyField = false;
+                foreach (var field in fields.EnumerateArray())
+                {
+                    anyField = true;
+                    var name = field.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    if (name is null) continue;
+
+                    if (name.Equals("Источник",       StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("Джерело",        StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("Источник лида",  StringComparison.OrdinalIgnoreCase) ||
+                        name.Equals("Джерело ліда",   StringComparison.OrdinalIgnoreCase))
+                    {
+                        _leadSourceFieldId = field.GetProperty("id").GetInt64();
+                        Debug.WriteLine($"[Kommo] ✓ Found lead-source field id={_leadSourceFieldId} name='{name}'");
+                        return _leadSourceFieldId;
+                    }
+                }
+
+                if (!anyField) break;
+                page++;
+            }
+            Debug.WriteLine("[Kommo] ✗ Lead-source field not found in any page");
+        }
+        catch (Exception ex) { Debug.WriteLine($"[Kommo] GetLeadSourceField failed: {ex.Message}"); }
         return null;
     }
 
