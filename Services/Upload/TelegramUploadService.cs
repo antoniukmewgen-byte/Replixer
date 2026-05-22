@@ -1,11 +1,8 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
-using Replixer.ViewModels;
-using Replixer.ViewModels.Dialogs;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Threading;
 using TL;
 
 namespace Replixer.Services.Upload;
@@ -34,6 +31,14 @@ public class TelegramUploadService : IDisposable
     private readonly AppSettings _settings;
     private WTelegram.Client? _client;
     private string? _pendingPhone;
+
+    /// <summary>
+    /// Set by the active ViewModel layer before any authorization flow that may
+    /// prompt for a verification code or 2FA password.
+    /// Called from a WTelegramClient background thread — the implementation
+    /// must be safe to await on the UI thread.
+    /// </summary>
+    public Func<string, Task<string?>>? InputHandler { get; set; }
 
     public TelegramUploadService(AppSettings settings) => _settings = settings;
 
@@ -242,21 +247,30 @@ public class TelegramUploadService : IDisposable
         _                   => null,
     };
 
-    private static string? AskForInput(string prompt)
+    private string? AskForInput(string prompt)
     {
         // ConfigProvider is called from a WTelegramClient background thread.
-        // We post the overlay to the UI thread, then block the background thread
-        // on the TCS until the user confirms or cancels.
-        var tcs = new TaskCompletionSource<string?>();
-        Application.Current.Dispatcher.Invoke(() =>
+        // Post the handler call to the UI thread and block until the user responds.
+        var handler = InputHandler;
+        if (handler is null)
         {
-            var host = (IDialogHost)Application.Current.MainWindow.DataContext;
-            var vm = new InputDialogViewModel(prompt, result =>
+            Debug.WriteLine("[TG] ✗ No InputHandler registered — cannot request user input");
+            return null;
+        }
+
+        var tcs = new TaskCompletionSource<string?>();
+        Application.Current.Dispatcher.BeginInvoke(async () =>
+        {
+            try
             {
-                host.HideInputDialog();
+                var result = await handler(prompt);
                 tcs.TrySetResult(result);
-            });
-            host.ShowInputDialog(vm);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TG] InputHandler threw: {ex.Message}");
+                tcs.TrySetResult(null);
+            }
         });
         return tcs.Task.GetAwaiter().GetResult();
     }

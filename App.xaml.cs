@@ -1,8 +1,8 @@
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.DependencyInjection;
+using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services.Manager;
-using Replixer.Services.Upload;
 using Replixer.ViewModels;
 using Replixer.Views;
 using System.Windows;
@@ -11,8 +11,6 @@ namespace Replixer;
 
 public partial class App : Application
 {
-    public static IWindowManager WindowManager { get; } = new WindowManager();
-
     private ServiceProvider? _services;
     private TaskbarIcon? _notifyIcon;
     private bool _mainWindowStarted;
@@ -42,7 +40,7 @@ public partial class App : Application
     private void ShowSetupWindow()
     {
         var setupVm     = _services!.GetRequiredService<SetupViewModel>();
-        var setupWindow = _services.GetRequiredService<SetupWindow>();
+        var setupWindow = _services!.GetRequiredService<SetupWindow>();
 
         Application.Current.MainWindow = setupWindow;
 
@@ -68,7 +66,7 @@ public partial class App : Application
         var settings = _services!.GetRequiredService<AppSettings>();
         AutoStartManager.SetState(settings.IsAutoStartEnabled);
 
-        var mainWindow = _services.GetRequiredService<MainWindow>();
+        var mainWindow = _services!.GetRequiredService<MainWindow>();
         Application.Current.MainWindow = mainWindow;
 
         if (!startInTray)
@@ -76,7 +74,7 @@ public partial class App : Application
 
         _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 
-        var trayVm = _services.GetRequiredService<TrayViewModel>();
+        var trayVm = _services!.GetRequiredService<TrayViewModel>();
         _notifyIcon.DataContext = trayVm;
         trayVm.BalloonRequested += (title, msg) =>
             _notifyIcon.ShowBalloonTip(title, msg, BalloonIcon.Info);
@@ -93,33 +91,10 @@ public partial class App : Application
     }
 
     private static ServiceProvider BuildServices()
-    {
-        var services = new ServiceCollection();
-
-        // Core
-        services.AddSingleton(AppSettings.Load());
-
-        // Upload
-        services.AddSingleton<GoogleDriveUploadService>();
-        services.AddSingleton<TelegramUploadService>();
-        services.AddSingleton<KommoService>();
-        services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
-
-        // Setup
-        services.AddSingleton<SetupViewModel>();
-        services.AddSingleton<SetupWindow>();
-
-        // ViewModels
-        services.AddSingleton<RecordingsViewModel>();
-        services.AddSingleton<ProfileViewModel>();
-        services.AddSingleton<HomeViewModel>();
-        services.AddSingleton<SettingsViewModel>();
-        services.AddSingleton<MainViewModel>();
-        services.AddSingleton<TrayViewModel>();
-
-        // View
-        services.AddSingleton<MainWindow>();
-
-        return services.BuildServiceProvider();
-    }
+        => new ServiceCollection()
+            .AddCoreServices()
+            .AddUploadServices()
+            .AddViewModels()
+            .AddViews()
+            .BuildServiceProvider();
 }

@@ -1,4 +1,5 @@
 using Replixer.Infrastructure;
+using Replixer.Services.Manager;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -7,8 +8,8 @@ namespace Replixer.ViewModels;
 
 public sealed class TrayViewModel : ViewModelBase
 {
-    private readonly MainWindow  _mainWindow;
-    private readonly HomeViewModel _homeVm;
+    private readonly IWindowManager _windowManager;
+    private readonly HomeViewModel  _homeVm;
 
     public event Action<string, string>? BalloonRequested;
 
@@ -19,10 +20,10 @@ public sealed class TrayViewModel : ViewModelBase
     public string RecordLabel =>
         _homeVm.IsRecording ? "Зупинити запис" : "Записати дзвінок";
 
-    public TrayViewModel(MainWindow mainWindow, HomeViewModel homeVm)
+    public TrayViewModel(IWindowManager windowManager, HomeViewModel homeVm)
     {
-        _mainWindow = mainWindow;
-        _homeVm     = homeVm;
+        _windowManager = windowManager;
+        _homeVm        = homeVm;
 
         OpenCommand   = new RelayCommand(OpenVault);
         RecordCommand = new RelayCommand(ToggleRecording);
@@ -37,13 +38,7 @@ public sealed class TrayViewModel : ViewModelBase
             OnPropertyChanged(nameof(RecordLabel));
     }
 
-    private void OpenVault()
-    {
-        _mainWindow.Show();
-        if (_mainWindow.WindowState == WindowState.Minimized)
-            _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
-    }
+    private void OpenVault() => _windowManager.ShowMainWindow();
 
     private void ToggleRecording()
     {

@@ -97,7 +97,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
 
-    public bool IsTelegramVisible => _position != "Діагност";
+    public bool IsTelegramVisible => PositionPolicy.IsTelegramVisible(_position);
 
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _position == "Кваліфікатор"
@@ -260,15 +260,37 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     private async Task AuthorizeTelegramAsync()
     {
+        // Own the InputHandler for the duration of this auth flow;
+        // MainViewModel (created later) will take it over permanently after setup.
+        _telegram.InputHandler = HandleTelegramInputAsync;
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;
-        var (ok, error) = await _telegram.AuthorizeAsync(_telegramPhone);
-        Application.Current.Dispatcher.Invoke(() =>
+        try
         {
-            IsAuthorizingTelegram = false;
-            IsTelegramConnected   = ok ? true : (bool?)false;
-            TelegramAuthError     = error;
+            var (ok, error) = await _telegram.AuthorizeAsync(_telegramPhone);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsAuthorizingTelegram = false;
+                IsTelegramConnected   = ok ? true : (bool?)false;
+                TelegramAuthError     = error;
+            });
+        }
+        finally
+        {
+            _telegram.InputHandler = null;
+        }
+    }
+
+    private Task<string?> HandleTelegramInputAsync(string prompt)
+    {
+        var tcs = new TaskCompletionSource<string?>();
+        var vm  = new InputDialogViewModel(prompt, result =>
+        {
+            HideInputDialog();
+            tcs.TrySetResult(result);
         });
+        ShowInputDialog(vm);
+        return tcs.Task;
     }
 
     private async Task TestKommoConnectionAsync()

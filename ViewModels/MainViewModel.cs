@@ -1,4 +1,5 @@
 using Replixer.Infrastructure;
+using Replixer.Services.Upload;
 using Replixer.ViewModels.Dialogs;
 using Replixer.Views;
 using System.Windows;
@@ -28,20 +29,27 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     public ICommand NavigateSettingsCommand   { get; }
     public ICommand NavigateProfileCommand    { get; }
 
-    private readonly HomeViewModel _homeVm;
-    private readonly SettingsViewModel _settingsVm;
-    private readonly ProfileViewModel _profileVm;
+    private readonly HomeViewModel       _homeVm;
+    private readonly SettingsViewModel   _settingsVm;
+    private readonly ProfileViewModel    _profileVm;
+    private readonly TelegramUploadService _telegram;
     private CallToastWindow? _toast;
 
     public MainViewModel(
-        HomeViewModel homeVm,
-        RecordingsViewModel recordingsVm,
-        SettingsViewModel settingsVm,
-        ProfileViewModel profileVm)
+        HomeViewModel        homeVm,
+        RecordingsViewModel  recordingsVm,
+        SettingsViewModel    settingsVm,
+        ProfileViewModel     profileVm,
+        TelegramUploadService telegram)
     {
         _homeVm    = homeVm;
         _settingsVm = settingsVm;
         _profileVm  = profileVm;
+        _telegram   = telegram;
+
+        // Register as the permanent input handler for the main-window phase.
+        // SetupViewModel temporarily overrides this during the setup wizard.
+        _telegram.InputHandler = HandleTelegramInputAsync;
 
         _homeVm.DialogRequested    += OnCallDialogRequested;
         _homeVm.CallReportRequested += OnCallReportRequested;
@@ -98,7 +106,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         Dialog = vm;
     }
 
-    // ── Input dialog (from TelegramUploadService) ─────────────────────────────
+    // ── Input dialog (IDialogHost — used by SetupViewModel) ──────────────────
 
     public void ShowInputDialog(InputDialogViewModel vm)
     {
@@ -107,6 +115,26 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     }
 
     public void HideInputDialog() => Dialog = null;
+
+    // ── Telegram input handler ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Called by <see cref="TelegramUploadService"/> when WTelegramClient needs
+    /// a verification code or 2FA password during the main-window phase.
+    /// Runs on the UI thread (dispatched by the service).
+    /// </summary>
+    private Task<string?> HandleTelegramInputAsync(string prompt)
+    {
+        var tcs = new TaskCompletionSource<string?>();
+        RestoreIfMinimized();
+        var vm = new InputDialogViewModel(prompt, result =>
+        {
+            HideInputDialog();
+            tcs.TrySetResult(result);
+        });
+        ShowInputDialog(vm);
+        return tcs.Task;
+    }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -124,6 +152,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public void Dispose()
     {
+        _telegram.InputHandler = null;
         _homeVm.DialogRequested     -= OnCallDialogRequested;
         _homeVm.CallReportRequested -= OnCallReportRequested;
         _homeVm.Dispose();

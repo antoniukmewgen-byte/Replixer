@@ -1,6 +1,7 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services.Upload;
+using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -85,7 +86,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
 
-    public bool IsTelegramVisible => _settings.Position != "Діагност";
+    public bool IsTelegramVisible => PositionPolicy.IsTelegramVisible(_settings.Position);
 
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _settings.Position == "Кваліфікатор"
@@ -243,6 +244,9 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     private async Task AuthorizeTelegramAsync()
     {
+        // MainViewModel already owns InputHandler permanently, but set it here
+        // too in case this is called before MainViewModel is fully initialised.
+        _telegram.InputHandler ??= HandleTelegramInputAsync;
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;
         var (ok, error) = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
@@ -252,6 +256,20 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             IsTelegramConnected   = ok ? true : (bool?)false;
             TelegramAuthError     = error;
         });
+    }
+
+    private Task<string?> HandleTelegramInputAsync(string prompt)
+    {
+        // Route through MainViewModel's dialog overlay (it owns the main window).
+        var mainVm = (IDialogHost)Application.Current.MainWindow.DataContext;
+        var tcs    = new TaskCompletionSource<string?>();
+        var vm     = new InputDialogViewModel(prompt, result =>
+        {
+            mainVm.HideInputDialog();
+            tcs.TrySetResult(result);
+        });
+        mainVm.ShowInputDialog(vm);
+        return tcs.Task;
     }
 
     private void LogoutTelegram()

@@ -2,6 +2,7 @@ using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Audio;
+using Replixer.Services.Manager;
 using Replixer.Services.Recording;
 using Replixer.Services.Upload;
 using Replixer.Services.Window;
@@ -29,6 +30,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
+    private readonly IWindowManager _windowManager;
     private IMonitorService _activeMonitor;
 
     private bool _isRecording;
@@ -52,12 +54,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public HomeViewModel(AppSettings settings, IUploadOrchestrator orchestrator, RecordingsViewModel recordingsVm)
+    public HomeViewModel(AppSettings settings, IUploadOrchestrator orchestrator, RecordingsViewModel recordingsVm, IWindowManager windowManager)
     {
-        _settings     = settings;
-        _orchestrator = orchestrator;
-        _recordingsVm = recordingsVm;
-        _recorder     = new AudioRecordingService(settings);
+        _settings      = settings;
+        _orchestrator  = orchestrator;
+        _recordingsVm  = recordingsVm;
+        _windowManager = windowManager;
+        _recorder      = new AudioRecordingService(settings);
 
         _callContent = new IdleCallViewModel(StartRecording);
 
@@ -178,7 +181,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
 
         CallContent = new ActiveCallViewModel(StopRecording);
-        App.WindowManager.ShowCheatSheet();
+        _windowManager.ShowCheatSheet();
     }
 
     private void StopRecording() => _ = StopRecordingAsync();
@@ -199,7 +202,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         try
         {
             string? path = await _recorder.StopRecordingAsync();
-            App.WindowManager.CloseCheatSheet();
+            _windowManager.CloseCheatSheet();
 
             if (path is null)
             {
@@ -212,7 +215,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
             CallReportData? reportData = null;
             string? caption = null;
-            bool telegramMatters = _orchestrator.IsTelegramReady && _settings.Position != "Діагност";
+            bool telegramMatters = _orchestrator.IsTelegramReady && PositionPolicy.IsTelegramVisible(_settings.Position);
             if (telegramMatters || _orchestrator.IsKommoEnabled)
             {
                 var result = await RequestCallReportAsync();
@@ -227,7 +230,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             }
 
             bool isRingostat   = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
-            bool skipTelegram  = ShouldSkipTelegram(_settings.Position, callDuration);
+            bool skipTelegram  = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
             var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
@@ -242,7 +245,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[HomeVM] StopRecording error: {ex.Message}");
-            App.WindowManager.CloseCheatSheet();
+            _windowManager.CloseCheatSheet();
             entry.Status = RecordingStatus.Error;
         }
         finally
@@ -255,7 +258,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private Task<CallReportData?> RequestCallReportAsync(CallReportData? existing = null)
     {
-        App.WindowManager.ShowMainWindow();
+        _windowManager.ShowMainWindow();
 
         var tcs = new TaskCompletionSource<CallReportData?>();
         var vm  = new CallReportViewModel(
@@ -364,12 +367,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             Debug.WriteLine("[HomeVM] Both EditTelegramCaptionAsync and EditKommoNoteAsync returned false");
     }
 
-    private static bool ShouldSkipTelegram(string position, TimeSpan duration) => position switch
-    {
-        "Кваліфікатор" => duration < TimeSpan.FromMinutes(1),
-        "Менеджер"     => duration < TimeSpan.FromMinutes(10),
-        _              => true,   // Діагност and any unknown — never send
-    };
 
     private void OnRecordingsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {

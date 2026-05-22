@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using System.Diagnostics;
 using System.Net.Http;
@@ -9,14 +10,6 @@ namespace Replixer.Services.Upload;
 
 public class KommoService
 {
-    // Pipeline name → allowed status names that trigger first-contact update
-    private static readonly Dictionary<string, HashSet<string>> FirstContactRules = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["MN EB1/2 Квалификация"] = new(StringComparer.OrdinalIgnoreCase) { "Квалификация" },
-        ["Відділ продажу ЕК"]     = new(StringComparer.OrdinalIgnoreCase) { "Распределены" },
-        ["Квалификация"]          = new(StringComparer.OrdinalIgnoreCase) { "Распределены" },
-    };
-
     private readonly AppSettings _settings;
     private readonly HttpClient  _http = new() { Timeout = TimeSpan.FromSeconds(30) };
 
@@ -52,14 +45,6 @@ public class KommoService
         catch (Exception ex) { return ex.Message; }
     }
 
-    // Lead sources for which first-contact date and processing speed should NOT be set
-    private static readonly HashSet<string> SkipFirstContactSources = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "Рекомендація",        "Рекомендация",
-        "Реактивація",         "Реактивация",
-        "Вторинне опрацювання","Вторичная проработка",
-    };
-
     /// <summary>Posts note + conditionally sets first-contact date. Returns the created note ID.</summary>
     public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? leadSource = null)
     {
@@ -77,7 +62,7 @@ public class KommoService
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
         string token   = _settings.KommoApiToken;
 
-        bool skipDates = leadSource is not null && SkipFirstContactSources.Contains(leadSource);
+        bool skipDates = KommoRules.ShouldSkipDates(leadSource);
         if (skipDates)
             Debug.WriteLine($"[Kommo] Skipping first-contact/speed fields for source '{leadSource}'");
 
@@ -186,7 +171,7 @@ public class KommoService
                 await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value, sourceFieldId);
 
             // Check CRM-side source (regardless of what was selected in the app)
-            if (crmSource is not null && SkipFirstContactSources.Contains(crmSource))
+            if (KommoRules.ShouldSkipDates(crmSource))
             {
                 Debug.WriteLine($"[Kommo] Skipping first-contact/speed — CRM source '{crmSource}' is excluded");
                 return;
@@ -206,7 +191,7 @@ public class KommoService
             Debug.WriteLine($"[Kommo] Lead pipeline='{pipelineName}' status='{statusName}'");
 
             // 4. Check rules
-            if (!ShouldSetFirstContact(pipelineName, statusName))
+            if (!KommoRules.ShouldSetFirstContact(pipelineName, statusName))
             {
                 Debug.WriteLine("[Kommo] No first-contact rule matched — skipping date update");
                 return;
@@ -349,9 +334,6 @@ public class KommoService
         return cache;
     }
 
-    // Dictionary already uses OrdinalIgnoreCase for keys and the value sets too.
-    private static bool ShouldSetFirstContact(string pipelineName, string statusName)
-        => FirstContactRules.TryGetValue(pipelineName, out var statuses) && statuses.Contains(statusName);
 
     // ── Custom field lookup ───────────────────────────────────────────────────
 

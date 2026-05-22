@@ -124,15 +124,14 @@ public class CallReportViewModel : ViewModelBase
         }
     }
 
-    private bool IsNedozvon           => _selectedCallType is "Недодзвон (ще не було спілкування)" or "Недодзвон (вже було спілкування)";
-    private bool IsManager            => _position == "Менеджер";
-    private bool HidesRatingOutcome   => IsNedozvon || _selectedCallType == "Інший";
+    private bool IsNedozvon         => _selectedCallType is "Недодзвон (ще не було спілкування)" or "Недодзвон (вже було спілкування)";
+    private bool HidesRatingOutcome => IsNedozvon || _selectedCallType == "Інший";
 
-    public bool IsCallTypeVisible       => IsManager;
-    public bool IsCustomCallTypeVisible => IsManager && _selectedCallType == "Інший";
-    public bool IsLeadSourceVisible     => _position != "Діагност";
-    public bool IsRatingVisible         => IsManager && !HidesRatingOutcome;
-    public bool IsOutcomeVisible        => IsManager && !HidesRatingOutcome;
+    public bool IsCallTypeVisible       => PositionPolicy.IsCallTypeVisible(_position);
+    public bool IsCustomCallTypeVisible => PositionPolicy.IsCallTypeVisible(_position) && _selectedCallType == "Інший";
+    public bool IsLeadSourceVisible     => PositionPolicy.IsLeadSourceVisible(_position);
+    public bool IsRatingVisible         => PositionPolicy.IsRatingVisible(_position) && !HidesRatingOutcome;
+    public bool IsOutcomeVisible        => PositionPolicy.IsOutcomeVisible(_position) && !HidesRatingOutcome;
     public bool IsNoteVisible           => true;
 
     public string CustomCallType

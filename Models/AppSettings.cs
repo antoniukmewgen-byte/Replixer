@@ -178,45 +178,83 @@ public class AppSettings : INotifyPropertyChanged
 
     // ── Persistence ──────────────────────────────────────────────────────────
 
+    // Captured on the UI thread at construction time; used to dispatch
+    // serialization back to the UI thread so it never races with property setters.
+    private readonly SynchronizationContext? _uiContext;
+    private Timer? _saveDebounce;
+
+    public AppSettings()
+    {
+        _uiContext = SynchronizationContext.Current;
+    }
+
     public static AppSettings Load()
     {
         try
         {
             if (File.Exists(SettingsPath))
             {
-                var json = File.ReadAllText(SettingsPath);
-                return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions)
-                       ?? new AppSettings();
+                var settings = JsonSerializer.Deserialize<AppSettings>(
+                    File.ReadAllText(SettingsPath), JsonOptions);
+                if (settings is not null)
+                    return settings;
             }
         }
-        catch { /* corrupt file — fall back to defaults */ }
-
+        catch { /* corrupt file — use defaults */ }
         return new AppSettings();
     }
 
-    private Timer? _saveDebounce;
-
     private void Save()
     {
-        // Debounce: coalesce rapid successive saves (e.g. user typing in a text field)
-        // into a single write 500 ms after the last change.
+        // Debounce: coalesce rapid successive saves into one write 500 ms after
+        // the last change.
         _saveDebounce?.Dispose();
-        _saveDebounce = new Timer(_ => WriteToDisk(), null, dueTime: 500, period: Timeout.Infinite);
+        _saveDebounce = new Timer(_ =>
+        {
+            if (_uiContext is not null)
+            {
+                // Dispatch serialization to the UI thread — all property setters
+                // also run on the UI thread, so this eliminates any data race.
+                _uiContext.Post(_ =>
+                {
+                    var json = JsonSerializer.Serialize(this, JsonOptions);
+                    _ = PersistAsync(json);
+                }, null);
+            }
+            else
+            {
+                // Fallback (design-time / unit tests): write synchronously.
+                WriteToDisk();
+            }
+        }, null, dueTime: 500, period: Timeout.Infinite);
     }
 
+    /// <summary>Cancel any pending debounce and write immediately (called on app exit).</summary>
     public void Flush()
     {
         _saveDebounce?.Dispose();
         _saveDebounce = null;
-        WriteToDisk();
+        WriteToDisk(); // Flush is always called on the UI thread — safe to serialize here.
     }
 
+    // Synchronous write used only by Flush (UI thread, app exit).
     private void WriteToDisk()
     {
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
             File.WriteAllText(SettingsPath, JsonSerializer.Serialize(this, JsonOptions));
+        }
+        catch { }
+    }
+
+    // Async write used by the debounce timer after serializing on the UI thread.
+    private static async Task PersistAsync(string json)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+            await File.WriteAllTextAsync(SettingsPath, json);
         }
         catch { }
     }
