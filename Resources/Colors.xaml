@@ -31,6 +31,8 @@
     <SolidColorBrush x:Key="OtherBrushSubColor2" Color="#57A5EC" />
     <SolidColorBrush x:Key="OtherBrushSubColor3" Color="#E3AC4F" />
     <SolidColorBrush x:Key="OtherBrushSubColor4" Color="#C64444" />
+    <SolidColorBrush x:Key="OtherBrushColor5" Color="#1E1A2D" />
+    <SolidColorBrush x:Key="OtherBrushSubColor5" Color="#9B6EF5" />
 
     <!--    -->
     <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />

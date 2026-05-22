@@ -143,6 +143,77 @@
                     FontSize="12"
                     FontWeight="Bold"
                     Foreground="{StaticResource SubText}">
+                    СПОВІЩЕННЯ
+                </TextBlock>
+                <Border
+                    Padding="16"
+                    Background="{StaticResource BrushColor3}"
+                    BorderBrush="{StaticResource BrushBorderColor3}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
+                            Width="38"
+                            Height="38"
+                            Background="{StaticResource OtherBrushColor5}"
+                            CornerRadius="8">
+                            <Path
+                                Width="18"
+                                Height="18"
+                                Data="M4.068,18H19.724a3,3,0,0,0,2.821-4.021L19.693,6.094A8.323,8.323,0,0,0,11.675,0h0A8.321,8.321,0,0,0,3.552,6.516l-2.35,7.6A3,3,0,0,0,4.068,18Z M7.1,20a5,5,0,0,0,9.8,0Z"
+                                Fill="{StaticResource OtherBrushSubColor5}"
+                                Stretch="Uniform" />
+                        </Border>
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="12,0,12,0"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource Text}">
+                                Показувати сповіщення
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                TextWrapping="Wrap">
+                                Тости з результатами запису у правому нижньому куті
+                            </TextBlock>
+                        </StackPanel>
+                        <ToggleButton
+                            Grid.Column="2"
+                            IsChecked="{Binding IsNotificationsEnabled, Mode=TwoWay}"
+                            Style="{StaticResource ToggleSwitch}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Margin="0,12,0,0"
+            Padding="16"
+            Background="{StaticResource BrushColor2}"
+            BorderBrush="{StaticResource BrushBorderColor2}"
+            BorderThickness="1"
+            CornerRadius="12">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,12"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource SubText}">
                     НАЛАШТУВАННЯ АВТОЗАПУСКУ
                 </TextBlock>
                 <Border

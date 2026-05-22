@@ -128,7 +128,7 @@ public class TelegramUploadService : IDisposable
 
     // ── Edit ──────────────────────────────────────────────────────────────────
 
-    public async Task<bool> EditMessageAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
+    public async Task<string?> EditMessageAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
     {
         Debug.WriteLine($"[TG] ── EditMessageAsync (msgId={messageId}) ───────");
         try
@@ -137,22 +137,22 @@ public class TelegramUploadService : IDisposable
             if (_client == null)
             {
                 Debug.WriteLine("[TG] ✗ No client — not authorized");
-                return false;
+                return "Telegram: не авторизовано";
             }
 
             TL.InputPeer? peer = await ResolvePeerAsync(chatId);
             if (peer == null)
-                return false;
+                return "Telegram: не вдалося знайти чат";
 
             var (msgText, entities) = BuildCaption(caption, driveUrl);
             await _client.Messages_EditMessage(peer, messageId, message: msgText, entities: entities);
             Debug.WriteLine("[TG] ✓ Edited successfully");
-            return true;
+            return null;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] ✗ Edit failed: {ex.Message}");
-            return false;
+            return $"Telegram: {ex.Message}";
         }
         finally
         {

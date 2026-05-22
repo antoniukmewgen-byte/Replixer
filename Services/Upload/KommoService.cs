@@ -76,9 +76,10 @@ public class KommoService
     }
 
     /// <summary>Updates the text of an existing note.</summary>
-    public async Task<bool> EditNoteAsync(string leadUrl, long noteId, string noteText)
+    /// <returns>null on success, error message on failure.</returns>
+    public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText)
     {
-        if (!IsEnabled) return false;
+        if (!IsEnabled) return "Kommo: інтеграція вимкнена";
 
         var (subdomain, leadId) = ParseLeadUrl(leadUrl);
         subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
@@ -86,7 +87,7 @@ public class KommoService
         if (leadId is null || string.IsNullOrEmpty(subdomain))
         {
             Debug.WriteLine($"[Kommo] Cannot parse lead URL: {leadUrl}");
-            return false;
+            return "Kommo: не вдалося розпарсити URL ліда";
         }
 
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
@@ -108,12 +109,12 @@ public class KommoService
             var res  = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
             Debug.WriteLine($"[Kommo] Note PATCH → {(int)res.StatusCode}  {body[..Math.Min(500, body.Length)]}");
-            return res.IsSuccessStatusCode;
+            return res.IsSuccessStatusCode ? null : $"Kommo: помилка {(int)res.StatusCode}";
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] EditNote failed: {ex.Message}");
-            return false;
+            return $"Kommo: {ex.Message}";
         }
     }
 

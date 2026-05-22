@@ -38,6 +38,12 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public bool IsNotificationsEnabled
+    {
+        get => _settings.IsNotificationsEnabled;
+        set => _settings.IsNotificationsEnabled = value;
+    }
+
     public SettingsViewModel(AppSettings settings)
     {
         _settings = settings;
@@ -56,6 +62,10 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         else if (e.PropertyName == nameof(AppSettings.IsAutoStartEnabled))
         {
             OnPropertyChanged(nameof(IsAutoStartEnabled));
+        }
+        else if (e.PropertyName == nameof(AppSettings.IsNotificationsEnabled))
+        {
+            OnPropertyChanged(nameof(IsNotificationsEnabled));
         }
     }
 }

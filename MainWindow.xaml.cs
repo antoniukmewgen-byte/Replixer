@@ -108,6 +108,9 @@ public partial class MainWindow : Window
         FullscreenIcon.Data      = Geometry.Parse(maximized ? IconCollapse : IconExpand);
     }
 
+    private void EmailButton_Click(object sender, RoutedEventArgs e) =>
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://t.me/DrawC0de") { UseShellExecute = true });
+
     private void CollapseButton_Click(object sender, RoutedEventArgs e) => Hide();
 
     private void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();

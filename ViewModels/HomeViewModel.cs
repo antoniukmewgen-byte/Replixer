@@ -178,7 +178,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(IsRecording));
 
         if (!_recorder.StartRecording(_lastDetectedApp))
+        {
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
+            var reason = _recorder.LastError;
+            var msg    = string.IsNullOrWhiteSpace(reason)
+                ? "Не вдалося запустити запис. Перевірте мікрофон."
+                : $"Не вдалося запустити запис.\n{reason}";
+            NotificationService.ShowError(msg);
+        }
 
         CallContent = new ActiveCallViewModel(StopRecording);
         _windowManager.ShowCheatSheet();
@@ -219,6 +226,11 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             if (path is null)
             {
                 entry.Status = RecordingStatus.Error;
+                var reason = _recorder.LastError;
+                var msg    = string.IsNullOrWhiteSpace(reason)
+                    ? "Помилка обробки аудіо. Файл не збережено."
+                    : $"Помилка обробки аудіо.\n{reason}";
+                NotificationService.ShowError(msg);
                 return;
             }
 
@@ -245,6 +257,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
             entry.Status            = RecordingStatus.Saved;
+            NotificationService.ShowSuccess("Запис збережено та відправлено.");
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
         catch (Exception ex)
@@ -252,6 +265,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             Debug.WriteLine($"[HomeVM] StopRecording error: {ex.Message}");
             _windowManager.CloseCheatSheet();
             entry.Status = RecordingStatus.Error;
+            NotificationService.ShowError($"Помилка збереження запису.\n{ex.Message}");
         }
         finally
         {
@@ -331,12 +345,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
             entry.Status            = RecordingStatus.Saved;
+            NotificationService.ShowSuccess("Запис повторно відправлено.");
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[HomeVM] Retry failed: {ex.Message}");
             entry.Status = RecordingStatus.Error;
+            NotificationService.ShowError($"Повторна відправка не вдалась.\n{ex.Message}");
         }
     }
 
@@ -354,7 +370,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 entry.TelegramTopicId,
                 caption,
                 entry.DriveUrl)
-            : Task.FromResult(false);
+            : Task.FromResult<string?>("Telegram: повідомлення не прив'язано");
 
         var kommoBase = CaptionHelper.StripHashtags(caption);
         var kommoNote = string.IsNullOrWhiteSpace(entry.DriveUrl)
@@ -362,14 +378,27 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             : kommoBase + $"\n💾 Google Drive: {entry.DriveUrl}";
         var kommoTask = entry.KommoNoteId.HasValue && !string.IsNullOrWhiteSpace(newData.CrmUrl)
             ? _orchestrator.EditKommoNoteAsync(newData.CrmUrl, entry.KommoNoteId.Value, kommoNote)
-            : Task.FromResult(false);
+            : Task.FromResult<string?>("Kommo: нотатка не прив'язана");
 
         await Task.WhenAll(tgTask, kommoTask);
 
-        if (await tgTask || await kommoTask)
+        string? tgError    = tgTask.Result;
+        string? kommoError = kommoTask.Result;
+
+        if (tgError is null || kommoError is null)
+        {
             entry.ReportData = newData;
+            NotificationService.ShowSuccess("Звіт оновлено.");
+        }
         else
-            Debug.WriteLine("[HomeVM] Both EditTelegramCaptionAsync and EditKommoNoteAsync returned false");
+        {
+            var errors = new List<string>();
+            if (tgError    is not null) errors.Add(tgError);
+            if (kommoError is not null) errors.Add(kommoError);
+            var reason = string.Join("\n", errors);
+            Debug.WriteLine($"[HomeVM] Edit failed: {reason}");
+            NotificationService.ShowError($"Не вдалося оновити звіт.\n{reason}");
+        }
     }
 
 

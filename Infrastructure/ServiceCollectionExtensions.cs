@@ -38,6 +38,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<ProfileViewModel>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<NotificationsViewModel>();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<TrayViewModel>();
         return services;

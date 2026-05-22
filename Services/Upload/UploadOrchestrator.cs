@@ -84,10 +84,10 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return new UploadResult { LocalPath = MoveToRecordingsFolder(filePath) };
     }
 
-    public Task<bool> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
+    public Task<string?> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
         => _telegram.EditMessageAsync(messageId, chatId, topicId, caption, driveUrl);
 
-    public Task<bool> EditKommoNoteAsync(string leadUrl, long noteId, string noteText)
+    public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText)
         => _kommo.EditNoteAsync(leadUrl, noteId, noteText);
 
     private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)

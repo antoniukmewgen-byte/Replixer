@@ -35,17 +35,21 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     private readonly TelegramUploadService _telegram;
     private CallToastWindow? _toast;
 
+    public NotificationsViewModel Notifications { get; }
+
     public MainViewModel(
         HomeViewModel        homeVm,
         RecordingsViewModel  recordingsVm,
         SettingsViewModel    settingsVm,
         ProfileViewModel     profileVm,
-        TelegramUploadService telegram)
+        TelegramUploadService telegram,
+        NotificationsViewModel notifications)
     {
-        _homeVm    = homeVm;
-        _settingsVm = settingsVm;
-        _profileVm  = profileVm;
-        _telegram   = telegram;
+        _homeVm       = homeVm;
+        _settingsVm   = settingsVm;
+        _profileVm    = profileVm;
+        _telegram     = telegram;
+        Notifications = notifications;
 
         // Register as the permanent input handler for the main-window phase.
         // SetupViewModel temporarily overrides this during the setup wizard.

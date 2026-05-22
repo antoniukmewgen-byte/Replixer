@@ -147,7 +147,7 @@
                     Source="/Assets/Icons/IconApp.png" />
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button x:Name="EmailButton" Style="{StaticResource HeaderButton}">
+                    <Button x:Name="EmailButton" Click="EmailButton_Click" Style="{StaticResource HeaderButton}">
                         <Path
                             Width="12"
                             Height="12"
@@ -308,6 +308,139 @@
                     VerticalAlignment="Center"
                     Content="{Binding Dialog}" />
             </Grid>
+
+            <!--  Toast notifications — bottom-right corner, non-interactive  -->
+            <ItemsControl
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                Margin="0,0,14,14"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                IsHitTestVisible="False"
+                ItemsSource="{Binding Notifications.Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel VerticalAlignment="Bottom" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Width="290"
+                            Margin="0,0,0,6"
+                            CornerRadius="10">
+
+                            <Border.RenderTransform>
+                                <TranslateTransform />
+                            </Border.RenderTransform>
+
+                            <!--  Background + fade-out/slide-out  -->
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsError}" Value="False">
+                                            <Setter Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsLeaving}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            To="0"
+                                                            Duration="0:0:0.35" />
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                            To="50"
+                                                            Duration="0:0:0.35">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CubicEase EasingMode="EaseIn" />
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
+                            <!--  Slide-in + fade-in on appear  -->
+                            <Border.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                From="50"
+                                                To="0"
+                                                Duration="0:0:0.25">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Border.Triggers>
+
+                            <Grid>
+                                <!--  Left accent bar  -->
+                                <Border
+                                    Width="3"
+                                    HorizontalAlignment="Left"
+                                    CornerRadius="10,0,0,10">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{StaticResource OtherBrushSubColor4}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsError}" Value="False">
+                                                    <Setter Property="Background" Value="{StaticResource OtherBrushSubColor1}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+
+                                <!--  Icon + text  -->
+                                <StackPanel Margin="16,10,12,10" Orientation="Horizontal">
+                                    <TextBlock
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Top"
+                                        FontSize="13"
+                                        FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="✕" />
+                                                <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsError}" Value="False">
+                                                        <Setter Property="Text" Value="✓" />
+                                                        <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock
+                                        MaxWidth="230"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{StaticResource Text}"
+                                        Text="{Binding Message}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
         </Grid>
     </Border>

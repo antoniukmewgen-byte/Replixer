@@ -21,9 +21,10 @@ public class AudioRecordingService : IDisposable
     private string? _micTempPath;
     private string? _finalMp3Path;
 
-    public bool    IsRecording      { get; private set; }
+    public bool    IsRecording       { get; private set; }
     public string  LastSavedFilePath { get; private set; } = string.Empty;
     public string? CurrentFilePath   => _finalMp3Path;
+    public string? LastError         { get; private set; }
 
     public event Action<string>? RecordingCompleted; // saved file path
     public event Action<string>? RecordingFailed;    // error message
@@ -41,6 +42,7 @@ public class AudioRecordingService : IDisposable
         // IsRecording is cleared early, but captures are still alive until CleanupCaptures().
         if (IsRecording || _loopbackCapture != null || _micCapture != null) return false;
 
+        LastError = null;
         try
         {
             string tempFolder = Path.GetTempPath();
@@ -79,6 +81,7 @@ public class AudioRecordingService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[Recording] Start failed: {ex.Message}");
+            LastError = ex.Message;
             CleanupCaptures();
             return false;
         }
@@ -192,6 +195,7 @@ public class AudioRecordingService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[Recording] Mix failed: {ex.Message}");
+            LastError = ex.Message;
             return null;
         }
         finally

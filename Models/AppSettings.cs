@@ -176,6 +176,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_isKommoConnected == value) return; _isKommoConnected = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isNotificationsEnabled = true;
+    public bool IsNotificationsEnabled
+    {
+        get => _isNotificationsEnabled;
+        set { if (_isNotificationsEnabled == value) return; _isNotificationsEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     // Captured on the UI thread at construction time; used to dispatch
