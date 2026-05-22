@@ -14,6 +14,7 @@
     TextOptions.TextFormattingMode="Display"
     TextOptions.TextRenderingMode="ClearType"
     Topmost="True"
+    ResizeMode="NoResize"
     WindowStyle="None">
 
     <Border

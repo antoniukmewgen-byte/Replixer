@@ -21,8 +21,9 @@ public class AudioRecordingService : IDisposable
     private string? _micTempPath;
     private string? _finalMp3Path;
 
-    public bool   IsRecording      { get; private set; }
-    public string LastSavedFilePath { get; private set; } = string.Empty;
+    public bool    IsRecording      { get; private set; }
+    public string  LastSavedFilePath { get; private set; } = string.Empty;
+    public string? CurrentFilePath   => _finalMp3Path;
 
     public event Action<string>? RecordingCompleted; // saved file path
     public event Action<string>? RecordingFailed;    // error message

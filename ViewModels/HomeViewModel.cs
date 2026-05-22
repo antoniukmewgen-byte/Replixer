@@ -199,10 +199,22 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
         WireEntryEditCommand(entry);
+        entry.SourcePath = _recorder.CurrentFilePath; // persist path immediately so retry works after crash
         try
         {
-            string? path = await _recorder.StopRecordingAsync();
+            // Stop recording and show the report form in parallel — the form
+            // doesn't need the file, so the user sees it immediately.
+            bool telegramMatters = _orchestrator.IsTelegramReady && PositionPolicy.IsTelegramVisible(_settings.Position);
+            bool needsForm       = telegramMatters || _orchestrator.IsKommoEnabled;
+
+            var stopTask   = _recorder.StopRecordingAsync();
+            var reportTask = needsForm ? RequestCallReportAsync() : Task.FromResult<CallReportData?>(null);
+
+            // Close cheat sheet as soon as the file is ready — don't wait for the form.
+            string? path = await stopTask;
             _windowManager.CloseCheatSheet();
+
+            await reportTask;
 
             if (path is null)
             {
@@ -213,21 +225,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             // Store before upload — enables retry if upload fails or app closes mid-flight.
             entry.SourcePath = path;
 
-            CallReportData? reportData = null;
-            string? caption = null;
-            bool telegramMatters = _orchestrator.IsTelegramReady && PositionPolicy.IsTelegramVisible(_settings.Position);
-            if (telegramMatters || _orchestrator.IsKommoEnabled)
-            {
-                var result = await RequestCallReportAsync();
-                if (result is not null)
-                    result = result with
-                    {
-                        AppName  = entry.PlatformDisplayName,
-                        Duration = callDuration,
-                    };
-                caption    = result?.FormatCaption();
-                reportData = result;
-            }
+            CallReportData? reportData = reportTask.Result;
+            if (reportData is not null)
+                reportData = reportData with
+                {
+                    AppName  = entry.PlatformDisplayName,
+                    Duration = callDuration,
+                };
+            string? caption = reportData?.FormatCaption();
 
             bool isRingostat   = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
             bool skipTelegram  = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
