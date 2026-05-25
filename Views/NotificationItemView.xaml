@@ -1,0 +1,92 @@
+<UserControl
+    x:Class="Replixer.Views.NotificationItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:Replixer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:NotificationItem}"
+    d:DesignHeight="56"
+    d:DesignWidth="290"
+    mc:Ignorable="d">
+
+    <Border
+        x:Name="RootBorder"
+        MaxHeight="200"
+        Width="290"
+        Margin="0,0,0,6"
+        BorderThickness="3,0,0,0"
+        CornerRadius="10">
+
+        <Border.RenderTransform>
+            <TranslateTransform x:Name="SlideTransform" />
+        </Border.RenderTransform>
+
+        <!--  Slide-in + fade-in on appear  -->
+        <Border.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                            From="50" To="0"
+                            Storyboard.TargetName="SlideTransform"
+                            Storyboard.TargetProperty="X"
+                            Duration="0:0:0.25">
+                            <DoubleAnimation.EasingFunction>
+                                <CubicEase EasingMode="EaseOut" />
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        <DoubleAnimation
+                            From="0" To="1"
+                            Storyboard.TargetProperty="Opacity"
+                            Duration="0:0:0.2" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Border.Triggers>
+
+        <!--  Background + BorderBrush по IsError  -->
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Background"  Value="{StaticResource OtherBrushColor4}" />
+                <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsError}" Value="False">
+                        <Setter Property="Background"  Value="{StaticResource OtherBrushColor1}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <!--  Icon + text  -->
+        <StackPanel Margin="13,10,12,10" Orientation="Horizontal">
+            <TextBlock
+                Margin="0,0,8,0"
+                VerticalAlignment="Top"
+                FontSize="13"
+                FontWeight="SemiBold">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text"       Value="✕" />
+                        <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsError}" Value="False">
+                                <Setter Property="Text"       Value="✓" />
+                                <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock
+                MaxWidth="230"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource InterFont}"
+                FontSize="12"
+                Foreground="{StaticResource Text}"
+                Text="{Binding Message}"
+                TextWrapping="Wrap" />
+        </StackPanel>
+    </Border>
+</UserControl>

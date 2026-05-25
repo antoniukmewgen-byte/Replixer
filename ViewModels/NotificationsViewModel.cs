@@ -22,6 +22,9 @@ public sealed class NotificationItem : INotifyPropertyChanged
         internal set { if (_isLeaving == value) return; _isLeaving = value; OnPropertyChanged(); }
     }
 
+    /// <summary>Called by the view when the leave animation finishes — removes item from the collection.</summary>
+    internal Action? AnimationCompleted { get; set; }
+
     internal NotificationItem(string message, NotificationType type)
     {
         Message = message;
@@ -35,15 +38,14 @@ public sealed class NotificationItem : INotifyPropertyChanged
 
 /// <summary>
 /// Subscribes to <see cref="NotificationService"/> and manages the observable list of toasts.
-/// Each toast auto-dismisses after a fixed duration with a fade-out.
-/// Must be created on the UI thread (DispatcherTimer requires it).
+/// Each toast auto-dismisses after a fixed duration. Removal happens only after
+/// the view signals AnimationCompleted — so the leave animation always plays in full.
 /// </summary>
 public sealed class NotificationsViewModel
 {
-    // Durations
     private const double SuccessSeconds = 3.0;
     private const double ErrorSeconds   = 5.0;
-    private const double FadeSeconds    = 0.4; // must match XAML animation duration
+    private const double LeaveSeconds   = 0.4; // must match animation duration in NotificationItemView
 
     private readonly AppSettings _settings;
 
@@ -63,19 +65,18 @@ public sealed class NotificationsViewModel
 
     private void Show(string message, NotificationType type)
     {
-        var item     = new NotificationItem(message, type);
-        double total = type == NotificationType.Error ? ErrorSeconds : SuccessSeconds;
+        var item = new NotificationItem(message, type);
 
+        // View calls this when its leave animation finishes.
+        item.AnimationCompleted = () => Items.Remove(item);
+
+        double total = type == NotificationType.Error ? ErrorSeconds : SuccessSeconds;
         Items.Add(item);
 
-        // After (total - FadeSeconds): start fade-out animation by flipping IsLeaving.
-        var fadeTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(total - FadeSeconds) };
-        fadeTimer.Tick += (_, _) => { fadeTimer.Stop(); item.IsLeaving = true; };
-        fadeTimer.Start();
-
-        // After full duration: remove from collection (animation will have finished by now).
-        var removeTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(total) };
-        removeTimer.Tick += (_, _) => { removeTimer.Stop(); Items.Remove(item); };
-        removeTimer.Start();
+        // After (total - LeaveSeconds): flip IsLeaving → view starts leave animation.
+        // Removal is NOT scheduled here — it happens via AnimationCompleted callback.
+        var leaveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(total - LeaveSeconds) };
+        leaveTimer.Tick += (_, _) => { leaveTimer.Stop(); item.IsLeaving = true; };
+        leaveTimer.Start();
     }
 }
