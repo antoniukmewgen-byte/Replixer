@@ -16,10 +16,6 @@ public class GoogleDriveUploadService
 
     public bool IsAuthorized => _service is not null;
 
-    public event Action<int>?    ProgressChanged;  // 0–100
-    public event Action<string>? UploadCompleted;  // web view link
-    public event Action<string>? UploadFailed;     // error message
-
     public GoogleDriveUploadService()
     {
         try
@@ -33,9 +29,6 @@ public class GoogleDriveUploadService
         }
     }
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
-    /// <summary>Checks access to the folder. Returns null on success, or an error message on failure.</summary>
     public async Task<string?> TestFolderAccessAsync(string folderId, CancellationToken ct = default)
     {
         Debug.WriteLine($"[GDrive] ── TestFolderAccess ──────────────────────────");
@@ -86,8 +79,6 @@ public class GoogleDriveUploadService
         }
     }
 
-    /// <summary>Uploads <paramref name="filePath"/> to <paramref name="folderId"/> on Google Drive.
-    /// Returns the webViewLink on success, or null on failure.</summary>
     public async Task<string?> UploadAsync(string filePath, string? folderId, CancellationToken ct = default)
     {
         Debug.WriteLine($"[GDrive] ── UploadAsync ─────────────────────────────");
@@ -98,7 +89,6 @@ public class GoogleDriveUploadService
         {
             const string err = "Service account not initialized. Check that service_account.json is embedded.";
             Debug.WriteLine($"[GDrive] ✗ {err}");
-            UploadFailed?.Invoke(err);
             return null;
         }
 
@@ -134,7 +124,6 @@ public class GoogleDriveUploadService
                 if (p.Status == UploadStatus.Uploading && totalBytes > 0)
                 {
                     int pct = (int)(p.BytesSent * 100 / totalBytes);
-                    ProgressChanged?.Invoke(pct);
 
                     if (pct / 25 > lastReported / 25)
                     {
@@ -160,7 +149,6 @@ public class GoogleDriveUploadService
                 Debug.WriteLine($"[GDrive] ✓ File id   : {id}");
                 Debug.WriteLine($"[GDrive] ✓ File name : {name}");
                 Debug.WriteLine($"[GDrive] ✓ View link : {link}");
-                UploadCompleted?.Invoke(link);
                 return link;
             }
 
@@ -168,7 +156,6 @@ public class GoogleDriveUploadService
                 ? $"{result.Exception.GetType().Name}: {result.Exception.Message}"
                 : "Unknown error";
             Debug.WriteLine($"[GDrive] ✗ Upload failed: {error}");
-            UploadFailed?.Invoke(error);
             return null;
         }
         catch (OperationCanceledException)
@@ -180,7 +167,6 @@ public class GoogleDriveUploadService
         {
             Debug.WriteLine($"[GDrive] ✗ Exception: {ex.GetType().Name}: {ex.Message}");
             Debug.WriteLine($"[GDrive]   StackTrace: {ex.StackTrace}");
-            UploadFailed?.Invoke(ex.Message);
             return null;
         }
         finally
@@ -189,8 +175,6 @@ public class GoogleDriveUploadService
         }
     }
 
-    /// <summary>Finds or creates a subfolder with <paramref name="userName"/> inside <paramref name="parentFolderId"/>.
-    /// Returns the folder ID, or null on failure.</summary>
     public async Task<string?> GetOrCreateUserFolderAsync(string parentFolderId, string userName, CancellationToken ct = default)
     {
         if (_service is null || string.IsNullOrWhiteSpace(parentFolderId) || string.IsNullOrWhiteSpace(userName))
@@ -231,8 +215,6 @@ public class GoogleDriveUploadService
             return null;
         }
     }
-
-    // ── Private ───────────────────────────────────────────────────────────────
 
     private static DriveService CreateService()
     {

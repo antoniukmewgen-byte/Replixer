@@ -17,8 +17,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     private readonly KommoService _kommo;
     private readonly RecordingsViewModel _recordings;
 
-    // ── Manager name & position ───────────────────────────────────────────────
-
     public static IReadOnlyList<string> Positions => Dialogs.CallReportViewModel.Positions;
 
     public string ManagerName
@@ -32,8 +30,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         get => _settings.Position;
         set => _settings.Position = value;
     }
-
-    // ── Google Drive ──────────────────────────────────────────────────────────
 
     public bool IsGoogleDriveEnabled
     {
@@ -69,8 +65,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     }
 
     public AsyncRelayCommand TestDriveConnectionCommand { get; }
-
-    // ── Telegram ──────────────────────────────────────────────────────────────
 
     public bool IsTelegramEnabled
     {
@@ -132,8 +126,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     public RelayCommand TelegramActionCommand { get; }
     public RelayCommand LogoutTelegramCommand { get; }
 
-    // ── Kommo ─────────────────────────────────────────────────────────────────
-
     public bool IsKommoEnabled
     {
         get => _settings.IsKommoEnabled;
@@ -175,11 +167,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     public AsyncRelayCommand TestKommoConnectionCommand { get; }
 
-    // ── Clear all data ────────────────────────────────────────────────────────
-
     public RelayCommand ClearAllDataCommand { get; }
-
-    // ── Constructor ───────────────────────────────────────────────────────────
 
     public ProfileViewModel(
         AppSettings settings,
@@ -209,8 +197,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
         _settings.PropertyChanged += OnSettingsChanged;
     }
-
-    // ── Commands ──────────────────────────────────────────────────────────────
 
     private async Task TestDriveConnectionAsync()
     {
@@ -244,8 +230,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     private async Task AuthorizeTelegramAsync()
     {
-        // MainViewModel already owns InputHandler permanently, but set it here
-        // too in case this is called before MainViewModel is fully initialised.
         _telegram.InputHandler ??= HandleTelegramInputAsync;
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;
@@ -260,10 +244,14 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     private Task<string?> HandleTelegramInputAsync(string prompt)
     {
-        // Route through MainViewModel's dialog overlay (it owns the main window).
-        var mainVm = (IDialogHost)Application.Current.MainWindow.DataContext;
-        var tcs    = new TaskCompletionSource<string?>();
-        var vm     = new InputDialogViewModel(prompt, result =>
+        if (Application.Current.MainWindow?.DataContext is not IDialogHost mainVm)
+        {
+            Debug.WriteLine("[Profile] HandleTelegramInputAsync: MainWindow is not an IDialogHost — cannot show input dialog");
+            return Task.FromResult<string?>(null);
+        }
+
+        var tcs = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var vm  = new InputDialogViewModel(prompt, result =>
         {
             mainVm.HideInputDialog();
             tcs.TrySetResult(result);
@@ -323,11 +311,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
     }
 
-    // ── IDisposable ───────────────────────────────────────────────────────────
-
     public void Dispose() => _settings.PropertyChanged -= OnSettingsChanged;
-
-    // ── Settings change relay ─────────────────────────────────────────────────
 
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
     {

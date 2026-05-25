@@ -23,7 +23,6 @@ public partial class CallCheatSheetWindow : Window
         InitializeComponent();
         Loaded += (_, _) =>
         {
-            // Measure real physical pixels (accounts for DPI scaling)
             var ps   = PresentationSource.FromVisual(this);
             double sx = ps?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
             double sy = ps?.CompositionTarget?.TransformToDevice.M22 ?? 1.0;

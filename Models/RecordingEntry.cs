@@ -19,23 +19,39 @@ public class RecordingEntry : INotifyPropertyChanged
     public string? DriveUrl
     {
         get => _driveUrl;
-        set { if (_driveUrl == value) return; _driveUrl = value; OnPropertyChanged(); }
+        set
+        {
+            if (_driveUrl == value) return;
+            _driveUrl = value;
+            OnPropertyChanged();
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
     }
 
     private string? _filePath;
     public string? FilePath
     {
         get => _filePath;
-        set { if (_filePath == value) return; _filePath = value; OnPropertyChanged(); }
+        set
+        {
+            if (_filePath == value) return;
+            _filePath = value;
+            OnPropertyChanged();
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
     }
 
-    // Path to the original MP3 before upload (temp folder). Set immediately after recording,
-    // before any upload attempt — allows retry even if upload never completed.
     private string? _sourcePath;
     public string? SourcePath
     {
         get => _sourcePath;
-        set { if (_sourcePath == value) return; _sourcePath = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasRetryableFile)); }
+        set
+        {
+            if (_sourcePath == value) return;
+            _sourcePath = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasRetryableFile));
+        }
     }
 
     public bool HasRetryableFile =>
@@ -46,12 +62,35 @@ public class RecordingEntry : INotifyPropertyChanged
     public int? TelegramMessageId
     {
         get => _telegramMessageId;
-        set { if (_telegramMessageId == value) return; _telegramMessageId = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasTelegramMessage)); }
+        set
+        {
+            if (_telegramMessageId == value) return;
+            _telegramMessageId = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasTelegramMessage));
+        }
     }
 
-    public long  TelegramChatId  { get; set; }
-    public int?  TelegramTopicId { get; set; }
-    public long? KommoNoteId     { get; set; }
+    private long _telegramChatId;
+    public long TelegramChatId
+    {
+        get => _telegramChatId;
+        set { if (_telegramChatId == value) return; _telegramChatId = value; OnPropertyChanged(); }
+    }
+
+    private int? _telegramTopicId;
+    public int? TelegramTopicId
+    {
+        get => _telegramTopicId;
+        set { if (_telegramTopicId == value) return; _telegramTopicId = value; OnPropertyChanged(); }
+    }
+
+    private long? _kommoNoteId;
+    public long? KommoNoteId
+    {
+        get => _kommoNoteId;
+        set { if (_kommoNoteId == value) return; _kommoNoteId = value; OnPropertyChanged(); }
+    }
 
     private CallReportData? _reportData;
     public CallReportData? ReportData
@@ -95,27 +134,11 @@ public class RecordingEntry : INotifyPropertyChanged
 
     public bool IsError => _status == RecordingStatus.Error;
 
-    // Single source of truth for all platform-specific data.
-    // Adding a new platform only requires a new entry in each dictionary.
-    private static readonly Dictionary<string, string> s_displayNames = new()
-    {
-        ["Telegram"]              = "Telegram",
-        ["Viber"]                 = "Viber",
-        ["WhatsApp.Root"]         = "WhatsApp",
-        ["Ringostat Smart Phone"] = "Ringostat",
-    };
+    public bool    IsManual            => !PlatformHelper.IsKnownPlatform(Platform);
 
-    private static readonly Dictionary<string, string> s_iconPaths = new()
-    {
-        ["Telegram"]              = "/Assets/Icons/telegram.png",
-        ["Viber"]                 = "/Assets/Icons/viber.png",
-        ["WhatsApp.Root"]         = "/Assets/Icons/whatsapp.png",
-        ["Ringostat Smart Phone"] = "/Assets/Icons/ringostat.png",
-    };
+    public string  PlatformDisplayName => PlatformHelper.ToDisplayName(Platform);
 
-    public bool    IsManual           => !s_displayNames.ContainsKey(Platform);
-    public string  PlatformDisplayName => s_displayNames.TryGetValue(Platform, out var n) ? n : "Ручний запис";
-    public string? IconPath            => s_iconPaths.TryGetValue(Platform, out var p) ? p : null;
+    public string? IconPath            => PlatformHelper.ToRelativeIconPath(Platform);
 
     public string DateDisplay      => StartedAt.ToString("dd.MM.yyyy");
     public string TimeOfDayDisplay => StartedAt.ToString("HH:mm");
@@ -134,11 +157,14 @@ public class RecordingEntry : INotifyPropertyChanged
     {
         Platform  = platform;
         StartedAt = startedAt;
+
         OpenInDriveCommand = new RelayCommand(
-            () => Process.Start(new ProcessStartInfo(_driveUrl!) { UseShellExecute = true }));
+            execute:    () => Process.Start(new ProcessStartInfo(_driveUrl!) { UseShellExecute = true }),
+            canExecute: () => !string.IsNullOrEmpty(_driveUrl));
 
         OpenInExplorerCommand = new RelayCommand(
-            () => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_filePath}\"") { UseShellExecute = true }));
+            execute:    () => Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_filePath}\"") { UseShellExecute = true }),
+            canExecute: () => !string.IsNullOrEmpty(_filePath) && File.Exists(_filePath));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

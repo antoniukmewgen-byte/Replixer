@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace Replixer.ViewModels;
 
-public sealed class TrayViewModel : ViewModelBase
+public sealed class TrayViewModel : ViewModelBase, IDisposable
 {
     private readonly IWindowManager _windowManager;
     private readonly HomeViewModel  _homeVm;
@@ -50,4 +50,6 @@ public sealed class TrayViewModel : ViewModelBase
 
     public void ShowBalloon(string title, string message) =>
         BalloonRequested?.Invoke(title, message);
+
+    public void Dispose() => _homeVm.PropertyChanged -= OnHomePropertyChanged;
 }

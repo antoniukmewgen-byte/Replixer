@@ -50,7 +50,6 @@ public class RingostatCallDetector : ICallDetector
 
         try
         {
-            // Forces the GPU-rendered (Flutter) window to paint into our bitmap
             PrintWindow(hWnd, memDC, PW_RENDERFULLCONTENT);
 
             int sampleX = w / 2;

@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using NAudio.CoreAudioApi;
 using NAudio.Lame;
@@ -26,20 +27,34 @@ public class AudioRecordingService : IDisposable
     public string? CurrentFilePath   => _finalMp3Path;
     public string? LastError         { get; private set; }
 
-    public event Action<string>? RecordingCompleted; // saved file path
-    public event Action<string>? RecordingFailed;    // error message
+    public event Action<string>? RecordingCompleted;
+    public event Action<string>? RecordingFailed;
 
     public AudioRecordingService(AppSettings settings)
     {
         _settings = settings;
+        CleanupStaleTempFiles();
     }
 
-    // ── Start ─────────────────────────────────────────────────────────────────
+    private static void CleanupStaleTempFiles()
+    {
+        try
+        {
+            string temp = Path.GetTempPath();
+            foreach (var pattern in new[] { "ev_loopback_*.wav", "ev_mic_*.wav" })
+            {
+                foreach (var file in Directory.GetFiles(temp, pattern))
+                {
+                    try { File.Delete(file); }
+                    catch { }
+                }
+            }
+        }
+        catch { }
+    }
 
     public bool StartRecording(string appName)
     {
-        // Guard against starting while a previous StopRecordingAsync is still tearing down:
-        // IsRecording is cleared early, but captures are still alive until CleanupCaptures().
         if (IsRecording || _loopbackCapture != null || _micCapture != null) return false;
 
         LastError = null;
@@ -48,10 +63,9 @@ public class AudioRecordingService : IDisposable
             string tempFolder = Path.GetTempPath();
             var    now        = DateTime.Now;
             string manager    = Sanitize(string.IsNullOrWhiteSpace(_settings.ManagerName) ? "Менеджер" : _settings.ManagerName);
-            string platform   = Sanitize(LocalizePlatform(appName));
+            string platform   = Sanitize(PlatformHelper.ToFileName(appName));
             string baseName   = $"{manager}_{platform}_{now:yy.MM.dd}_{now:HH.mm}";
 
-            // avoid collision when two recordings start in the same minute
             string mp3Path = Path.Combine(tempFolder, $"{baseName}.mp3");
             if (File.Exists(mp3Path))
                 mp3Path = Path.Combine(tempFolder, $"{baseName}_{now:ss}.mp3");
@@ -87,22 +101,16 @@ public class AudioRecordingService : IDisposable
         }
     }
 
-    // ── Stop ──────────────────────────────────────────────────────────────────
-
     public async Task<string?> StopRecordingAsync()
     {
         if (!IsRecording) return null;
         IsRecording = false;
 
-        // Signal captures to stop and wait for RecordingStopped events
-        // (avoids Thread.Sleep — lets WASAPI flush naturally)
         await StopCapturesAsync().ConfigureAwait(false);
 
-        // Flush WAV writers to disk before reading them
         _loopbackWriter?.Dispose(); _loopbackWriter = null;
         _micWriter?.Dispose();      _micWriter      = null;
 
-        // Mix + encode on background thread so UI stays responsive
         string? path = await Task.Run(MixAndSaveToMp3).ConfigureAwait(false);
 
         CleanupCaptures();
@@ -138,15 +146,12 @@ public class AudioRecordingService : IDisposable
         _loopbackCapture?.StopRecording();
         _micCapture?.StopRecording();
 
-        // Timeout of 3s in case a capture never fires RecordingStopped
         var timeout = Task.Delay(TimeSpan.FromSeconds(3));
         await Task.WhenAll(
             Task.WhenAny(loopbackDone.Task, timeout),
             Task.WhenAny(micDone.Task,      timeout)
         ).ConfigureAwait(false);
     }
-
-    // ── Mix & encode ──────────────────────────────────────────────────────────
 
     private string? MixAndSaveToMp3()
     {
@@ -161,13 +166,11 @@ public class AudioRecordingService : IDisposable
             ISampleProvider loopback = loopbackReader.ToSampleProvider();
             ISampleProvider mic      = micReader.ToSampleProvider();
 
-            // Normalise to 44100 Hz
             if (loopback.WaveFormat.SampleRate != 44100)
                 loopback = new WdlResamplingSampleProvider(loopback, 44100);
             if (mic.WaveFormat.SampleRate != 44100)
                 mic = new WdlResamplingSampleProvider(mic, 44100);
 
-            // Normalise to stereo
             if (loopback.WaveFormat.Channels == 1)
                 loopback = new MonoToStereoSampleProvider(loopback);
             if (mic.WaveFormat.Channels == 1)
@@ -177,14 +180,11 @@ public class AudioRecordingService : IDisposable
             mixer.AddMixerInput(loopback);
             mixer.AddMixerInput(mic);
 
-            // SampleToWaveProvider16 handles float→int16 correctly
             IWaveProvider pcm = new SampleToWaveProvider16(mixer);
-
-            // temp folder always exists — no need to create it
 
             using var mp3 = new LameMP3FileWriter(_finalMp3Path, new WaveFormat(44100, 16, 2), 192);
 
-            var buffer = new byte[44100 * 2 * 2]; // ~1 s of 44100 Hz stereo 16-bit
+            var buffer = new byte[44100 * 2 * 2];
             int bytesRead;
             while ((bytesRead = pcm.Read(buffer, 0, buffer.Length)) > 0)
                 mp3.Write(buffer, 0, bytesRead);
@@ -205,8 +205,6 @@ public class AudioRecordingService : IDisposable
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private void CleanupCaptures()
     {
         _loopbackCapture?.Dispose(); _loopbackCapture = null;
@@ -220,15 +218,6 @@ public class AudioRecordingService : IDisposable
         if (!string.IsNullOrEmpty(path) && File.Exists(path))
             try { File.Delete(path); } catch { }
     }
-
-    private static string LocalizePlatform(string name) => name switch
-    {
-        "Telegram"  => "Телеграм",
-        "WhatsApp"  => "WhatsApp",
-        "Viber"     => "Viber",
-        "Ringostat" => "Ringostat",
-        _           => name,
-    };
 
     private static string Sanitize(string name)
         => string.Concat(name.Trim().Split(Path.GetInvalidFileNameChars()));

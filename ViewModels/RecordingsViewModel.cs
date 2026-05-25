@@ -29,20 +29,22 @@ public class RecordingsViewModel : ViewModelBase
 
     public bool IsEmpty => Recordings.Count == 0;
 
-    public IReadOnlyList<RecordingEntry> RecentRecordings => Recordings.Take(4).ToList();
+    private IReadOnlyList<RecordingEntry>? _recentRecordings;
+    public  IReadOnlyList<RecordingEntry>  RecentRecordings
+        => _recentRecordings ??= Recordings.Take(4).ToList();
 
     public RecordingsViewModel()
     {
         Load();
         Recordings.CollectionChanged += (_, _) =>
         {
+            _recentRecordings = null;
             OnPropertyChanged(nameof(IsEmpty));
             OnPropertyChanged(nameof(RecentRecordings));
             ScheduleSave();
         };
     }
 
-    // Must be called on the UI thread.
     public RecordingEntry AddEntry(string platform)
     {
         var entry = new RecordingEntry(platform);
@@ -53,8 +55,6 @@ public class RecordingsViewModel : ViewModelBase
 
     private void SubscribeEntry(RecordingEntry entry)
         => entry.PropertyChanged += (_, _) => ScheduleSave();
-
-    // ── Persistence ───────────────────────────────────────────────────────────
 
     private void Load()
     {
@@ -72,7 +72,6 @@ public class RecordingsViewModel : ViewModelBase
             {
                 var entry = new RecordingEntry(dto.Platform, dto.StartedAt)
                 {
-                    // Loading persisted to disk means the app was closed mid-upload — treat as error.
                     Status            = dto.Status == RecordingStatus.Loading ? RecordingStatus.Error : dto.Status,
                     DriveUrl          = dto.DriveUrl,
                     FilePath          = dto.FilePath,
@@ -87,7 +86,7 @@ public class RecordingsViewModel : ViewModelBase
                 Recordings.Add(entry);
             }
         }
-        catch { /* corrupt file — start fresh */ }
+        catch { }
         finally
         {
             _loading = false;
@@ -98,7 +97,6 @@ public class RecordingsViewModel : ViewModelBase
     {
         if (_loading) return;
 
-        // Snapshot on the UI thread; SaveAsync picks up the latest snapshot.
         _pendingSave = Recordings
             .Select(e => new RecordingDto(
                 e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath, e.SourcePath,
@@ -110,7 +108,6 @@ public class RecordingsViewModel : ViewModelBase
 
     private async Task SaveAsync()
     {
-        // If another save is already running it will loop back and pick up _pendingSave.
         if (!await _saveLock.WaitAsync(millisecondsTimeout: 0)) return;
         try
         {

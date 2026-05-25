@@ -16,7 +16,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         private set => SetField(ref _currentViewModel, value);
     }
 
-    // Holds either CallDialogViewModel or InputDialogViewModel
     private ViewModelBase? _dialog;
     public ViewModelBase? Dialog
     {
@@ -51,8 +50,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _telegram     = telegram;
         Notifications = notifications;
 
-        // Register as the permanent input handler for the main-window phase.
-        // SetupViewModel temporarily overrides this during the setup wizard.
         _telegram.InputHandler = HandleTelegramInputAsync;
 
         _homeVm.DialogRequested    += OnCallDialogRequested;
@@ -64,8 +61,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         NavigateSettingsCommand   = new RelayCommand(() => CurrentViewModel = _settingsVm);
         NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = profileVm);
     }
-
-    // ── Call dialog (from HomeViewModel) ─────────────────────────────────────
 
     private void OnCallDialogRequested(CallDialogViewModel? vm)
     {
@@ -97,8 +92,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _toast = null;
     }
 
-    // ── Call report dialog (from HomeViewModel) ───────────────────────────────
-
     private void OnCallReportRequested(CallReportViewModel? vm)
     {
         if (vm is null)
@@ -110,8 +103,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         Dialog = vm;
     }
 
-    // ── Input dialog (IDialogHost — used by SetupViewModel) ──────────────────
-
     public void ShowInputDialog(InputDialogViewModel vm)
     {
         RestoreIfMinimized();
@@ -120,13 +111,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public void HideInputDialog() => Dialog = null;
 
-    // ── Telegram input handler ────────────────────────────────────────────────
-
-    /// <summary>
-    /// Called by <see cref="TelegramUploadService"/> when WTelegramClient needs
-    /// a verification code or 2FA password during the main-window phase.
-    /// Runs on the UI thread (dispatched by the service).
-    /// </summary>
     private Task<string?> HandleTelegramInputAsync(string prompt)
     {
         var tcs = new TaskCompletionSource<string?>();
@@ -140,8 +124,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         return tcs.Task;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private static void RestoreIfMinimized()
     {
         var window = Application.Current.MainWindow;
@@ -151,8 +133,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
             window.Activate();
         }
     }
-
-    // ── IDisposable ───────────────────────────────────────────────────────────
 
     public void Dispose()
     {

@@ -8,12 +8,16 @@ using System.Text.Json;
 
 namespace Replixer.Services.Upload;
 
-public class KommoService
+public class KommoService : IDisposable
 {
     private readonly AppSettings _settings;
-    private readonly HttpClient  _http = new() { Timeout = TimeSpan.FromSeconds(30) };
 
-    // Simple in-memory cache per session
+    private readonly HttpClient _http = new(new SocketsHttpHandler
+    {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(15),
+    })
+    { Timeout = TimeSpan.FromSeconds(30) };
+
     private Dictionary<(long pid, long sid), (string pipeline, string status)>? _pipelineCache;
     private long? _firstContactFieldId;
     private long? _processingSpeedFieldId;
@@ -25,8 +29,6 @@ public class KommoService
         _settings.IsKommoEnabled &&
         !string.IsNullOrWhiteSpace(_settings.KommoApiToken) &&
         !string.IsNullOrWhiteSpace(_settings.KommoSubdomain);
-
-    // ── Public API ────────────────────────────────────────────────────────────
 
     public async Task<string?> TestConnectionAsync(string subdomain, string token)
     {
@@ -45,7 +47,6 @@ public class KommoService
         catch (Exception ex) { return ex.Message; }
     }
 
-    /// <summary>Posts note + conditionally sets first-contact date. Returns the created note ID.</summary>
     public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? leadSource = null)
     {
         if (!IsEnabled) return null;
@@ -75,8 +76,6 @@ public class KommoService
         return await noteTask;
     }
 
-    /// <summary>Updates the text of an existing note.</summary>
-    /// <returns>null on success, error message on failure.</returns>
     public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText)
     {
         if (!IsEnabled) return "Kommo: інтеграція вимкнена";
@@ -118,8 +117,6 @@ public class KommoService
         }
     }
 
-    // ── Private: note ─────────────────────────────────────────────────────────
-
     private async Task<long?> PostNoteAsync(string baseUrl, string token, string leadId, string text)
     {
         try
@@ -152,13 +149,10 @@ public class KommoService
         return null;
     }
 
-    // ── Private: first-contact date ───────────────────────────────────────────
-
     private async Task TrySetFirstContactDateAsync(string baseUrl, string token, string leadId, DateTime callStartTime)
     {
         try
         {
-            // 1. Get field IDs (cached after first call)
             long? fieldId = await GetFirstContactFieldIdAsync(baseUrl, token);
             if (fieldId is null)
             {
@@ -166,12 +160,10 @@ public class KommoService
                 return;
             }
 
-            // 2. Get lead details: pipeline, status, createdAt, field value, and CRM source — one request
             long? sourceFieldId = await GetLeadSourceFieldIdAsync(baseUrl, token);
             var (pipelineId, statusId, createdAt, isFieldAlreadySet, crmSource) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value, sourceFieldId);
 
-            // Check CRM-side source (regardless of what was selected in the app)
             if (KommoRules.ShouldSkipDates(crmSource))
             {
                 Debug.WriteLine($"[Kommo] Skipping first-contact/speed — CRM source '{crmSource}' is excluded");
@@ -186,23 +178,19 @@ public class KommoService
 
             if (pipelineId is null || statusId is null) return;
 
-            // 3. Resolve pipeline/status names (cached)
             var (pipelineName, statusName) = await ResolvePipelineStatusNamesAsync(
                 baseUrl, token, pipelineId.Value, statusId.Value);
             Debug.WriteLine($"[Kommo] Lead pipeline='{pipelineName}' status='{statusName}'");
 
-            // 4. Check rules
             if (!KommoRules.ShouldSetFirstContact(pipelineName, statusName))
             {
                 Debug.WriteLine("[Kommo] No first-contact rule matched — skipping date update");
                 return;
             }
 
-            // 5. Set first-contact date
             long unix = new DateTimeOffset(callStartTime.ToUniversalTime()).ToUnixTimeSeconds();
             await PatchLeadFieldAsync(baseUrl, token, leadId, fieldId.Value, unix);
 
-            // 6. Calculate and set processing speed (minutes since lead creation)
             if (createdAt.HasValue)
             {
                 long? speedFieldId = await GetProcessingSpeedFieldIdAsync(baseUrl, token);
@@ -335,14 +323,6 @@ public class KommoService
         return cache;
     }
 
-
-    // ── Custom field lookup ───────────────────────────────────────────────────
-
-    /// <summary>
-    /// Paginates /leads/custom_fields and returns the ID of the first field
-    /// whose name satisfies <paramref name="match"/>. Result is NOT cached here —
-    /// callers cache it in their own nullable field.
-    /// </summary>
     private async Task<long?> FindCustomFieldIdAsync(
         string baseUrl, string token, Func<string, bool> match, string logLabel)
     {
@@ -378,7 +358,7 @@ public class KommoService
                     }
                 }
 
-                if (!anyField) break; // no more pages
+                if (!anyField) break;
                 page++;
             }
             Debug.WriteLine($"[Kommo] ✗ '{logLabel}' field not found");
@@ -444,7 +424,7 @@ public class KommoService
         catch (Exception ex) { Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}"); }
     }
 
-    // ── URL parsing ───────────────────────────────────────────────────────────
+    public void Dispose() => _http.Dispose();
 
     private static (string subdomain, string? leadId) ParseLeadUrl(string url)
     {

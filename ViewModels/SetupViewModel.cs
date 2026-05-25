@@ -16,8 +16,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public event Action? SetupCompleted;
 
-    // ── Manager name & position ───────────────────────────────────────────────
-
     public static IReadOnlyList<string> Positions => Dialogs.CallReportViewModel.Positions;
 
     private string _managerName = string.Empty;
@@ -56,8 +54,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public bool CanFinish => !string.IsNullOrWhiteSpace(_managerName) && !string.IsNullOrWhiteSpace(_position);
 
-    // ── Google Drive ──────────────────────────────────────────────────────────
-
     private string _googleDriveFolderId = string.Empty;
     public string GoogleDriveFolderId
     {
@@ -92,8 +88,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     }
 
     public AsyncRelayCommand TestDriveConnectionCommand { get; }
-
-    // ── Telegram ──────────────────────────────────────────────────────────────
 
     public IReadOnlyList<TelegramChat> TelegramChats => TelegramUploadService.Chats;
 
@@ -146,8 +140,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public RelayCommand TelegramActionCommand { get; }
 
-    // ── Kommo CRM ─────────────────────────────────────────────────────────────
-
     private string _kommoSubdomain = string.Empty;
     public string KommoSubdomain
     {
@@ -195,8 +187,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public AsyncRelayCommand TestKommoConnectionCommand { get; }
 
-    // ── Dialog overlay (for Telegram verification code) ───────────────────────
-
     private ViewModelBase? _dialog;
     public ViewModelBase? Dialog
     {
@@ -207,11 +197,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     public void ShowInputDialog(InputDialogViewModel vm) => Dialog = vm;
     public void HideInputDialog() => Dialog = null;
 
-    // ── Finish ────────────────────────────────────────────────────────────────
-
     public RelayCommand FinishCommand { get; }
-
-    // ── Constructor ───────────────────────────────────────────────────────────
 
     public SetupViewModel(AppSettings settings, GoogleDriveUploadService driveUploader, TelegramUploadService telegram, KommoService kommo)
     {
@@ -220,7 +206,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         _telegram      = telegram;
         _kommo         = kommo;
 
-        // When re-opening setup (not first run), restore what the user already configured.
         if (settings.IsSetupComplete)
         {
             _managerName = settings.ManagerName;
@@ -242,8 +227,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         FinishCommand              = new RelayCommand(Finish, () => CanFinish);
     }
 
-    // ── Commands ──────────────────────────────────────────────────────────────
-
     private async Task TestDriveConnectionAsync()
     {
         IsDriveConnected     = null;
@@ -260,8 +243,6 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     private async Task AuthorizeTelegramAsync()
     {
-        // Own the InputHandler for the duration of this auth flow;
-        // MainViewModel (created later) will take it over permanently after setup.
         _telegram.InputHandler = HandleTelegramInputAsync;
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;

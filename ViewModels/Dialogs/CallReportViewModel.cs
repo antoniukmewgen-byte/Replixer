@@ -16,7 +16,6 @@ public record CallReportData(
     string PaymentProbability,
     string Note)
 {
-    // Not positional parameters — keeps old serialised records compatible.
     public string   Position      { get; init; } = "Менеджер";
     public string?  CustomOutcome { get; init; }
     public string   AppName       { get; init; } = string.Empty;
@@ -242,7 +241,7 @@ public class CallReportViewModel : ViewModelBase
     {
         "Діагност"     => !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
         "Кваліфікатор" => _selectedLeadSource is not null && !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
-        _ =>   // Менеджер
+        _ =>
             _selectedCallType   is not null &&
             _selectedLeadSource is not null &&
             (!IsRatingVisible  || _selectedRating  is not null) &&

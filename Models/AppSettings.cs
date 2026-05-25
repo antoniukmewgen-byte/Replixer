@@ -18,8 +18,6 @@ public class AppSettings : INotifyPropertyChanged
         Converters = { new JsonStringEnumConverter() },
     };
 
-    // ── Properties ───────────────────────────────────────────────────────────
-
     private MonitorMode _monitorMode = MonitorMode.Microphone;
 
     public MonitorMode MonitorMode
@@ -183,17 +181,18 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_isNotificationsEnabled == value) return; _isNotificationsEnabled = value; OnPropertyChanged(); Save(); }
     }
 
-    // ── Persistence ──────────────────────────────────────────────────────────
-
-    // Captured on the UI thread at construction time; used to dispatch
-    // serialization back to the UI thread so it never races with property setters.
-    private readonly SynchronizationContext? _uiContext;
+    private SynchronizationContext? _uiContext;
     private Timer? _saveDebounce;
+
+    private CancellationTokenSource? _saveCts;
 
     public AppSettings()
     {
         _uiContext = SynchronizationContext.Current;
     }
+
+    public void InitializeDispatch()
+        => _uiContext ??= SynchronizationContext.Current;
 
     public static AppSettings Load()
     {
@@ -207,44 +206,48 @@ public class AppSettings : INotifyPropertyChanged
                     return settings;
             }
         }
-        catch { /* corrupt file — use defaults */ }
+        catch { }
         return new AppSettings();
     }
 
     private void Save()
     {
-        // Debounce: coalesce rapid successive saves into one write 500 ms after
-        // the last change.
+        _saveCts?.Cancel();
+        _saveCts?.Dispose();
+        _saveCts = new CancellationTokenSource();
+        var token = _saveCts.Token;
+
         _saveDebounce?.Dispose();
         _saveDebounce = new Timer(_ =>
         {
+            if (token.IsCancellationRequested) return;
+
             if (_uiContext is not null)
             {
-                // Dispatch serialization to the UI thread — all property setters
-                // also run on the UI thread, so this eliminates any data race.
                 _uiContext.Post(_ =>
                 {
+                    if (token.IsCancellationRequested) return;
                     var json = JsonSerializer.Serialize(this, JsonOptions);
-                    _ = PersistAsync(json);
+                    _ = PersistAsync(json, token);
                 }, null);
             }
             else
             {
-                // Fallback (design-time / unit tests): write synchronously.
                 WriteToDisk();
             }
         }, null, dueTime: 500, period: Timeout.Infinite);
     }
 
-    /// <summary>Cancel any pending debounce and write immediately (called on app exit).</summary>
     public void Flush()
     {
+        _saveCts?.Cancel();
+        _saveCts?.Dispose();
+        _saveCts = null;
         _saveDebounce?.Dispose();
         _saveDebounce = null;
-        WriteToDisk(); // Flush is always called on the UI thread — safe to serialize here.
+        WriteToDisk();
     }
 
-    // Synchronous write used only by Flush (UI thread, app exit).
     private void WriteToDisk()
     {
         try
@@ -255,18 +258,18 @@ public class AppSettings : INotifyPropertyChanged
         catch { }
     }
 
-    // Async write used by the debounce timer after serializing on the UI thread.
-    private static async Task PersistAsync(string json)
+    private static async Task PersistAsync(string json, CancellationToken ct = default)
     {
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            await File.WriteAllTextAsync(SettingsPath, json);
+            await File.WriteAllTextAsync(SettingsPath, json, ct);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch { }
     }
-
-    // ── INotifyPropertyChanged ───────────────────────────────────────────────
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

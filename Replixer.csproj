@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Infrastructure\AppSecrets.example.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="service_account.json" Condition="Exists('service_account.json')" />
   </ItemGroup>
 

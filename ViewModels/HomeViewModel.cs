@@ -20,7 +20,6 @@ namespace Replixer.ViewModels;
 
 public sealed class HomeViewModel : ViewModelBase, IDisposable
 {
-    // MainViewModel subscribes to wire up the dialog overlay.
     public event Action<CallDialogViewModel?>?  DialogRequested;
     public event Action<CallReportViewModel?>?  CallReportRequested;
 
@@ -41,6 +40,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private string _lastDetectedApp = string.Empty;
     private DateTime? _recordingStartedAt;
 
+    private CallDialogViewModel? _currentDialog;
+
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
 
@@ -54,13 +55,18 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public HomeViewModel(AppSettings settings, IUploadOrchestrator orchestrator, RecordingsViewModel recordingsVm, IWindowManager windowManager)
+    public HomeViewModel(
+        AppSettings settings,
+        IUploadOrchestrator orchestrator,
+        RecordingsViewModel recordingsVm,
+        IWindowManager windowManager,
+        AudioRecordingService recorder)
     {
         _settings      = settings;
         _orchestrator  = orchestrator;
         _recordingsVm  = recordingsVm;
         _windowManager = windowManager;
-        _recorder      = new AudioRecordingService(settings);
+        _recorder      = recorder;
 
         _callContent = new IdleCallViewModel(StartRecording);
 
@@ -79,7 +85,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _settings.PropertyChanged += OnSettingsChanged;
 
-        // Wire commands for entries already loaded from disk.
         foreach (var entry in _recordingsVm.Recordings)
         {
             WireEntryEditCommand(entry);
@@ -88,8 +93,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
     }
-
-    // ── Monitor switching ─────────────────────────────────────────────────────
 
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -119,8 +122,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         monitor.CallDetected -= OnCallDetected;
         monitor.CallEnded    -= OnCallEnded;
     }
-
-    // ── Call events ───────────────────────────────────────────────────────────
 
     private void OnCallDetected(string app)
     {
@@ -155,8 +156,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         });
     }
 
-    // ── Recording ─────────────────────────────────────────────────────────────
-
     public void ManualStartRecording()
     {
         if (_isRecording || _isStopping) return;
@@ -173,6 +172,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         if (_isStopping) return;
         DismissDialog();
+
+        if (string.IsNullOrEmpty(_lastDetectedApp))
+            _lastDetectedApp = "Ручний запис";
+
         _isRecording        = true;
         _recordingStartedAt = DateTime.Now;
         OnPropertyChanged(nameof(IsRecording));
@@ -198,7 +201,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         DismissDialog();
         _isRecording = false;
         _isStopping  = true;
-        var callStartTime   = _recordingStartedAt;   // capture before clearing
+        var callStartTime   = _recordingStartedAt;
         _recordingStartedAt = null;
         var callDuration    = callStartTime.HasValue ? DateTime.Now - callStartTime.Value : TimeSpan.Zero;
         OnPropertyChanged(nameof(IsRecording));
@@ -206,22 +209,20 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
         WireEntryEditCommand(entry);
-        entry.SourcePath = _recorder.CurrentFilePath; // persist path immediately so retry works after crash
+        WireEntryRetryCommand(entry);
+        entry.SourcePath = _recorder.CurrentFilePath;
         try
         {
-            // Stop recording and show the report form in parallel — the form
-            // doesn't need the file, so the user sees it immediately.
             bool telegramMatters = _orchestrator.IsTelegramReady && PositionPolicy.IsTelegramVisible(_settings.Position);
             bool needsForm       = telegramMatters || _orchestrator.IsKommoEnabled;
 
             var stopTask   = _recorder.StopRecordingAsync();
             var reportTask = needsForm ? RequestCallReportAsync() : Task.FromResult<CallReportData?>(null);
 
-            // Close cheat sheet as soon as the file is ready — don't wait for the form.
             string? path = await stopTask;
             _windowManager.CloseCheatSheet();
 
-            await reportTask;
+            CallReportData? reportData = await reportTask;
 
             if (path is null)
             {
@@ -234,10 +235,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 return;
             }
 
-            // Store before upload — enables retry if upload fails or app closes mid-flight.
             entry.SourcePath = path;
 
-            CallReportData? reportData = reportTask.Result;
             if (reportData is not null)
                 reportData = reportData with
                 {
@@ -246,8 +245,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 };
             string? caption = reportData?.FormatCaption();
 
-            bool isRingostat   = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
-            bool skipTelegram  = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
+            bool isRingostat  = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
+            bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
             var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
@@ -257,7 +256,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
             entry.Status            = RecordingStatus.Saved;
-            NotificationService.ShowSuccess("Запис збережено та відправлено.");
+            ShowUploadNotification(upload);
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
         catch (Exception ex)
@@ -272,8 +271,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             _isStopping = false;
         }
     }
-
-    // ── Call report form ──────────────────────────────────────────────────────
 
     private Task<CallReportData?> RequestCallReportAsync(CallReportData? existing = null)
     {
@@ -294,8 +291,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     }
 
     private void DismissCallReport() => CallReportRequested?.Invoke(null);
-
-    // ── Edit report ───────────────────────────────────────────────────────────
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {
@@ -318,10 +313,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                       : null;
         if (retryPath is null) return;
 
-        // Show call report form (pre-filled with existing data if available).
         var reportData = await RequestCallReportAsync(existing: entry.ReportData);
         if (reportData is not null)
-            reportData = reportData with { AppName = entry.PlatformDisplayName, Duration = TimeSpan.Zero };
+            reportData = reportData with
+            {
+                AppName  = entry.PlatformDisplayName,
+                Duration = entry.ReportData?.Duration ?? TimeSpan.Zero,
+            };
 
         entry.Status = RecordingStatus.Loading;
         try
@@ -345,7 +343,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
             entry.Status            = RecordingStatus.Saved;
-            NotificationService.ShowSuccess("Запис повторно відправлено.");
+            ShowUploadNotification(upload, isRetry: true);
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
         catch (Exception ex)
@@ -370,7 +368,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 entry.TelegramTopicId,
                 caption,
                 entry.DriveUrl)
-            : Task.FromResult<string?>("Telegram: повідомлення не прив'язано");
+            : Task.FromResult<string?>(null);
 
         var kommoBase = CaptionHelper.StripHashtags(caption);
         var kommoNote = string.IsNullOrWhiteSpace(entry.DriveUrl)
@@ -378,14 +376,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             : kommoBase + $"\n💾 Google Drive: {entry.DriveUrl}";
         var kommoTask = entry.KommoNoteId.HasValue && !string.IsNullOrWhiteSpace(newData.CrmUrl)
             ? _orchestrator.EditKommoNoteAsync(newData.CrmUrl, entry.KommoNoteId.Value, kommoNote)
-            : Task.FromResult<string?>("Kommo: нотатка не прив'язана");
+            : Task.FromResult<string?>(null);
 
         await Task.WhenAll(tgTask, kommoTask);
 
         string? tgError    = tgTask.Result;
         string? kommoError = kommoTask.Result;
 
-        if (tgError is null || kommoError is null)
+        if (tgError is null && kommoError is null)
         {
             entry.ReportData = newData;
             NotificationService.ShowSuccess("Звіт оновлено.");
@@ -401,11 +399,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
     }
 
-
     private void OnRecordingsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        // Wire commands only for newly inserted entries not already wired (e.g. added via AddEntry).
-        // Entries loaded from disk are handled in the constructor.
         if (e.NewItems is null) return;
         foreach (RecordingEntry entry in e.NewItems)
         {
@@ -414,30 +409,49 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
     }
 
-    // ── Dialog helpers ────────────────────────────────────────────────────────
+    private static void ShowUploadNotification(UploadResult upload, bool isRetry = false)
+    {
+        var warnings = new List<string>();
+        if (upload.TelegramAttempted && upload.TelegramWarning is not null)
+            warnings.Add(upload.TelegramWarning);
+        if (upload.KommoAttempted && upload.KommoWarning is not null)
+            warnings.Add(upload.KommoWarning);
+
+        if (warnings.Count == 0)
+        {
+            NotificationService.ShowSuccess(isRetry ? "Запис повторно відправлено." : "Запис збережено та відправлено.");
+        }
+        else
+        {
+            var detail = string.Join("\n", warnings);
+            NotificationService.ShowError($"Запис збережено, але не всі сервіси спрацювали:\n{detail}");
+        }
+    }
 
     private void ShowDialog(CallDialogViewModel vm)
     {
+        _currentDialog?.Dispose();
+        _currentDialog   = vm;
         _hasActiveDialog = true;
         DialogRequested?.Invoke(vm);
     }
 
     private void DismissDialog()
     {
+        _currentDialog?.Dispose();
+        _currentDialog   = null;
         _hasActiveDialog = false;
         DialogRequested?.Invoke(null);
     }
 
-    // ── IDisposable ───────────────────────────────────────────────────────────
-
     public void Dispose()
     {
+        _currentDialog?.Dispose();
         _settings.PropertyChanged -= OnSettingsChanged;
         _recordingsVm.Recordings.CollectionChanged -= OnRecordingsChanged;
         Unsubscribe(_activeMonitor);
         _activeMonitor.Stop();
         _windowMonitor.Dispose();
         _micMonitor.Dispose();
-        _recorder.Dispose();
     }
 }

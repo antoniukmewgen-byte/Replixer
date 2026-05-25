@@ -38,13 +38,10 @@ public partial class NotificationItemView : UserControl
     {
         var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
 
-        // Fade out
         var fade = new DoubleAnimation(0, TimeSpan.FromSeconds(0.3)) { EasingFunction = ease };
 
-        // Slide right
         var slide = new DoubleAnimation(50, TimeSpan.FromSeconds(0.3)) { EasingFunction = ease };
 
-        // Collapse height — fires AnimationCompleted when done
         var collapse = new DoubleAnimation(0, TimeSpan.FromSeconds(0.25))
         {
             BeginTime      = TimeSpan.FromSeconds(0.15),

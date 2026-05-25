@@ -21,30 +21,29 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     }
 
     public bool IsTelegramReady => _settings.IsTelegramEnabled && _telegram.IsAuthorized;
-    public bool IsKommoEnabled => _kommo.IsEnabled;
+    public bool IsKommoEnabled  => _kommo.IsEnabled;
 
-    public async Task<UploadResult> UploadAsync(string filePath, string? telegramCaption = null, string? kommoLeadUrl = null, DateTime? callStartTime = null, string? leadSource = null, bool skipTelegram = false, CancellationToken ct = default)
+    public async Task<UploadResult> UploadAsync(
+        string filePath,
+        string? telegramCaption = null,
+        string? kommoLeadUrl    = null,
+        DateTime? callStartTime = null,
+        string? leadSource      = null,
+        bool skipTelegram       = false,
+        CancellationToken ct    = default)
     {
         bool sendTelegram = IsTelegramReady && !skipTelegram;
+
         if (_settings.IsGoogleDriveEnabled)
         {
             string? folderId = await ResolveTargetFolderAsync(ct);
             string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
 
-            int? msgId = sendTelegram
-                ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption, driveUrl)
-                : null;
+            var (tgMessageId, tgWarning) = await SendTelegramAsync(
+                sendTelegram, filePath, telegramCaption, driveUrl);
 
-            // Post to Kommo before deleting the file
-            long? kommoNoteId = null;
-            if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-            {
-                var kommoBase = CaptionHelper.StripHashtags(telegramCaption ?? string.Empty);
-                var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
-                    ? kommoBase
-                    : kommoBase + $"\n💾 Google Drive: {driveUrl}";
-                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource);
-            }
+            var (kommoNoteId, kommoWarning) = await PostKommoAsync(
+                kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource);
 
             if (driveUrl is not null)
             {
@@ -52,10 +51,14 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 return new UploadResult
                 {
                     DriveUrl          = driveUrl.Length > 0 ? driveUrl : null,
-                    TelegramMessageId = msgId,
+                    TelegramMessageId = tgMessageId,
                     TelegramChatId    = _settings.TelegramChatId,
                     TelegramTopicId   = _settings.TelegramTopicId,
+                    TelegramAttempted = sendTelegram,
+                    TelegramWarning   = tgWarning,
                     KommoNoteId       = kommoNoteId,
+                    KommoAttempted    = !string.IsNullOrWhiteSpace(kommoLeadUrl) && _kommo.IsEnabled,
+                    KommoWarning      = kommoWarning,
                 };
             }
 
@@ -63,21 +66,23 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         }
         else
         {
-            int? msgId = sendTelegram
-                ? await _telegram.SendFileAsync(filePath, _settings.TelegramChatId, _settings.TelegramTopicId, telegramCaption)
-                : null;
+            var (tgMessageId, tgWarning) = await SendTelegramAsync(
+                sendTelegram, filePath, telegramCaption, driveUrl: null);
 
-            long? kommoNoteId = null;
-            if (!string.IsNullOrWhiteSpace(kommoLeadUrl))
-                kommoNoteId = await _kommo.ProcessLeadAsync(kommoLeadUrl, CaptionHelper.StripHashtags(telegramCaption ?? string.Empty), callStartTime, leadSource);
+            var (kommoNoteId, kommoWarning) = await PostKommoAsync(
+                kommoLeadUrl, telegramCaption, driveUrl: null, callStartTime, leadSource);
 
             return new UploadResult
             {
                 LocalPath         = MoveToRecordingsFolder(filePath),
-                TelegramMessageId = msgId,
+                TelegramMessageId = tgMessageId,
                 TelegramChatId    = _settings.TelegramChatId,
                 TelegramTopicId   = _settings.TelegramTopicId,
+                TelegramAttempted = sendTelegram,
+                TelegramWarning   = tgWarning,
                 KommoNoteId       = kommoNoteId,
+                KommoAttempted    = !string.IsNullOrWhiteSpace(kommoLeadUrl) && _kommo.IsEnabled,
+                KommoWarning      = kommoWarning,
             };
         }
 
@@ -89,6 +94,38 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
     public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText)
         => _kommo.EditNoteAsync(leadUrl, noteId, noteText);
+
+    private async Task<(int? MessageId, string? Warning)> SendTelegramAsync(
+        bool send, string filePath, string? caption, string? driveUrl)
+    {
+        if (!send) return (null, null);
+
+        int? msgId = await _telegram.SendFileAsync(
+            filePath, _settings.TelegramChatId, _settings.TelegramTopicId, caption, driveUrl);
+
+        string? warning = msgId is null ? "Telegram: не вдалося відправити файл" : null;
+        return (msgId, warning);
+    }
+
+    private async Task<(long? NoteId, string? Warning)> PostKommoAsync(
+        string? kommoLeadUrl, string? telegramCaption, string? driveUrl,
+        DateTime? callStartTime, string? leadSource)
+    {
+        if (string.IsNullOrWhiteSpace(kommoLeadUrl)) return (null, null);
+
+        var kommoBase = CaptionHelper.StripHashtags(telegramCaption ?? string.Empty);
+        var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
+            ? kommoBase
+            : kommoBase + $"\n💾 Google Drive: {driveUrl}";
+
+        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource);
+
+        string? warning = noteId is null && _kommo.IsEnabled
+            ? "Kommo: не вдалося створити нотатку"
+            : null;
+
+        return (noteId, warning);
+    }
 
     private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)
     {

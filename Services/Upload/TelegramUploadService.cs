@@ -9,35 +9,19 @@ namespace Replixer.Services.Upload;
 
 public class TelegramUploadService : IDisposable
 {
-    private const int    ApiId   = 12654804;
-    private const string ApiHash = "05c29366d6fcc9c48f3778321ad99656";
+    private static int    ApiId   => AppSecrets.TelegramApiId;
+    private static string ApiHash => AppSecrets.TelegramApiHash;
 
     private static readonly string SessionPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "Replixer", "telegram_session.dat");
 
-    public static readonly IReadOnlyList<TelegramChat> Chats = new[]
-    {
-        new TelegramChat("TestGroup", 3805068290L),
-
-        new TelegramChat("Чат Kvalifikatory Team", 3836828860L,5),
-        new TelegramChat("Записи разговоров Тим лидов", 3688506342L),
-        new TelegramChat("Записи разговоров Адама", 3891343034L),
-        new TelegramChat("Стажування Move Nation", 3600976908L,261),
-        new TelegramChat("Чат Avangard Team", 3865749650L,2),
-        new TelegramChat("Чат Prime Team", 3991400384L,7),
-    };
+    public static IReadOnlyList<TelegramChat> Chats => AppSecrets.TelegramChats;
 
     private readonly AppSettings _settings;
     private WTelegram.Client? _client;
     private string? _pendingPhone;
 
-    /// <summary>
-    /// Set by the active ViewModel layer before any authorization flow that may
-    /// prompt for a verification code or 2FA password.
-    /// Called from a WTelegramClient background thread — the implementation
-    /// must be safe to await on the UI thread.
-    /// </summary>
     public Func<string, Task<string?>>? InputHandler { get; set; }
 
     public TelegramUploadService(AppSettings settings) => _settings = settings;
@@ -52,8 +36,6 @@ public class TelegramUploadService : IDisposable
             File.Delete(SessionPath);
         Debug.WriteLine("[TG] Logged out, session deleted");
     }
-
-    // ── Auth ──────────────────────────────────────────────────────────────────
 
     public async Task<(bool ok, string? error)> AuthorizeAsync(string phone)
     {
@@ -82,8 +64,6 @@ public class TelegramUploadService : IDisposable
             _pendingPhone = null;
         }
     }
-
-    // ── Send ──────────────────────────────────────────────────────────────────
 
     public async Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null)
     {
@@ -126,8 +106,6 @@ public class TelegramUploadService : IDisposable
         }
     }
 
-    // ── Edit ──────────────────────────────────────────────────────────────────
-
     public async Task<string?> EditMessageAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
     {
         Debug.WriteLine($"[TG] ── EditMessageAsync (msgId={messageId}) ───────");
@@ -165,7 +143,6 @@ public class TelegramUploadService : IDisposable
         if (string.IsNullOrWhiteSpace(driveUrl))
             return (caption, null);
 
-        // Pull trailing hashtag line out so it goes after the Drive link
         var (body, hashtagLine) = CaptionHelper.SplitHashtagSuffix(caption);
         var text = body + $"\n💾 Google Drive: {driveUrl}"
                        + (hashtagLine is null ? string.Empty : "\n" + hashtagLine);
@@ -174,14 +151,12 @@ public class TelegramUploadService : IDisposable
 
     private async Task<TL.InputPeer?> ResolvePeerAsync(long chatId)
     {
-        // Groups & channels
         var allChats = await _client!.Messages_GetAllChats();
         if (allChats.chats.TryGetValue(chatId, out var chatBase))
             return chatBase;
 
         Debug.WriteLine($"[TG] Not found in GetAllChats ({allChats.chats.Count} entries), trying GetAllDialogs…");
 
-        // Private chats / bots / users
         var dialogs = await _client.Messages_GetAllDialogs();
         if (dialogs.chats.TryGetValue(chatId, out var dialogChat))
             return dialogChat;
@@ -199,15 +174,11 @@ public class TelegramUploadService : IDisposable
         return null;
     }
 
-    // ── IDisposable ───────────────────────────────────────────────────────────
-
     public void Dispose()
     {
         _client?.Dispose();
         _client = null;
     }
-
-    // ── Private ───────────────────────────────────────────────────────────────
 
     private async Task EnsureClientAsync()
     {
@@ -230,7 +201,6 @@ public class TelegramUploadService : IDisposable
     private static string NormalizePhone(string phone)
     {
         var digits = phone.TrimStart('+').Replace(" ", "").Replace("-", "");
-        // 0XXXXXXXXX → +380XXXXXXXXX
         if (digits.StartsWith("0") && digits.Length == 10)
             digits = "380" + digits[1..];
         return "+" + digits;
@@ -249,8 +219,6 @@ public class TelegramUploadService : IDisposable
 
     private string? AskForInput(string prompt)
     {
-        // ConfigProvider is called from a WTelegramClient background thread.
-        // Post the handler call to the UI thread and block until the user responds.
         var handler = InputHandler;
         if (handler is null)
         {
@@ -258,8 +226,16 @@ public class TelegramUploadService : IDisposable
             return null;
         }
 
-        var tcs = new TaskCompletionSource<string?>();
-        Application.Current.Dispatcher.BeginInvoke(async () =>
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.HasShutdownStarted)
+        {
+            Debug.WriteLine("[TG] ✗ Dispatcher unavailable — skipping user input");
+            return null;
+        }
+
+        var tcs = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var op = dispatcher.InvokeAsync(async () =>
         {
             try
             {
@@ -272,6 +248,18 @@ public class TelegramUploadService : IDisposable
                 tcs.TrySetResult(null);
             }
         });
-        return tcs.Task.GetAwaiter().GetResult();
+
+        op.Task.ContinueWith(
+            t => tcs.TrySetResult(null),
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+
+        if (!tcs.Task.Wait(TimeSpan.FromMinutes(3)))
+        {
+            Debug.WriteLine("[TG] ✗ AskForInput timed out after 3 minutes");
+            tcs.TrySetCanceled();
+            return null;
+        }
+
+        return tcs.Task.Result;
     }
 }

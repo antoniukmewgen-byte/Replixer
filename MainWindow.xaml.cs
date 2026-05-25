@@ -28,7 +28,7 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == 0x0024) // WM_GETMINMAXINFO
+        if (msg == 0x0024)
         {
             ApplyWorkAreaConstraints(hwnd, lParam);
             handled = true;
@@ -40,7 +40,7 @@ public partial class MainWindow : Window
     {
         var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
 
-        var monitor = NativeMethods.MonitorFromWindow(hwnd, 0x00000002); // MONITOR_DEFAULTTONEAREST
+        var monitor = NativeMethods.MonitorFromWindow(hwnd, 0x00000002);
         if (monitor != IntPtr.Zero)
         {
             var info = new NativeMethods.MONITORINFO { cbSize = Marshal.SizeOf<NativeMethods.MONITORINFO>() };

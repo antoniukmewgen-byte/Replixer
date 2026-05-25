@@ -28,7 +28,6 @@ public class MicrophoneMonitorService : IMonitorService
 
         if (!_isCallActive)
         {
-            // START: both mic AND speaker must be active for the same app
             if (micApp != null && audioApp != null &&
                 string.Equals(micApp, audioApp, StringComparison.OrdinalIgnoreCase))
             {
@@ -40,8 +39,6 @@ public class MicrophoneMonitorService : IMonitorService
         }
         else
         {
-            // END: BOTH mic AND speaker must be gone for the app that started the call.
-            // Muting the mic while speaker is still active → call continues.
             bool micActive   = string.Equals(micApp,   _activeApp, StringComparison.OrdinalIgnoreCase);
             bool audioActive = string.Equals(audioApp, _activeApp, StringComparison.OrdinalIgnoreCase);
 
@@ -54,8 +51,6 @@ public class MicrophoneMonitorService : IMonitorService
             }
         }
     }
-
-    // ── Microphone (registry) ─────────────────────────────────────────────────
 
     private string? GetMicrophoneActiveApp()
     {
@@ -90,12 +85,10 @@ public class MicrophoneMonitorService : IMonitorService
             using var pkgKey = rootKey.OpenSubKey(subKeyName);
             if (pkgKey == null) continue;
 
-            // Check values directly in the package key
             var directStop = pkgKey.GetValue("LastUsedTimeStop");
             if (directStop is long t0 && t0 == 0)
                 return match;
 
-            // MSIX packaged apps (e.g. WhatsApp) store usage in a per-app-id child subkey
             foreach (var childName in pkgKey.GetSubKeyNames())
             {
                 if (IsMicActiveInSubKey(pkgKey.OpenSubKey(childName)))
@@ -116,17 +109,12 @@ public class MicrophoneMonitorService : IMonitorService
         }
     }
 
-    // ── Audio output / speaker (WASAPI) ───────────────────────────────────────
-
     private string? GetAudioOutputActiveApp()
     {
         try
         {
             using var enumerator = new MMDeviceEnumerator();
 
-            // Check both Multimedia and Communications render endpoints.
-            // WhatsApp calls route audio through the Communications device, which
-            // may differ from the Multimedia device when headphones are connected.
             var roles = new[] { Role.Multimedia, Role.Communications };
             foreach (var role in roles)
             {
@@ -154,7 +142,7 @@ public class MicrophoneMonitorService : IMonitorService
                                 return match;
                             }
                         }
-                        catch { /* process may have exited */ }
+                        catch { }
                     }
                 }
             }

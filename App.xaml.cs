@@ -30,6 +30,8 @@ public partial class App : Application
 
         _services = BuildServices();
 
+        _services.GetRequiredService<AppSettings>().InitializeDispatch();
+
         var settings = _services.GetRequiredService<AppSettings>();
         if (!settings.IsSetupComplete)
             ShowSetupWindow();
@@ -85,6 +87,11 @@ public partial class App : Application
         _services?.GetService<AppSettings>()?.Flush();
         if (_mainWindowStarted)
             _services?.GetService<MainViewModel>()?.Dispose();
+
+        _services?.GetService<NotificationsViewModel>()?.Dispose();
+
+        _services?.GetService<TrayViewModel>()?.Dispose();
+
         _notifyIcon?.Dispose();
         _services?.Dispose();
         base.OnExit(e);
@@ -93,6 +100,7 @@ public partial class App : Application
     private static ServiceProvider BuildServices()
         => new ServiceCollection()
             .AddCoreServices()
+            .AddRecordingServices()
             .AddUploadServices()
             .AddViewModels()
             .AddViews()

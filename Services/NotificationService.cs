@@ -2,10 +2,6 @@ namespace Replixer.Services;
 
 public enum NotificationType { Success, Error }
 
-/// <summary>
-/// Lightweight static event bus for UI toast notifications.
-/// Any service or view-model can raise an event; NotificationsViewModel subscribes.
-/// </summary>
 public static class NotificationService
 {
     public static event Action<string, NotificationType>? Raised;
