@@ -24,6 +24,7 @@ public class KommoService : IDisposable
     private long? _processingSpeedFieldId;
     private long? _leadSourceFieldId;
     private long? _callTypeFieldId;
+    private bool  _fieldIdsLoaded;
 
     public KommoService(AppSettings settings) => _settings = settings;
 
@@ -64,6 +65,8 @@ public class KommoService : IDisposable
 
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
         string token   = _settings.KommoApiToken;
+
+        await EnsureAllFieldIdsAsync(baseUrl, token);
 
         bool skipDates = KommoRules.ShouldSkipDates(leadSource);
         if (skipDates)
@@ -158,14 +161,14 @@ public class KommoService : IDisposable
     {
         try
         {
-            long? fieldId = await GetFirstContactFieldIdAsync(baseUrl, token);
+            long? fieldId = _firstContactFieldId;
             if (fieldId is null)
             {
                 Debug.WriteLine("[Kommo] 'Дата и время первого касания' field not found");
                 return;
             }
 
-            long? sourceFieldId = await GetLeadSourceFieldIdAsync(baseUrl, token);
+            long? sourceFieldId = _leadSourceFieldId;
             var (pipelineId, statusId, createdAt, isFieldAlreadySet, crmSource) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value, sourceFieldId);
 
@@ -198,7 +201,7 @@ public class KommoService : IDisposable
 
             if (createdAt.HasValue)
             {
-                long? speedFieldId = await GetProcessingSpeedFieldIdAsync(baseUrl, token);
+                long? speedFieldId = _processingSpeedFieldId;
                 if (speedFieldId is not null)
                 {
                     var leadCreated = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
@@ -328,9 +331,9 @@ public class KommoService : IDisposable
         return cache;
     }
 
-    private async Task<long?> FindCustomFieldIdAsync(
-        string baseUrl, string token, Func<string, bool> match, string logLabel)
+    private async Task EnsureAllFieldIdsAsync(string baseUrl, string token)
     {
+        if (_fieldIdsLoaded) return;
         try
         {
             int page = 1;
@@ -341,7 +344,7 @@ public class KommoService : IDisposable
                 req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var res  = await _http.SendAsync(req);
                 var body = await res.Content.ReadAsStringAsync();
-                Debug.WriteLine($"[Kommo] CustomFields GET '{logLabel}' page={page} → {(int)res.StatusCode}");
+                Debug.WriteLine($"[Kommo] CustomFields GET page={page} → {(int)res.StatusCode}");
                 if (!res.IsSuccessStatusCode) break;
 
                 using var doc = JsonDocument.Parse(body);
@@ -352,82 +355,56 @@ public class KommoService : IDisposable
                 foreach (var field in fields.EnumerateArray())
                 {
                     anyField = true;
-                    var name = field.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    if (!field.TryGetProperty("name", out var n)) continue;
+                    var name = n.GetString();
                     if (name is null) continue;
+                    long id = field.GetProperty("id").GetInt64();
 
-                    if (match(name))
-                    {
-                        long id = field.GetProperty("id").GetInt64();
-                        Debug.WriteLine($"[Kommo] ✓ Found '{logLabel}' field id={id} name='{name}'");
-                        return id;
-                    }
+                    if (!_firstContactFieldId.HasValue &&
+                        (name.Contains("первого касания",  StringComparison.OrdinalIgnoreCase) ||
+                         name.Contains("першого контакту", StringComparison.OrdinalIgnoreCase) ||
+                         name.Contains("першого касання",  StringComparison.OrdinalIgnoreCase)))
+                        _firstContactFieldId = id;
+
+                    else if (!_processingSpeedFieldId.HasValue &&
+                        (name.Contains("Скорость обработки", StringComparison.OrdinalIgnoreCase) ||
+                         name.Contains("Швидкість обробки",  StringComparison.OrdinalIgnoreCase)))
+                        _processingSpeedFieldId = id;
+
+                    else if (!_leadSourceFieldId.HasValue &&
+                        (name.Equals("Источник",      StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Джерело",       StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Источник лида", StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Джерело ліда",  StringComparison.OrdinalIgnoreCase)))
+                        _leadSourceFieldId = id;
+
+                    else if (!_callTypeFieldId.HasValue &&
+                        (name.Equals("Тип дзвінка",  StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Тип дзвінку",  StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Тип дзвонка",  StringComparison.OrdinalIgnoreCase) ||
+                         name.Equals("Тип звонка",   StringComparison.OrdinalIgnoreCase)))
+                        _callTypeFieldId = id;
                 }
 
                 if (!anyField) break;
                 page++;
             }
-            Debug.WriteLine($"[Kommo] ✗ '{logLabel}' field not found");
         }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] FindCustomField('{logLabel}') failed: {ex.Message}"); }
-        return null;
-    }
-
-    private async Task<long?> GetFirstContactFieldIdAsync(string baseUrl, string token)
-    {
-        if (_firstContactFieldId.HasValue) return _firstContactFieldId;
-        _firstContactFieldId = await FindCustomFieldIdAsync(baseUrl, token,
-            name => name.Contains("первого касания",  StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("першого контакту", StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("першого касання",  StringComparison.OrdinalIgnoreCase),
-            "first-contact date");
-        return _firstContactFieldId;
-    }
-
-    private async Task<long?> GetProcessingSpeedFieldIdAsync(string baseUrl, string token)
-    {
-        if (_processingSpeedFieldId.HasValue) return _processingSpeedFieldId;
-        _processingSpeedFieldId = await FindCustomFieldIdAsync(baseUrl, token,
-            name => name.Contains("Скорость обработки", StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("Швидкість обробки",  StringComparison.OrdinalIgnoreCase),
-            "processing speed");
-        return _processingSpeedFieldId;
-    }
-
-    private async Task<long?> GetLeadSourceFieldIdAsync(string baseUrl, string token)
-    {
-        if (_leadSourceFieldId.HasValue) return _leadSourceFieldId;
-        _leadSourceFieldId = await FindCustomFieldIdAsync(baseUrl, token,
-            name => name.Equals("Источник",      StringComparison.OrdinalIgnoreCase) ||
-                    name.Equals("Джерело",       StringComparison.OrdinalIgnoreCase) ||
-                    name.Equals("Источник лида", StringComparison.OrdinalIgnoreCase) ||
-                    name.Equals("Джерело ліда",  StringComparison.OrdinalIgnoreCase),
-            "lead source");
-        return _leadSourceFieldId;
-    }
-
-    private async Task<long?> GetCallTypeFieldIdAsync(string baseUrl, string token)
-    {
-        if (_callTypeFieldId.HasValue) return _callTypeFieldId;
-        _callTypeFieldId = await FindCustomFieldIdAsync(baseUrl, token,
-            name => name.Equals("Тип дзвінка",  StringComparison.OrdinalIgnoreCase) ||
-                    name.Equals("Тип дзвінку",  StringComparison.OrdinalIgnoreCase) ||
-                    name.Equals("Тип звонка",   StringComparison.OrdinalIgnoreCase),
-            "call type");
-        return _callTypeFieldId;
+        catch (Exception ex) { Debug.WriteLine($"[Kommo] EnsureAllFieldIds failed: {ex.Message}"); }
+        finally { _fieldIdsLoaded = true; }
     }
 
     private async Task SetCallTypeAsync(string baseUrl, string token, string leadId, string callType)
     {
         try
         {
-            long? fieldId = await GetCallTypeFieldIdAsync(baseUrl, token);
-            if (fieldId is null)
+            if (_callTypeFieldId is null)
             {
                 Debug.WriteLine("[Kommo] 'Тип дзвінка' field not found");
                 NotificationService.ShowError("Kommo: поле «Тип дзвінка» не знайдено в CRM. Створіть його у вкладці «Технічні».");
                 return;
             }
-            await PatchLeadFieldAsync(baseUrl, token, leadId, fieldId.Value, (object)callType);
+            await PatchLeadFieldAsync(baseUrl, token, leadId, _callTypeFieldId.Value, (object)callType);
         }
         catch (Exception ex) { Debug.WriteLine($"[Kommo] SetCallType failed: {ex.Message}"); }
     }
