@@ -1,5 +1,6 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -22,6 +23,7 @@ public class KommoService : IDisposable
     private long? _firstContactFieldId;
     private long? _processingSpeedFieldId;
     private long? _leadSourceFieldId;
+    private long? _callTypeFieldId;
 
     public KommoService(AppSettings settings) => _settings = settings;
 
@@ -47,7 +49,7 @@ public class KommoService : IDisposable
         catch (Exception ex) { return ex.Message; }
     }
 
-    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? leadSource = null)
+    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? leadSource = null, string? callType = null)
     {
         if (!IsEnabled) return null;
 
@@ -67,12 +69,15 @@ public class KommoService : IDisposable
         if (skipDates)
             Debug.WriteLine($"[Kommo] Skipping first-contact/speed fields for source '{leadSource}'");
 
-        var noteTask = PostNoteAsync(baseUrl, token, leadId, noteText);
-        var dateTask = callStartTime.HasValue && !skipDates
+        var noteTask     = PostNoteAsync(baseUrl, token, leadId, noteText);
+        var dateTask     = callStartTime.HasValue && !skipDates
             ? TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime.Value)
             : Task.CompletedTask;
+        var callTypeTask = !string.IsNullOrWhiteSpace(callType)
+            ? SetCallTypeAsync(baseUrl, token, leadId, callType)
+            : Task.CompletedTask;
 
-        await Task.WhenAll(noteTask, dateTask);
+        await Task.WhenAll(noteTask, dateTask, callTypeTask);
         return await noteTask;
     }
 
@@ -400,7 +405,34 @@ public class KommoService : IDisposable
         return _leadSourceFieldId;
     }
 
-    private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, long unixTimestamp)
+    private async Task<long?> GetCallTypeFieldIdAsync(string baseUrl, string token)
+    {
+        if (_callTypeFieldId.HasValue) return _callTypeFieldId;
+        _callTypeFieldId = await FindCustomFieldIdAsync(baseUrl, token,
+            name => name.Equals("Тип дзвінка",  StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Тип дзвінку",  StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Тип звонка",   StringComparison.OrdinalIgnoreCase),
+            "call type");
+        return _callTypeFieldId;
+    }
+
+    private async Task SetCallTypeAsync(string baseUrl, string token, string leadId, string callType)
+    {
+        try
+        {
+            long? fieldId = await GetCallTypeFieldIdAsync(baseUrl, token);
+            if (fieldId is null)
+            {
+                Debug.WriteLine("[Kommo] 'Тип дзвінка' field not found");
+                NotificationService.ShowError("Kommo: поле «Тип дзвінка» не знайдено в CRM. Створіть його у вкладці «Технічні».");
+                return;
+            }
+            await PatchLeadFieldAsync(baseUrl, token, leadId, fieldId.Value, (object)callType);
+        }
+        catch (Exception ex) { Debug.WriteLine($"[Kommo] SetCallType failed: {ex.Message}"); }
+    }
+
+    private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, object value)
     {
         try
         {
@@ -408,7 +440,7 @@ public class KommoService : IDisposable
             {
                 custom_fields_values = new[]
                 {
-                    new { field_id = fieldId, values = new[] { new { value = unixTimestamp } } }
+                    new { field_id = fieldId, values = new[] { new { value } } }
                 }
             });
 
@@ -419,7 +451,7 @@ public class KommoService : IDisposable
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var res = await _http.SendAsync(req);
-            Debug.WriteLine($"[Kommo] PatchLead (first-contact) → {(int)res.StatusCode}");
+            Debug.WriteLine($"[Kommo] PatchLead → {(int)res.StatusCode}");
         }
         catch (Exception ex) { Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}"); }
     }

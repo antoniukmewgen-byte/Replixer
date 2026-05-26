@@ -113,7 +113,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     private Task<string?> HandleTelegramInputAsync(string prompt)
     {
-        var tcs = new TaskCompletionSource<string?>();
+        var tcs = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
         RestoreIfMinimized();
         var vm = new InputDialogViewModel(prompt, result =>
         {

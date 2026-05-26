@@ -96,7 +96,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _position == "Кваліфікатор"
             ? TelegramChats.Where(c => c.Name == "Чат Kvalifikatory Team").ToList()
-            : TelegramChats;
+            : TelegramChats.Where(c => c.Name != "Чат Kvalifikatory Team").ToList();
 
     private TelegramChat? _selectedTelegramChat;
     public TelegramChat? SelectedTelegramChat

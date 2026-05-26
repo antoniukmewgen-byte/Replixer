@@ -30,6 +30,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         DateTime? callStartTime = null,
         string? leadSource      = null,
         bool skipTelegram       = false,
+        string? callType        = null,
         CancellationToken ct    = default)
     {
         bool sendTelegram = IsTelegramReady && !skipTelegram;
@@ -43,7 +44,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 sendTelegram, filePath, telegramCaption, driveUrl);
 
             var (kommoNoteId, kommoWarning) = await PostKommoAsync(
-                kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource);
+                kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
 
             if (driveUrl is not null)
             {
@@ -63,15 +64,6 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             }
 
             Debug.WriteLine("[Upload] Drive upload failed — falling back to local save");
-        }
-        else
-        {
-            var (tgMessageId, tgWarning) = await SendTelegramAsync(
-                sendTelegram, filePath, telegramCaption, driveUrl: null);
-
-            var (kommoNoteId, kommoWarning) = await PostKommoAsync(
-                kommoLeadUrl, telegramCaption, driveUrl: null, callStartTime, leadSource);
-
             return new UploadResult
             {
                 LocalPath         = MoveToRecordingsFolder(filePath),
@@ -86,7 +78,24 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             };
         }
 
-        return new UploadResult { LocalPath = MoveToRecordingsFolder(filePath) };
+        var (tgMsgId, tgWarn) = await SendTelegramAsync(
+            sendTelegram, filePath, telegramCaption, driveUrl: null);
+
+        var (kommoId, kommoWarn) = await PostKommoAsync(
+            kommoLeadUrl, telegramCaption, driveUrl: null, callStartTime, leadSource, callType);
+
+        return new UploadResult
+        {
+            LocalPath         = MoveToRecordingsFolder(filePath),
+            TelegramMessageId = tgMsgId,
+            TelegramChatId    = _settings.TelegramChatId,
+            TelegramTopicId   = _settings.TelegramTopicId,
+            TelegramAttempted = sendTelegram,
+            TelegramWarning   = tgWarn,
+            KommoNoteId       = kommoId,
+            KommoAttempted    = !string.IsNullOrWhiteSpace(kommoLeadUrl) && _kommo.IsEnabled,
+            KommoWarning      = kommoWarn,
+        };
     }
 
     public Task<string?> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
@@ -109,7 +118,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
 
     private async Task<(long? NoteId, string? Warning)> PostKommoAsync(
         string? kommoLeadUrl, string? telegramCaption, string? driveUrl,
-        DateTime? callStartTime, string? leadSource)
+        DateTime? callStartTime, string? leadSource, string? callType = null)
     {
         if (string.IsNullOrWhiteSpace(kommoLeadUrl)) return (null, null);
 
@@ -118,7 +127,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             ? kommoBase
             : kommoBase + $"\n💾 Google Drive: {driveUrl}";
 
-        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource);
+        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource, callType);
 
         string? warning = noteId is null && _kommo.IsEnabled
             ? "Kommo: не вдалося створити нотатку"

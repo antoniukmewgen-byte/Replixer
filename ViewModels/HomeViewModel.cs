@@ -249,7 +249,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
             bool isRingostat  = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
             bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
-            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram);
+            string? callType  = ResolveCallType(reportData);
+            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram, callType);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;
@@ -329,13 +330,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             var caption      = reportData?.FormatCaption();
             var crmUrl       = reportData?.CrmUrl;
             bool isRingostat = entry.Platform.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
+            string? callType = ResolveCallType(reportData);
 
             var upload = await _orchestrator.UploadAsync(
                 retryPath,
                 caption,
                 isRingostat ? null : crmUrl,
                 entry.StartedAt,
-                reportData?.LeadSource);
+                reportData?.LeadSource,
+                callType: callType);
 
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath ?? entry.FilePath;
@@ -428,6 +431,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             var detail = string.Join("\n", warnings);
             NotificationService.ShowError($"Запис збережено, але не всі сервіси спрацювали:\n{detail}");
         }
+    }
+
+    private static string? ResolveCallType(CallReportData? reportData)
+    {
+        if (reportData is null || string.IsNullOrEmpty(reportData.CallType)) return null;
+        return reportData.CallType == "Інший" && !string.IsNullOrWhiteSpace(reportData.CustomCallType)
+            ? reportData.CustomCallType
+            : reportData.CallType;
     }
 
     private void ShowDialog(CallDialogViewModel vm)

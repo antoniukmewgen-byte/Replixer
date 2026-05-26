@@ -85,7 +85,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     public IReadOnlyList<TelegramChat> FilteredTelegramChats =>
         _settings.Position == "Кваліфікатор"
             ? TelegramChats.Where(c => c.Name == "Чат Kvalifikatory Team").ToList()
-            : TelegramChats;
+            : TelegramChats.Where(c => c.Name != "Чат Kvalifikatory Team").ToList();
 
     private TelegramChat? _selectedTelegramChat;
     public TelegramChat? SelectedTelegramChat

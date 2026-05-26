@@ -28,6 +28,7 @@ public interface IUploadOrchestrator
         DateTime? callStartTime = null,
         string? leadSource      = null,
         bool skipTelegram       = false,
+        string? callType        = null,
         CancellationToken ct    = default);
 
     Task<string?> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null);

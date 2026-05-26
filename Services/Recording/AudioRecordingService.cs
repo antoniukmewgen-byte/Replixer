@@ -27,9 +27,6 @@ public class AudioRecordingService : IDisposable
     public string? CurrentFilePath   => _finalMp3Path;
     public string? LastError         { get; private set; }
 
-    public event Action<string>? RecordingCompleted;
-    public event Action<string>? RecordingFailed;
-
     public AudioRecordingService(AppSettings settings)
     {
         _settings = settings;
@@ -117,14 +114,7 @@ public class AudioRecordingService : IDisposable
         CleanupCaptures();
 
         if (path != null)
-        {
             LastSavedFilePath = path;
-            RecordingCompleted?.Invoke(path);
-        }
-        else
-        {
-            RecordingFailed?.Invoke("Не вдалося зберегти запис");
-        }
 
         return path;
     }
