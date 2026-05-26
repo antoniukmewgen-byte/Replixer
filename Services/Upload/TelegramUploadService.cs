@@ -1,5 +1,6 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -257,6 +258,8 @@ public class TelegramUploadService : IDisposable
         {
             Debug.WriteLine("[TG] ✗ AskForInput timed out after 3 minutes");
             tcs.TrySetCanceled();
+            dispatcher.BeginInvoke(() =>
+                NotificationService.ShowError("Час очікування введення Telegram вийшов. Спробуйте авторизуватися знову."));
             return null;
         }
 

@@ -98,14 +98,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         if (e.PropertyName != nameof(AppSettings.MonitorMode)) return;
 
+        var prev = _activeMonitor;
         var next = GetMonitorForMode(_settings.MonitorMode);
-        if (next == _activeMonitor) return;
+        if (next == prev) return;
 
-        Unsubscribe(_activeMonitor);
-        _activeMonitor.Stop();
+        Unsubscribe(prev);
+        prev.Stop();
+
         _activeMonitor = next;
-        Subscribe(_activeMonitor);
-        _activeMonitor.Start();
+        Subscribe(next);
+        next.Start();
     }
 
     private IMonitorService GetMonitorForMode(MonitorMode mode)

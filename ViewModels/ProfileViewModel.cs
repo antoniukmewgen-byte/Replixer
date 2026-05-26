@@ -204,7 +204,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         DriveConnectionError = null;
         IsCheckingDrive      = true;
         string? error = await _uploader.TestFolderAccessAsync(_settings.GoogleDriveFolderId);
-        Application.Current.Dispatcher.Invoke(() =>
+        await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             IsCheckingDrive      = false;
             IsDriveConnected     = error is null;
@@ -218,7 +218,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         KommoConnectionError = null;
         IsCheckingKommo      = true;
         string? error = await _kommo.TestConnectionAsync(_settings.KommoSubdomain, _settings.KommoApiToken);
-        Application.Current.Dispatcher.Invoke(() =>
+        await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             IsCheckingKommo      = false;
             IsKommoConnected     = error is null;
@@ -234,7 +234,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;
         var (ok, error) = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
-        Application.Current.Dispatcher.Invoke(() =>
+        await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             IsAuthorizingTelegram = false;
             IsTelegramConnected   = ok ? true : (bool?)false;

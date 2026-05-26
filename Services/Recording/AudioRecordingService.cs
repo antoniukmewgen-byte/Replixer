@@ -111,7 +111,8 @@ public class AudioRecordingService : IDisposable
         _loopbackWriter?.Dispose(); _loopbackWriter = null;
         _micWriter?.Dispose();      _micWriter      = null;
 
-        string? path = await Task.Run(MixAndSaveToMp3).ConfigureAwait(false);
+        using var mixCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        string? path = await Task.Run(() => MixAndSaveToMp3(mixCts.Token)).ConfigureAwait(false);
 
         CleanupCaptures();
 
@@ -153,7 +154,7 @@ public class AudioRecordingService : IDisposable
         ).ConfigureAwait(false);
     }
 
-    private string? MixAndSaveToMp3()
+    private string? MixAndSaveToMp3(CancellationToken ct = default)
     {
         if (_loopbackTempPath is null || _micTempPath is null || _finalMp3Path is null)
             return null;
@@ -187,10 +188,19 @@ public class AudioRecordingService : IDisposable
             var buffer = new byte[44100 * 2 * 2];
             int bytesRead;
             while ((bytesRead = pcm.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                ct.ThrowIfCancellationRequested();
                 mp3.Write(buffer, 0, bytesRead);
+            }
 
             Debug.WriteLine($"[Recording] Saved → {_finalMp3Path}");
             return _finalMp3Path;
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.WriteLine("[Recording] Mix timed out after 5 minutes");
+            LastError = "Час обробки аудіо вийшов";
+            return null;
         }
         catch (Exception ex)
         {

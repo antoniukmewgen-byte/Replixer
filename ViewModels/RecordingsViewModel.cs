@@ -2,6 +2,7 @@ using Replixer.Models;
 using Replixer.ViewModels.Dialogs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -119,7 +120,10 @@ public class RecordingsViewModel : ViewModelBase
                 await File.WriteAllTextAsync(SavePath, json);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Recordings] Save failed: {ex.Message}");
+        }
         finally
         {
             _saveLock.Release();

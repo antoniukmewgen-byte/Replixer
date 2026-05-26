@@ -183,8 +183,8 @@ public class AppSettings : INotifyPropertyChanged
 
     private SynchronizationContext? _uiContext;
     private Timer? _saveDebounce;
-
     private CancellationTokenSource? _saveCts;
+    private readonly object _saveSyncLock = new();
 
     public AppSettings()
     {
@@ -212,39 +212,41 @@ public class AppSettings : INotifyPropertyChanged
 
     private void Save()
     {
-        _saveCts?.Cancel();
-        _saveCts?.Dispose();
-        _saveCts = new CancellationTokenSource();
-        var token = _saveCts.Token;
-
-        _saveDebounce?.Dispose();
-        _saveDebounce = new Timer(_ =>
+        lock (_saveSyncLock)
         {
-            if (token.IsCancellationRequested) return;
+            _saveCts?.Cancel();
+            _saveCts?.Dispose();
+            _saveCts = new CancellationTokenSource();
+            var token = _saveCts.Token;
 
-            if (_uiContext is not null)
+            _saveDebounce?.Dispose();
+            _saveDebounce = new Timer(_ =>
             {
-                _uiContext.Post(_ =>
-                {
-                    if (token.IsCancellationRequested) return;
-                    var json = JsonSerializer.Serialize(this, JsonOptions);
-                    _ = PersistAsync(json, token);
-                }, null);
-            }
-            else
-            {
-                WriteToDisk();
-            }
-        }, null, dueTime: 500, period: Timeout.Infinite);
+                if (token.IsCancellationRequested) return;
+
+                if (_uiContext is not null)
+                    _uiContext.Post(_ =>
+                    {
+                        if (token.IsCancellationRequested) return;
+                        var json = JsonSerializer.Serialize(this, JsonOptions);
+                        _ = PersistAsync(json, token);
+                    }, null);
+                else
+                    WriteToDisk();
+            }, null, dueTime: 500, period: Timeout.Infinite);
+        }
     }
 
     public void Flush()
     {
-        _saveCts?.Cancel();
-        _saveCts?.Dispose();
-        _saveCts = null;
-        _saveDebounce?.Dispose();
-        _saveDebounce = null;
+        lock (_saveSyncLock)
+        {
+            _saveCts?.Cancel();
+            _saveCts?.Dispose();
+            _saveCts = null;
+            _saveDebounce?.Dispose();
+            _saveDebounce = null;
+        }
         WriteToDisk();
     }
 

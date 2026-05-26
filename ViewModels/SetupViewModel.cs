@@ -233,7 +233,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         DriveConnectionError = null;
         IsCheckingDrive      = true;
         string? error = await _driveUploader.TestFolderAccessAsync(_googleDriveFolderId);
-        Application.Current.Dispatcher.Invoke(() =>
+        await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             IsCheckingDrive      = false;
             IsDriveConnected     = error is null;
@@ -249,7 +249,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         try
         {
             var (ok, error) = await _telegram.AuthorizeAsync(_telegramPhone);
-            Application.Current.Dispatcher.Invoke(() =>
+            await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 IsAuthorizingTelegram = false;
                 IsTelegramConnected   = ok ? true : (bool?)false;
@@ -280,7 +280,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         KommoConnectionError = null;
         IsCheckingKommo      = true;
         string? error = await _kommo.TestConnectionAsync(_kommoSubdomain, _kommoApiToken);
-        Application.Current.Dispatcher.Invoke(() =>
+        await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             IsCheckingKommo      = false;
             IsKommoConnected     = error is null;
