@@ -12,6 +12,7 @@ namespace Replixer.Services;
 internal static class ErrorReporter
 {
     private static string _userName = "Unknown";
+    private static Timer? _retryTimer;
 
     private static readonly HttpClient _http = new(new SocketsHttpHandler
     {
@@ -26,7 +27,11 @@ internal static class ErrorReporter
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?";
 
     public static void Configure(AppSettings settings)
-        => _userName = settings.ManagerName.Trim() is { Length: > 0 } n ? n : "Unknown";
+    {
+        _userName = settings.ManagerName.Trim() is { Length: > 0 } n ? n : "Unknown";
+        _retryTimer = new Timer(_ => _ = FlushQueueAsync(), null,
+            TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+    }
 
     // Normal (recoverable) errors — fire and forget
     public static void Report(string category, string message, Exception? ex = null)
