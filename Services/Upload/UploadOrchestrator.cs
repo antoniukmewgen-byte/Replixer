@@ -63,10 +63,10 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 };
             }
 
-            Debug.WriteLine("[Upload] Drive upload failed — falling back to local save");
+            Debug.WriteLine("[Upload] Drive upload failed — file remains in temp for retry");
             return new UploadResult
             {
-                LocalPath         = MoveToRecordingsFolder(filePath),
+                DriveWarning      = "Google Drive: не вдалося завантажити файл",
                 TelegramMessageId = tgMessageId,
                 TelegramChatId    = _settings.TelegramChatId,
                 TelegramTopicId   = _settings.TelegramTopicId,

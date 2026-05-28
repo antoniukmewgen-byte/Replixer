@@ -258,7 +258,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramTopicId   = upload.TelegramTopicId;
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
-            entry.Status            = RecordingStatus.Saved;
+
+            if (upload.DriveWarning is not null)
+            {
+                entry.Status = RecordingStatus.Error;
+                NotificationService.ShowError($"Запис не збережено:\n{upload.DriveWarning}");
+                return;
+            }
+
+            entry.Status = RecordingStatus.Saved;
             ShowUploadNotification(upload);
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }
@@ -347,7 +355,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramTopicId   = upload.TelegramTopicId;
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
-            entry.Status            = RecordingStatus.Saved;
+
+            if (upload.DriveWarning is not null)
+            {
+                entry.Status = RecordingStatus.Error;
+                NotificationService.ShowError($"Запис не збережено:\n{upload.DriveWarning}");
+                return;
+            }
+
+            entry.Status = RecordingStatus.Saved;
             ShowUploadNotification(upload, isRetry: true);
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
         }

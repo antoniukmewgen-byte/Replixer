@@ -2,6 +2,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Upload;
+using Replixer.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -156,6 +157,7 @@ public class GoogleDriveUploadService
                 ? $"{result.Exception.GetType().Name}: {result.Exception.Message}"
                 : "Unknown error";
             Debug.WriteLine($"[GDrive] ✗ Upload failed: {error}");
+            ErrorReporter.Report("GOOGLE_DRIVE", $"Upload failed: {error}", result.Exception);
             return null;
         }
         catch (OperationCanceledException)
@@ -167,6 +169,7 @@ public class GoogleDriveUploadService
         {
             Debug.WriteLine($"[GDrive] ✗ Exception: {ex.GetType().Name}: {ex.Message}");
             Debug.WriteLine($"[GDrive]   StackTrace: {ex.StackTrace}");
+            ErrorReporter.Report("GOOGLE_DRIVE", $"Upload exception: {ex.Message}", ex);
             return null;
         }
         finally

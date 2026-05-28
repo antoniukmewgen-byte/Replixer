@@ -82,7 +82,10 @@ public class TelegramUploadService : IDisposable
 
             TL.InputPeer? peer = await ResolvePeerAsync(chatId);
             if (peer == null)
+            {
+                ErrorReporter.Report("TELEGRAM", $"Чат не знайдений (chatId={chatId})");
                 return null;
+            }
 
             Debug.WriteLine($"[TG] Peer resolved: {peer}");
             Debug.WriteLine("[TG] Uploading file…");
@@ -99,6 +102,7 @@ public class TelegramUploadService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] ✗ Send failed: {ex.Message}");
+            ErrorReporter.Report("TELEGRAM", $"SendFile failed: {ex.Message}", ex);
             return null;
         }
         finally
@@ -195,6 +199,7 @@ public class TelegramUploadService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] ✗ Failed to restore session: {ex.Message}");
+            ErrorReporter.Report("TELEGRAM", $"Не вдалося відновити сесію: {ex.Message}", ex);
             _client = null;
         }
     }

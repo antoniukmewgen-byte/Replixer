@@ -2,6 +2,7 @@ using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.DependencyInjection;
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using Replixer.Services.Manager;
 using Replixer.ViewModels;
 using Replixer.Views;
@@ -33,6 +34,26 @@ public partial class App : Application
         _services.GetRequiredService<AppSettings>().InitializeDispatch();
 
         var settings = _services.GetRequiredService<AppSettings>();
+
+        ErrorReporter.Configure(settings);
+        _ = ErrorReporter.FlushQueueAsync();
+
+        DispatcherUnhandledException += (_, e) =>
+            ErrorReporter.ReportCrash("CRASH", e.Exception.Message, e.Exception);
+
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+                ErrorReporter.ReportCrash("CRASH_FATAL", ex.Message, ex);
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            ErrorReporter.Report("TASK_ERROR",
+                e.Exception.InnerException?.Message ?? e.Exception.Message, e.Exception);
+            e.SetObserved();
+        };
+
         if (!settings.IsSetupComplete)
             ShowSetupWindow();
         else

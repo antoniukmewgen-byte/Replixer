@@ -60,6 +60,7 @@ public class KommoService : IDisposable
         if (leadId is null || string.IsNullOrEmpty(subdomain))
         {
             Debug.WriteLine($"[Kommo] Cannot parse lead URL: {leadUrl}");
+            ErrorReporter.Report("KOMMO", $"Не вдалося розпарсити URL ліда: {leadUrl}");
             return null;
         }
 
@@ -144,7 +145,11 @@ public class KommoService : IDisposable
             var body = await res.Content.ReadAsStringAsync();
             Debug.WriteLine($"[Kommo] Note POST → {(int)res.StatusCode}");
 
-            if (!res.IsSuccessStatusCode) return null;
+            if (!res.IsSuccessStatusCode)
+            {
+                ErrorReporter.Report("KOMMO", $"PostNote HTTP {(int)res.StatusCode} — lead {leadId}");
+                return null;
+            }
 
             using var doc = JsonDocument.Parse(body);
             if (doc.RootElement.TryGetProperty("_embedded", out var emb) &&
@@ -153,7 +158,11 @@ public class KommoService : IDisposable
                 notes[0].TryGetProperty("id", out var idProp))
                 return idProp.GetInt64();
         }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] PostNote failed: {ex.Message}"); }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] PostNote failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"PostNote exception — lead {leadId}: {ex.Message}", ex);
+        }
         return null;
     }
 
