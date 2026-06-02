@@ -1,4 +1,5 @@
 using Replixer.Models;
+using Replixer.Services;
 using Replixer.ViewModels.Dialogs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -87,7 +88,10 @@ public class RecordingsViewModel : ViewModelBase
                 Recordings.Add(entry);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            ErrorReporter.Report("RecordingsViewModel", "Не вдалося завантажити список записів", ex);
+        }
         finally
         {
             _loading = false;

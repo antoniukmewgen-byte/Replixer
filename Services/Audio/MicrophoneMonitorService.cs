@@ -142,7 +142,10 @@ public class MicrophoneMonitorService : IMonitorService
                                 return match;
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[AudioMonitor] GetProcessById failed: {ex.Message}");
+                        }
                     }
                 }
             }

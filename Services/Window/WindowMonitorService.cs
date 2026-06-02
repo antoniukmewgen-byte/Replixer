@@ -94,7 +94,10 @@ public class WindowMonitorService : IMonitorService
                             return false;
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[WindowMonitor] UIA access failed: {ex.Message}");
+                    }
 
                     return true;
                 }, IntPtr.Zero);

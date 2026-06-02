@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -213,7 +214,10 @@ public class AppSettings : INotifyPropertyChanged
                     return settings;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[AppSettings] Load failed: {ex.Message}");
+        }
         return new AppSettings();
     }
 
@@ -264,7 +268,10 @@ public class AppSettings : INotifyPropertyChanged
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
             File.WriteAllText(SettingsPath, JsonSerializer.Serialize(this, JsonOptions));
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[AppSettings] WriteToDisk failed: {ex.Message}");
+        }
     }
 
     private static async Task PersistAsync(string json, CancellationToken ct = default)
@@ -274,10 +281,11 @@ public class AppSettings : INotifyPropertyChanged
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
             await File.WriteAllTextAsync(SettingsPath, json, ct);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
         {
+            Debug.WriteLine($"[AppSettings] PersistAsync failed: {ex.Message}");
         }
-        catch { }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

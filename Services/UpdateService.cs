@@ -66,7 +66,11 @@ public sealed class UpdateService
                 return new UpdateInfo(remoteVersion, manifest);
             }
         }
-        catch { }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            ErrorReporter.Report("UpdateService", "Не вдалося перевірити оновлення", ex);
+        }
 
         return null;
     }

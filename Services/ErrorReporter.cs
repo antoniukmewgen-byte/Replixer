@@ -12,6 +12,7 @@ namespace Replixer.Services;
 internal static class ErrorReporter
 {
     private static string _userName = "Unknown";
+    private static AppSettings? _settings;
     private static Timer? _retryTimer;
 
     private static readonly HttpClient _http = new(new SocketsHttpHandler
@@ -28,18 +29,23 @@ internal static class ErrorReporter
 
     public static void Configure(AppSettings settings)
     {
-        _userName = settings.ManagerName.Trim() is { Length: > 0 } n ? n : "Unknown";
+        _settings   = settings;
+        _userName   = settings.ManagerName.Trim() is { Length: > 0 } n ? n : "Unknown";
         _retryTimer = new Timer(_ => _ = FlushQueueAsync(), null,
             TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
     }
 
     // Normal (recoverable) errors — fire and forget
     public static void Report(string category, string message, Exception? ex = null)
-        => _ = SendOrQueueAsync(CreateEntry(category, message, ex));
+    {
+        NotificationService.ShowError(message);
+        _ = SendOrQueueAsync(CreateEntry(category, message, ex));
+    }
 
     // Crash handlers — synchronously write to queue first so it survives process death
     public static void ReportCrash(string category, string message, Exception? ex = null)
     {
+        NotificationService.ShowError("Сталася критична помилка. Звіт надіслано розробнику.");
         var entry = CreateEntry(category, message, ex);
         AppendToQueue(entry);    // Sync write — guaranteed even if process dies immediately
         _ = TrySendAsync(entry); // Best-effort send
@@ -72,26 +78,47 @@ internal static class ErrorReporter
         {
             var token  = AppSecrets.ErrorBotToken;
             var chatId = AppSecrets.ErrorChatId;
-            if (string.IsNullOrEmpty(token) || chatId == 0) return true; // not configured
+            if (string.IsNullOrEmpty(token) || chatId == 0) return true;
 
-            var text    = FormatMessage(entry);
-            var payload = JsonSerializer.Serialize(new { chat_id = chatId, text });
-
-            using var req = new HttpRequestMessage(HttpMethod.Post,
-                $"https://api.telegram.org/bot{token}/sendMessage")
+            var chunks = SplitIntoChunks(FormatMessage(entry), maxLength: 4096);
+            foreach (var chunk in chunks)
             {
-                Content = new StringContent(payload, Encoding.UTF8, "application/json")
-            };
-
-            var res = await _http.SendAsync(req);
-            Debug.WriteLine($"[ErrorReporter] {(int)res.StatusCode}");
-            return res.IsSuccessStatusCode;
+                var payload = JsonSerializer.Serialize(new { chat_id = chatId, text = chunk });
+                using var req = new HttpRequestMessage(HttpMethod.Post,
+                    $"https://api.telegram.org/bot{token}/sendMessage")
+                {
+                    Content = new StringContent(payload, Encoding.UTF8, "application/json")
+                };
+                var res = await _http.SendAsync(req);
+                Debug.WriteLine($"[ErrorReporter] {(int)res.StatusCode}");
+                if (!res.IsSuccessStatusCode) return false;
+            }
+            return true;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[ErrorReporter] Send failed: {ex.Message}");
             return false;
         }
+    }
+
+    private static List<string> SplitIntoChunks(string text, int maxLength)
+    {
+        var chunks = new List<string>();
+        var start  = 0;
+        while (start < text.Length)
+        {
+            var len = Math.Min(maxLength, text.Length - start);
+            // break at newline boundary if possible
+            if (start + len < text.Length)
+            {
+                var nl = text.LastIndexOf('\n', start + len - 1, len);
+                if (nl > start) len = nl - start + 1;
+            }
+            chunks.Add(text.Substring(start, len));
+            start += len;
+        }
+        return chunks;
     }
 
     private static string FormatMessage(ErrorEntry e)
@@ -102,17 +129,39 @@ internal static class ErrorReporter
         sb.AppendLine($"{icon} {e.Category}");
         sb.AppendLine($"👤 {e.User}  |  v{e.AppVersion}");
         sb.AppendLine($"🕐 {e.Timestamp:dd.MM.yyyy HH:mm:ss}");
+
+        if (_settings is { } s)
+        {
+            sb.AppendLine();
+            sb.AppendLine(FormatIntegrations(s));
+        }
+
         sb.AppendLine();
         sb.AppendLine(e.Message);
 
         if (e.Detail is { Length: > 0 })
         {
             sb.AppendLine();
-            var detail = e.Detail.Length > 3000 ? e.Detail[..3000] + "\n…(обрізано)" : e.Detail;
-            sb.Append(detail);
+            sb.Append(e.Detail);
         }
 
         return sb.ToString().TrimEnd();
+    }
+
+    private static string FormatIntegrations(AppSettings s)
+    {
+        static string Status(bool enabled, bool? connected) =>
+            !enabled ? "вимк." : connected == true ? "✅" : connected == false ? "❌" : "⏳";
+
+        var parts = new[]
+        {
+            $"Google Drive: {Status(s.IsGoogleDriveEnabled, s.IsGoogleDriveConnected)}",
+            $"Telegram: {Status(s.IsTelegramEnabled, s.IsTelegramConnected)}" +
+                (s.IsTelegramEnabled && !string.IsNullOrEmpty(s.TelegramPhone) ? $" ({s.TelegramPhone})" : ""),
+            $"Kommo: {Status(s.IsKommoEnabled, s.IsKommoConnected)}" +
+                (s.IsKommoEnabled && !string.IsNullOrEmpty(s.KommoSubdomain) ? $" ({s.KommoSubdomain})" : ""),
+        };
+        return "🔌 " + string.Join("  |  ", parts);
     }
 
     private static ErrorEntry CreateEntry(string category, string message, Exception? ex) => new()
