@@ -104,7 +104,7 @@ public sealed class UpdateService
         return stagingDir;
     }
 
-    public void LaunchUpdaterAndExit(string stagingDir)
+    public void LaunchUpdaterAndExit(string stagingDir, Version newVersion)
     {
         var installDir = AppContext.BaseDirectory.TrimEnd('\\', '/');
         var mainExe    = Path.Combine(installDir, "Replixer.exe");
@@ -124,6 +124,18 @@ public sealed class UpdateService
             }
 
             Remove-Item -LiteralPath '{{Esc(stagingDir)}}' -Recurse -Force -ErrorAction SilentlyContinue
+
+            $regId  = '{A3F2B1C4-7E8D-4F5A-9C3B-2D6E1F0A8B7C}_is1'
+            $newVer = '{{newVersion.ToString(3)}}'
+            foreach ($hive in @('HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+                                 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+                                 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall')) {
+                $key = Join-Path $hive $regId
+                if (Test-Path $key) {
+                    Set-ItemProperty -LiteralPath $key -Name 'DisplayVersion' -Value $newVer -ErrorAction SilentlyContinue
+                }
+            }
+
             Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue
 
             Start-Process -FilePath '{{Esc(mainExe)}}'

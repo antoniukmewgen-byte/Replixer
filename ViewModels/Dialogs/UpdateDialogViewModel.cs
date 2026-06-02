@@ -55,7 +55,7 @@ public sealed class UpdateDialogViewModel : ViewModelBase
                 dispatcher.BeginInvoke(() => DownloadProgress = p));
 
             var stagingDir = await _updateService.DownloadUpdatesAsync(_info, progress);
-            _updateService.LaunchUpdaterAndExit(stagingDir);
+            _updateService.LaunchUpdaterAndExit(stagingDir, _info.NewVersion);
         }
         catch (Exception ex)
         {
