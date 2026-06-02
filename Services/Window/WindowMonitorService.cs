@@ -119,8 +119,16 @@ public class WindowMonitorService : IMonitorService
 
     public void Stop()
     {
-        _pollTimer?.Dispose();
-        _pollTimer = null;
+        // Timer.Dispose(WaitHandle) signals the handle only after any in-progress
+        // callback finishes — guaranteeing Poll() is not using _automation when we dispose it.
+        if (_pollTimer is { } timer)
+        {
+            using var done = new System.Threading.ManualResetEventSlim(false);
+            timer.Dispose(done.WaitHandle);
+            _pollTimer = null;
+            done.Wait(TimeSpan.FromSeconds(5));
+        }
+
         _automation?.Dispose();
         _automation = null;
     }

@@ -6,6 +6,7 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace Replixer.Services.Recording;
 
@@ -21,6 +22,18 @@ public class AudioRecordingService : IDisposable
     private string? _loopbackTempPath;
     private string? _micTempPath;
     private string? _finalMp3Path;
+
+    // Used to detect and fill silence gaps in the loopback track.
+    // WasapiLoopbackCapture stops firing DataAvailable when nothing plays through speakers
+    // (e.g. between two calls). Without gap-filling the loopback WAV ends up shorter than
+    // the mic WAV, causing audio to appear out of order after mixing.
+    private long _loopbackStartStamp;   // Stopwatch.GetTimestamp() at StartRecording
+    private long _loopbackBytesWritten; // bytes written so far (single WASAPI thread — no lock needed)
+
+    // Volatile flags set in RecordingStopped handlers so DataAvailable callbacks
+    // can bail out immediately and never touch a disposed WaveFileWriter.
+    private volatile bool _loopbackStopped;
+    private volatile bool _micStopped;
 
     public bool    IsRecording       { get; private set; }
     public string  LastSavedFilePath { get; private set; } = string.Empty;
@@ -72,17 +85,34 @@ public class AudioRecordingService : IDisposable
             _micTempPath      = Path.Combine(tempFolder, $"ev_mic_{uid}.wav");
             _finalMp3Path     = mp3Path;
 
+            _loopbackBytesWritten = 0;
+            _loopbackStopped      = false;
+            _micStopped           = false;
+
             _loopbackCapture = new WasapiLoopbackCapture();
-            _loopbackCapture.DataAvailable += (_, e) => _loopbackWriter?.Write(e.Buffer, 0, e.BytesRecorded);
+            _loopbackCapture.DataAvailable += (_, e) =>
+            {
+                if (_loopbackStopped) return;
+                var writer = _loopbackWriter;
+                if (writer is null) return;
+                FillLoopbackGap(writer, _loopbackCapture.WaveFormat);
+                writer.Write(e.Buffer, 0, e.BytesRecorded);
+                _loopbackBytesWritten += e.BytesRecorded;
+            };
 
             _micCapture = new WasapiCapture();
-            _micCapture.DataAvailable += (_, e) => _micWriter?.Write(e.Buffer, 0, e.BytesRecorded);
+            _micCapture.DataAvailable += (_, e) =>
+            {
+                if (_micStopped) return;
+                _micWriter?.Write(e.Buffer, 0, e.BytesRecorded);
+            };
 
             _loopbackWriter = new WaveFileWriter(_loopbackTempPath, _loopbackCapture.WaveFormat);
             _micWriter      = new WaveFileWriter(_micTempPath, _micCapture.WaveFormat);
 
             IsRecording = true;
 
+            _loopbackStartStamp = Stopwatch.GetTimestamp();
             _loopbackCapture.StartRecording();
             _micCapture.StartRecording();
 
@@ -125,14 +155,20 @@ public class AudioRecordingService : IDisposable
         var micDone      = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         if (_loopbackCapture != null)
-            _loopbackCapture.RecordingStopped += (_, _) => loopbackDone.TrySetResult();
+            _loopbackCapture.RecordingStopped += (_, _) => { _loopbackStopped = true; loopbackDone.TrySetResult(); };
         else
+        {
+            _loopbackStopped = true;
             loopbackDone.TrySetResult();
+        }
 
         if (_micCapture != null)
-            _micCapture.RecordingStopped += (_, _) => micDone.TrySetResult();
+            _micCapture.RecordingStopped += (_, _) => { _micStopped = true; micDone.TrySetResult(); };
         else
+        {
+            _micStopped = true;
             micDone.TrySetResult();
+        }
 
         _loopbackCapture?.StopRecording();
         _micCapture?.StopRecording();
@@ -202,6 +238,24 @@ public class AudioRecordingService : IDisposable
         {
             SafeDelete(_loopbackTempPath);
             SafeDelete(_micTempPath);
+        }
+    }
+
+    private void FillLoopbackGap(WaveFileWriter writer, WaveFormat fmt)
+    {
+        var elapsed  = (double)(Stopwatch.GetTimestamp() - _loopbackStartStamp) / Stopwatch.Frequency;
+        var expected = (long)(elapsed * fmt.AverageBytesPerSecond);
+        expected -= expected % fmt.BlockAlign;
+        var gap = Math.Min(expected - _loopbackBytesWritten, (long)fmt.AverageBytesPerSecond * 30);
+        if (gap <= 0) return;
+
+        var chunk = new byte[fmt.AverageBytesPerSecond]; // 1-second chunks
+        while (gap > 0)
+        {
+            var toWrite = (int)Math.Min(gap, chunk.Length);
+            writer.Write(chunk, 0, toWrite);
+            _loopbackBytesWritten += toWrite;
+            gap -= toWrite;
         }
     }
 

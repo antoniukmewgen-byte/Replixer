@@ -88,20 +88,28 @@ public sealed class UpdateService
             .Where(f => NeedsUpdate(Path.Combine(installDir, f.Path), f.Sha256))
             .ToList();
 
-        for (var i = 0; i < toDownload.Count; i++)
+        try
         {
-            var entry    = toDownload[i];
-            var destPath = Path.Combine(stagingDir, entry.Path);
+            for (var i = 0; i < toDownload.Count; i++)
+            {
+                var entry    = toDownload[i];
+                var destPath = Path.Combine(stagingDir, entry.Path);
 
-            var dir = Path.GetDirectoryName(destPath);
-            if (dir is not null) Directory.CreateDirectory(dir);
+                var dir = Path.GetDirectoryName(destPath);
+                if (dir is not null) Directory.CreateDirectory(dir);
 
-            var fileIndex    = i;
-            var fileProgress = progress is not null
-                ? new Progress<double>(p => progress.Report((fileIndex + p) / toDownload.Count))
-                : null;
+                var fileIndex    = i;
+                var fileProgress = progress is not null
+                    ? new Progress<double>(p => progress.Report((fileIndex + p) / toDownload.Count))
+                    : null;
 
-            await DownloadFileAsync(entry.Url, destPath, fileProgress, ct);
+                await DownloadFileAsync(entry.Url, destPath, fileProgress, ct);
+            }
+        }
+        catch
+        {
+            try { Directory.Delete(stagingDir, recursive: true); } catch { }
+            throw;
         }
 
         progress?.Report(1.0);

@@ -32,15 +32,17 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly IWindowManager _windowManager;
     private IMonitorService _activeMonitor;
 
-    private bool _isRecording;
-    private bool _isStopping;
-    private bool _hasActiveDialog;
+    private bool  _isRecording;
+    private bool  _isStopping;
+    private bool  _hasActiveDialog;
+    private Task? _pendingStopTask;
 
     public bool IsRecording => _isRecording;
     private string _lastDetectedApp = string.Empty;
     private DateTime? _recordingStartedAt;
 
-    private CallDialogViewModel? _currentDialog;
+    private CallDialogViewModel?                  _currentDialog;
+    private TaskCompletionSource<CallReportData?>? _reportTcs;
 
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
@@ -196,7 +198,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _windowManager.ShowCheatSheet();
     }
 
-    private void StopRecording() => _ = StopRecordingAsync();
+    private void StopRecording() => _pendingStopTask = StopRecordingAsync();
 
     private async Task StopRecordingAsync()
     {
@@ -287,8 +289,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         _windowManager.ShowMainWindow();
 
-        var tcs = new TaskCompletionSource<CallReportData?>();
-        var vm  = new CallReportViewModel(
+        var tcs = new TaskCompletionSource<CallReportData?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _reportTcs = tcs;
+
+        var vm = new CallReportViewModel(
             onComplete: data =>
             {
                 DismissCallReport();
@@ -301,7 +305,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         return tcs.Task;
     }
 
-    private void DismissCallReport() => CallReportRequested?.Invoke(null);
+    private void DismissCallReport()
+    {
+        // Complete any pending report task with null so StopRecordingAsync never hangs
+        // when the dialog is dismissed externally (new call, app closing, manual dismiss).
+        _reportTcs?.TrySetResult(null);
+        _reportTcs = null;
+        CallReportRequested?.Invoke(null);
+    }
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {
@@ -475,6 +486,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
+        _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
         _currentDialog?.Dispose();
         _settings.PropertyChanged -= OnSettingsChanged;
         _recordingsVm.Recordings.CollectionChanged -= OnRecordingsChanged;

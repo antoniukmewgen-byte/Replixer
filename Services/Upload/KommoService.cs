@@ -398,9 +398,9 @@ public class KommoService : IDisposable
                 if (!anyField) break;
                 page++;
             }
+            _fieldIdsLoaded = true; // only reached when no exception — retry is possible after network failure
         }
         catch (Exception ex) { Debug.WriteLine($"[Kommo] EnsureAllFieldIds failed: {ex.Message}"); }
-        finally { _fieldIdsLoaded = true; }
     }
 
     private async Task SetCallTypeAsync(string baseUrl, string token, string leadId, string callType)
