@@ -4,77 +4,117 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Border
-        Width="340"
-        Padding="20"
+        Width="320"
+        Padding="16"
         Background="{StaticResource BrushColor2}"
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="12">
         <StackPanel>
 
-            <!--  Title row  -->
-            <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
-                <Path
-                    Width="16"
-                    Height="16"
-                    Margin="0,0,10,0"
-                    VerticalAlignment="Center"
-                    Data="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,5a1.5,1.5,0,1,1-1.5,1.5A1.5,1.5,0,0,1,12,5Zm2,13H10a1,1,0,0,1,0-2h1V11H10a1,1,0,0,1,0-2h2a1,1,0,0,1,1,1v6h1a1,1,0,0,1,0,2Z"
-                    Fill="{StaticResource OtherBrushSubColor2}"
-                    Stretch="Uniform" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontFamily="{StaticResource InterFont}"
-                    FontSize="14"
-                    FontWeight="SemiBold"
-                    Foreground="{StaticResource Text}"
-                    Text="Доступне оновлення" />
-            </StackPanel>
-
             <Border
-                Padding="14"
+                Padding="16"
                 Background="{StaticResource BrushColor3}"
                 BorderBrush="{StaticResource BrushBorderColor3}"
                 BorderThickness="1"
                 CornerRadius="8">
                 <StackPanel>
 
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="12"
-                        Foreground="{StaticResource SubText}"
-                        Text="Нова версія:" />
-                    <TextBlock
-                        Margin="0,0,0,14"
-                        FontFamily="{StaticResource InterFont}"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Foreground="{StaticResource OtherBrushSubColor2}"
-                        Text="{Binding NewVersion}" />
-
-                    <!--  Download progress (visible only while downloading)  -->
-                    <StackPanel
-                        Margin="0,0,0,14"
-                        Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">
+                    <!--  Icon + title  -->
+                    <StackPanel Margin="0,0,0,12" HorizontalAlignment="Center">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
+                            Data="M23.899,7H0v-1C0,3.243,2.243,1,5,1h2.528c.463,0,.927,.109,1.341,.316l3.156,1.578c.138,.069,.293,.105,.447,.105h6.528c2.414,0,4.434,1.721,4.899,4Zm.101,2v9c0,2.757-2.243,5-5,5H5c-2.757,0-5-2.243-5-5V9H24Zm-8.293,4.48l-1.613-1.613c-1.154-1.154-3.033-1.154-4.187,0l-1.614,1.613c-.921,.929,.486,2.335,1.414,1.414l1.293-1.293v6.398c.006,1.308,1.995,1.307,2,0v-6.398l1.293,1.293c.929,.921,2.335-.486,1.414-1.414Z"
+                            Fill="{StaticResource OtherBrushSubColor1}"
+                            Stretch="Uniform" />
                         <TextBlock
-                            Margin="0,0,0,6"
+                            HorizontalAlignment="Center"
                             FontFamily="{StaticResource InterFont}"
-                            FontSize="11"
-                            Foreground="{StaticResource SubText}"
-                            Text="Завантаження..." />
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="{StaticResource Text}"
+                            Text="Доступне оновлення" />
+                        <StackPanel
+                            Margin="0,4,0,0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                Text="Версія " />
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Foreground="{StaticResource OtherBrushSubColor1}"
+                                Text="{Binding NewVersion}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!--  Download progress  -->
+                    <StackPanel Margin="0,0,0,12" Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}"
+                                Text="Завантаження..." />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource OtherBrushSubColor1}">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0:0}%">
+                                        <Binding Mode="OneWay" Path="DownloadProgress" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
                         <ProgressBar
                             Height="4"
                             Maximum="1"
                             Minimum="0"
-                            Value="{Binding DownloadProgress}" />
+                            Value="{Binding DownloadProgress, Mode=OneWay}">
+                            <ProgressBar.Template>
+                                <ControlTemplate TargetType="ProgressBar">
+                                    <Border
+                                        Background="{StaticResource BrushColor4}"
+                                        BorderBrush="{StaticResource BrushBorderColor4}"
+                                        BorderThickness="1"
+                                        CornerRadius="2">
+                                        <Border ClipToBounds="True" CornerRadius="2">
+                                            <Border
+                                                x:Name="PART_Indicator"
+                                                HorizontalAlignment="Left"
+                                                Background="{StaticResource OtherBrushSubColor1}"
+                                                CornerRadius="2" />
+                                        </Border>
+                                    </Border>
+                                </ControlTemplate>
+                            </ProgressBar.Template>
+                        </ProgressBar>
                     </StackPanel>
 
                     <!--  Buttons  -->
-                    <StackPanel Orientation="Horizontal">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
                         <Button
-                            Margin="0,0,10,0"
+                            Grid.Column="0"
                             Padding="12,8"
+                            HorizontalAlignment="Stretch"
                             Command="{Binding DismissCommand}"
                             Cursor="Hand"
                             IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBool}}">
@@ -88,15 +128,19 @@
                                         BorderThickness="1"
                                         CornerRadius="16">
                                         <TextBlock
+                                            HorizontalAlignment="Center"
                                             FontFamily="{StaticResource InterFont}"
-                                            FontSize="13"
+                                            FontSize="14"
                                             FontWeight="Medium"
                                             Foreground="{StaticResource SubText}"
-                                            Text="Нагадати пізніше" />
+                                            Text="Пізніше" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="False">
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
@@ -107,28 +151,35 @@
                         </Button>
 
                         <Button
+                            Grid.Column="2"
                             Padding="12,8"
+                            HorizontalAlignment="Stretch"
                             Command="{Binding UpdateNowCommand}"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBool}}">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border
                                         x:Name="Bg"
                                         Padding="{TemplateBinding Padding}"
-                                        Background="{StaticResource OtherBrushColor2}"
-                                        BorderBrush="{StaticResource OtherBrushSubColor2}"
+                                        Background="{StaticResource OtherBrushColor1}"
+                                        BorderBrush="{StaticResource OtherBrushSubColor1}"
                                         BorderThickness="1"
                                         CornerRadius="16">
                                         <TextBlock
+                                            HorizontalAlignment="Center"
                                             FontFamily="{StaticResource InterFont}"
-                                            FontSize="13"
+                                            FontSize="14"
                                             FontWeight="Medium"
-                                            Foreground="{StaticResource OtherBrushSubColor2}"
-                                            Text="Оновити зараз" />
+                                            Foreground="{StaticResource OtherBrushSubColor1}"
+                                            Text="Оновити" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="False">
                                             <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
@@ -137,8 +188,8 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
-                    </StackPanel>
 
+                    </Grid>
                 </StackPanel>
             </Border>
         </StackPanel>
