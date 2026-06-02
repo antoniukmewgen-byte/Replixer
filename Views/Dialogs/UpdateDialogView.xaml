@@ -74,7 +74,7 @@
                                 Text="{Binding DownloadProgressText, Mode=OneWay}" />
                         </Grid>
                         <ProgressBar
-                            Height="4"
+                            Height="6"
                             Maximum="1"
                             Minimum="0"
                             Value="{Binding DownloadProgress, Mode=OneWay}">
