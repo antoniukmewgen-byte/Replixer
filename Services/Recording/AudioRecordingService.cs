@@ -1,4 +1,3 @@
-using System.Threading;
 using Replixer.Infrastructure;
 using Replixer.Models;
 using NAudio.CoreAudioApi;
@@ -22,10 +21,6 @@ public class AudioRecordingService : IDisposable
     private string? _loopbackTempPath;
     private string? _micTempPath;
     private string? _finalMp3Path;
-
-    // Ticks of first DataAvailable packet — used to compensate sequential start offset.
-    private long _loopbackFirstTicks;
-    private long _micFirstTicks;
 
     public bool    IsRecording       { get; private set; }
     public string  LastSavedFilePath { get; private set; } = string.Empty;
@@ -77,22 +72,11 @@ public class AudioRecordingService : IDisposable
             _micTempPath      = Path.Combine(tempFolder, $"ev_mic_{uid}.wav");
             _finalMp3Path     = mp3Path;
 
-            _loopbackFirstTicks = 0;
-            _micFirstTicks      = 0;
-
             _loopbackCapture = new WasapiLoopbackCapture();
-            _loopbackCapture.DataAvailable += (_, e) =>
-            {
-                Interlocked.CompareExchange(ref _loopbackFirstTicks, DateTime.UtcNow.Ticks, 0);
-                _loopbackWriter?.Write(e.Buffer, 0, e.BytesRecorded);
-            };
+            _loopbackCapture.DataAvailable += (_, e) => _loopbackWriter?.Write(e.Buffer, 0, e.BytesRecorded);
 
             _micCapture = new WasapiCapture();
-            _micCapture.DataAvailable += (_, e) =>
-            {
-                Interlocked.CompareExchange(ref _micFirstTicks, DateTime.UtcNow.Ticks, 0);
-                _micWriter?.Write(e.Buffer, 0, e.BytesRecorded);
-            };
+            _micCapture.DataAvailable += (_, e) => _micWriter?.Write(e.Buffer, 0, e.BytesRecorded);
 
             _loopbackWriter = new WaveFileWriter(_loopbackTempPath, _loopbackCapture.WaveFormat);
             _micWriter      = new WaveFileWriter(_micTempPath, _micCapture.WaveFormat);
@@ -182,20 +166,6 @@ public class AudioRecordingService : IDisposable
                 loopback = new MonoToStereoSampleProvider(loopback);
             if (mic.WaveFormat.Channels == 1)
                 mic = new MonoToStereoSampleProvider(mic);
-
-            // Compensate for the sequential start offset: skip the head of whichever stream started earlier.
-            var offsetTicks = _micFirstTicks - _loopbackFirstTicks;
-            if (offsetTicks != 0)
-            {
-                var offset = TimeSpan.FromTicks(Math.Abs(offsetTicks));
-                if (offset < TimeSpan.FromSeconds(2))
-                {
-                    if (offsetTicks > 0)
-                        loopback = new OffsetSampleProvider(loopback) { SkipOver = offset };
-                    else
-                        mic      = new OffsetSampleProvider(mic)      { SkipOver = offset };
-                }
-            }
 
             var mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
             mixer.AddMixerInput(loopback);
