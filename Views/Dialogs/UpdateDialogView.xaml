@@ -72,7 +72,7 @@
                                 FontWeight="Medium"
                                 Foreground="{StaticResource OtherBrushSubColor1}">
                                 <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0:0}%">
+                                    <MultiBinding Mode="OneWay" StringFormat="{}{0:0}%">
                                         <Binding Mode="OneWay" Path="DownloadProgress" />
                                     </MultiBinding>
                                 </TextBlock.Text>
