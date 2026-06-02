@@ -131,11 +131,12 @@ public sealed class UpdateService
 
         File.WriteAllText(scriptPath, script, System.Text.Encoding.UTF8);
 
-        Process.Start(new ProcessStartInfo("powershell.exe")
+        Process.Start(new ProcessStartInfo
         {
-            Arguments       = $"-ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File \"{scriptPath}\"",
-            UseShellExecute = true,
-            WindowStyle     = ProcessWindowStyle.Hidden,
+            FileName               = "powershell.exe",
+            Arguments              = $"-ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File \"{scriptPath}\"",
+            UseShellExecute        = false,
+            CreateNoWindow         = true,
         });
 
         System.Windows.Application.Current.Dispatcher.Invoke(

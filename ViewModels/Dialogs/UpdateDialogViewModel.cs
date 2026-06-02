@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Replixer.Infrastructure;
 using Replixer.Services;
 
@@ -49,15 +51,16 @@ public sealed class UpdateDialogViewModel : ViewModelBase
         try
         {
             var dispatcher = System.Windows.Application.Current.Dispatcher;
-            var progress = new Progress<double>(p =>
+            var progress   = new Progress<double>(p =>
                 dispatcher.BeginInvoke(() => DownloadProgress = p));
 
             var stagingDir = await _updateService.DownloadUpdatesAsync(_info, progress);
             _updateService.LaunchUpdaterAndExit(stagingDir);
         }
-        catch
+        catch (Exception ex)
         {
             IsDownloading = false;
+            NotificationService.ShowError($"Помилка оновлення: {ex.Message}");
         }
     }
 }
