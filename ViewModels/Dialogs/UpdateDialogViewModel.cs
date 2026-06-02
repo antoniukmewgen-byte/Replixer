@@ -21,8 +21,14 @@ public sealed class UpdateDialogViewModel : ViewModelBase
     public double DownloadProgress
     {
         get => _downloadProgress;
-        private set => SetField(ref _downloadProgress, value);
+        private set
+        {
+            SetField(ref _downloadProgress, value);
+            OnPropertyChanged(nameof(DownloadProgressText));
+        }
     }
+
+    public string DownloadProgressText => $"{_downloadProgress * 100:0}%";
 
     public AsyncRelayCommand UpdateNowCommand { get; }
     public RelayCommand      DismissCommand   { get; }

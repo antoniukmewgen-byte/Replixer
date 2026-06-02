@@ -70,13 +70,8 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="12"
                                 FontWeight="Medium"
-                                Foreground="{StaticResource OtherBrushSubColor1}">
-                                <TextBlock.Text>
-                                    <MultiBinding Mode="OneWay" StringFormat="{}{0:0}%">
-                                        <Binding Mode="OneWay" Path="DownloadProgress" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
+                                Foreground="{StaticResource OtherBrushSubColor1}"
+                                Text="{Binding DownloadProgressText, Mode=OneWay}" />
                         </Grid>
                         <ProgressBar
                             Height="4"
@@ -86,17 +81,17 @@
                             <ProgressBar.Template>
                                 <ControlTemplate TargetType="ProgressBar">
                                     <Border
+                                        x:Name="PART_Track"
                                         Background="{StaticResource BrushColor4}"
                                         BorderBrush="{StaticResource BrushBorderColor4}"
                                         BorderThickness="1"
+                                        ClipToBounds="True"
                                         CornerRadius="2">
-                                        <Border ClipToBounds="True" CornerRadius="2">
-                                            <Border
-                                                x:Name="PART_Indicator"
-                                                HorizontalAlignment="Left"
-                                                Background="{StaticResource OtherBrushSubColor1}"
-                                                CornerRadius="2" />
-                                        </Border>
+                                        <Border
+                                            x:Name="PART_Indicator"
+                                            HorizontalAlignment="Left"
+                                            Background="{StaticResource OtherBrushSubColor1}"
+                                            CornerRadius="2" />
                                     </Border>
                                 </ControlTemplate>
                             </ProgressBar.Template>
