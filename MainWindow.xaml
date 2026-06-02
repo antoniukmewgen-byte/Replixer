@@ -162,8 +162,7 @@
                     <Button
                         x:Name="UpdateButton"
                         Command="{Binding CheckForUpdatesCommand}"
-                        Style="{StaticResource HeaderButton}"
-                        ToolTip="Перевірити оновлення">
+                        Style="{StaticResource HeaderButton}">
                         <Grid>
                             <Path
                                 Width="12"
