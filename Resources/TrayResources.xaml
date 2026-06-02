@@ -22,6 +22,7 @@
                         <Grid Height="34">
                             <ContentPresenter
                                 Margin="10,0"
+                                HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 ContentSource="Header" />
                         </Grid>
@@ -81,19 +82,28 @@
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu Style="{StaticResource TrayContextMenuStyle}">
 
-                <MenuItem IsEnabled="False">
+                <MenuItem Command="{Binding RecordCommand}">
                     <MenuItem.Header>
-                        <TextBlock
-                            FontSize="11"
-                            FontWeight="Bold"
-                            Foreground="Gray"
-                            Text="Replixer" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding RecordLabel}" VerticalAlignment="Center" />
+                            <Ellipse
+                                Width="7" Height="7"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#555860" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                <Setter Property="Fill" Value="#F23F43" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                        </StackPanel>
                     </MenuItem.Header>
                 </MenuItem>
-
-                <Separator Style="{StaticResource TraySeparatorStyle}" />
-
-                <MenuItem Command="{Binding RecordCommand}" Header="{Binding RecordLabel}" />
 
                 <MenuItem Command="{Binding OpenCommand}" Header="Відкрити Replixer" />
 

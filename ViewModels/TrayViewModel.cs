@@ -17,8 +17,8 @@ public sealed class TrayViewModel : ViewModelBase, IDisposable
     public ICommand RecordCommand { get; }
     public ICommand ExitCommand   { get; }
 
-    public string RecordLabel =>
-        _homeVm.IsRecording ? "Зупинити запис" : "Записати дзвінок";
+    public string RecordLabel  => _homeVm.IsRecording ? "Зупинити запис" : "Записати дзвінок";
+    public bool   IsRecording  => _homeVm.IsRecording;
 
     public TrayViewModel(IWindowManager windowManager, HomeViewModel homeVm)
     {
@@ -35,7 +35,10 @@ public sealed class TrayViewModel : ViewModelBase, IDisposable
     private void OnHomePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(HomeViewModel.IsRecording))
+        {
             OnPropertyChanged(nameof(RecordLabel));
+            OnPropertyChanged(nameof(IsRecording));
+        }
     }
 
     private void OpenVault() => _windowManager.ShowMainWindow();
