@@ -64,7 +64,26 @@ jobs:
           $ver = $tag.TrimStart('v')
           echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
 
-      # Створюємо GitHub Release і прикріплюємо інсталер
+      # Генеруємо manifest.json: SHA256 для кожного Replixer.* файлу в publish/
+      - name: Generate update manifest
+        shell: pwsh
+        run: |
+          $version  = "${{ steps.version.outputs.VERSION }}"
+          $baseUrl  = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+          $files    = Get-ChildItem -Path publish -File |
+                        Where-Object { $_.Name -match '^Replixer\.' } |
+                        ForEach-Object {
+                          [ordered]@{
+                            path   = $_.Name
+                            sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+                            url    = "$baseUrl/$($_.Name)"
+                          }
+                        }
+          [ordered]@{ version = $version; files = @($files) } |
+            ConvertTo-Json -Depth 3 |
+            Out-File -FilePath manifest.json -Encoding utf8NoBOM
+
+      # Створюємо GitHub Release: інсталер + manifest.json + окремі Replixer.* файли
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -72,7 +91,13 @@ jobs:
           tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
-          files: installer/Replixer-Setup.exe
+          files: |
+            installer/Replixer-Setup.exe
+            manifest.json
+            publish/Replixer.exe
+            publish/Replixer.dll
+            publish/Replixer.runtimeconfig.json
+            publish/Replixer.deps.json
           body: |
             ## Що нового у версії ${{ steps.version.outputs.VERSION }}
 
