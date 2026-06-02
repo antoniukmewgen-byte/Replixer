@@ -1,4 +1,6 @@
 using Replixer.Infrastructure;
+using Replixer.Models;
+using Replixer.Services;
 using Replixer.Services.Upload;
 using Replixer.ViewModels.Dialogs;
 using Replixer.Views;
@@ -23,43 +25,96 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         private set => SetField(ref _dialog, value);
     }
 
+    private bool _updateAvailable;
+    public bool UpdateAvailable
+    {
+        get => _updateAvailable;
+        private set => SetField(ref _updateAvailable, value);
+    }
+
     public ICommand NavigateHomeCommand       { get; }
     public ICommand NavigateRecordingsCommand { get; }
     public ICommand NavigateSettingsCommand   { get; }
     public ICommand NavigateProfileCommand    { get; }
+    public ICommand CheckForUpdatesCommand    { get; }
 
-    private readonly HomeViewModel       _homeVm;
-    private readonly SettingsViewModel   _settingsVm;
-    private readonly ProfileViewModel    _profileVm;
+    private readonly HomeViewModel        _homeVm;
+    private readonly SettingsViewModel    _settingsVm;
+    private readonly ProfileViewModel     _profileVm;
     private readonly TelegramUploadService _telegram;
+    private readonly UpdateService        _updateService;
+    private readonly AppSettings          _settings;
     private CallToastWindow? _toast;
+    private UpdateInfo?      _pendingUpdate;
 
     public NotificationsViewModel Notifications { get; }
 
     public MainViewModel(
-        HomeViewModel        homeVm,
-        RecordingsViewModel  recordingsVm,
-        SettingsViewModel    settingsVm,
-        ProfileViewModel     profileVm,
-        TelegramUploadService telegram,
-        NotificationsViewModel notifications)
+        HomeViewModel          homeVm,
+        RecordingsViewModel    recordingsVm,
+        SettingsViewModel      settingsVm,
+        ProfileViewModel       profileVm,
+        TelegramUploadService  telegram,
+        NotificationsViewModel notifications,
+        UpdateService          updateService,
+        AppSettings            settings)
     {
-        _homeVm       = homeVm;
-        _settingsVm   = settingsVm;
-        _profileVm    = profileVm;
-        _telegram     = telegram;
-        Notifications = notifications;
+        _homeVm        = homeVm;
+        _settingsVm    = settingsVm;
+        _profileVm     = profileVm;
+        _telegram      = telegram;
+        _updateService = updateService;
+        _settings      = settings;
+        Notifications  = notifications;
 
         _telegram.InputHandler = HandleTelegramInputAsync;
 
-        _homeVm.DialogRequested    += OnCallDialogRequested;
+        _homeVm.DialogRequested     += OnCallDialogRequested;
         _homeVm.CallReportRequested += OnCallReportRequested;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
         NavigateRecordingsCommand = new RelayCommand(() => CurrentViewModel = recordingsVm);
         NavigateSettingsCommand   = new RelayCommand(() => CurrentViewModel = _settingsVm);
-        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = profileVm);
+        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = _profileVm);
+        CheckForUpdatesCommand    = new AsyncRelayCommand(CheckAndShowUpdateAsync);
+    }
+
+    public async Task StartupUpdateCheckAsync()
+    {
+        if (_settings.UpdateDismissedDate?.Date == DateTime.Today)
+            return;
+
+        _pendingUpdate = await _updateService.CheckForUpdateAsync();
+        if (_pendingUpdate is null) return;
+
+        UpdateAvailable = true;
+        ShowUpdateDialog(_pendingUpdate);
+    }
+
+    private async Task CheckAndShowUpdateAsync()
+    {
+        _pendingUpdate ??= await _updateService.CheckForUpdateAsync();
+
+        if (_pendingUpdate is null)
+        {
+            NotificationService.ShowSuccess("Встановлена остання версія програми.");
+            return;
+        }
+
+        UpdateAvailable = true;
+        ShowUpdateDialog(_pendingUpdate);
+    }
+
+    private void ShowUpdateDialog(UpdateInfo info)
+    {
+        var vm = new UpdateDialogViewModel(_updateService, info, onDismiss: () =>
+        {
+            _settings.UpdateDismissedDate = DateTime.Today;
+            Dialog = null;
+        });
+        RestoreIfMinimized();
+        Dialog = vm;
     }
 
     private void OnCallDialogRequested(CallDialogViewModel? vm)

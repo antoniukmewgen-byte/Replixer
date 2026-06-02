@@ -269,6 +269,33 @@
                     </Border.RenderTransform>
                 </Border>
 
+                <!--  Update button (bottom of sidebar, above profile)  -->
+                <Button
+                    x:Name="UpdateButton"
+                    Padding="0"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,10"
+                    Command="{Binding CheckForUpdatesCommand}"
+                    Style="{StaticResource SidebarButton}"
+                    ToolTip="Перевірити оновлення">
+                    <Grid>
+                        <Path
+                            Width="18"
+                            Height="18"
+                            Data="M23.707,4.293l-4-4a1,1,0,0,0-1.414,0l-4,4a1,1,0,0,0,1.414,1.414L18,3.414V15a1,1,0,0,0,2,0V3.414l2.293,2.293a1,1,0,0,0,1.414-1.414ZM13,19H5V5h6a1,1,0,0,0,0-2H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H13a1,1,0,0,0,0-2Z"
+                            Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Stretch="Uniform" />
+                        <!--  Notification dot — visible only when update is available  -->
+                        <Ellipse
+                            Width="8"
+                            Height="8"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Fill="{StaticResource OtherBrushSubColor2}"
+                            Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVis}}" />
+                    </Grid>
+                </Button>
+
                 <Button
                     x:Name="ProfileButton"
                     Padding="0"

@@ -1,0 +1,146 @@
+<UserControl
+    x:Class="Replixer.Views.Dialogs.UpdateDialogView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border
+        Width="340"
+        Padding="20"
+        Background="{StaticResource BrushColor2}"
+        BorderBrush="{StaticResource BrushBorderColor2}"
+        BorderThickness="1"
+        CornerRadius="12">
+        <StackPanel>
+
+            <!--  Title row  -->
+            <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+                <Path
+                    Width="16"
+                    Height="16"
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    Data="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,5a1.5,1.5,0,1,1-1.5,1.5A1.5,1.5,0,0,1,12,5Zm2,13H10a1,1,0,0,1,0-2h1V11H10a1,1,0,0,1,0-2h2a1,1,0,0,1,1,1v6h1a1,1,0,0,1,0,2Z"
+                    Fill="{StaticResource OtherBrushSubColor2}"
+                    Stretch="Uniform" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Text}"
+                    Text="Доступне оновлення" />
+            </StackPanel>
+
+            <Border
+                Padding="14"
+                Background="{StaticResource BrushColor3}"
+                BorderBrush="{StaticResource BrushBorderColor3}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel>
+
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        Foreground="{StaticResource SubText}"
+                        Text="Нова версія:" />
+                    <TextBlock
+                        Margin="0,0,0,14"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource OtherBrushSubColor2}"
+                        Text="{Binding NewVersion}" />
+
+                    <!--  Download progress (visible only while downloading)  -->
+                    <StackPanel
+                        Margin="0,0,0,14"
+                        Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}">
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="11"
+                            Foreground="{StaticResource SubText}"
+                            Text="Завантаження..." />
+                        <ProgressBar
+                            Height="4"
+                            Maximum="1"
+                            Minimum="0"
+                            Value="{Binding DownloadProgress}" />
+                    </StackPanel>
+
+                    <!--  Buttons  -->
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            Margin="0,0,10,0"
+                            Padding="12,8"
+                            Command="{Binding DismissCommand}"
+                            Cursor="Hand"
+                            IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBool}}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border
+                                        x:Name="Bg"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{StaticResource BrushColor4}"
+                                        BorderBrush="{StaticResource BrushBorderColor4}"
+                                        BorderThickness="1"
+                                        CornerRadius="16">
+                                        <TextBlock
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Foreground="{StaticResource SubText}"
+                                            Text="Нагадати пізніше" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <Button
+                            Padding="12,8"
+                            Command="{Binding UpdateNowCommand}"
+                            Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border
+                                        x:Name="Bg"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{StaticResource OtherBrushColor2}"
+                                        BorderBrush="{StaticResource OtherBrushSubColor2}"
+                                        BorderThickness="1"
+                                        CornerRadius="16">
+                                        <TextBlock
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Foreground="{StaticResource OtherBrushSubColor2}"
+                                            Text="Оновити зараз" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

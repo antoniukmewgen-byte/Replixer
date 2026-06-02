@@ -181,6 +181,13 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_isNotificationsEnabled == value) return; _isNotificationsEnabled = value; OnPropertyChanged(); Save(); }
     }
 
+    private DateTime? _updateDismissedDate;
+    public DateTime? UpdateDismissedDate
+    {
+        get => _updateDismissedDate;
+        set { if (_updateDismissedDate == value) return; _updateDismissedDate = value; OnPropertyChanged(); Save(); }
+    }
+
     private SynchronizationContext? _uiContext;
     private Timer? _saveDebounce;
     private CancellationTokenSource? _saveCts;

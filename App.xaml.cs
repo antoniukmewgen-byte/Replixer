@@ -89,11 +89,14 @@ public partial class App : Application
         var settings = _services!.GetRequiredService<AppSettings>();
         AutoStartManager.SetState(settings.IsAutoStartEnabled);
 
+        var mainVm     = _services!.GetRequiredService<MainViewModel>();
         var mainWindow = _services!.GetRequiredService<MainWindow>();
         Application.Current.MainWindow = mainWindow;
 
         if (!startInTray)
             mainWindow.Show();
+
+        _ = mainVm.StartupUpdateCheckAsync();
 
         _notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 

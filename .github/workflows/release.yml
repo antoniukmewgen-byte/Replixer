@@ -1,0 +1,77 @@
+name: Release
+
+# Запускається автоматично коли ти пушиш тег виду v1.2.3
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Відновлюємо секретні файли з GitHub Secrets
+      # (самі файли не зберігаються в репозиторії)
+      - name: Restore AppSecrets.cs
+        shell: pwsh
+        run: |
+          $bytes = [System.Convert]::FromBase64String("${{ secrets.APPSECRETS_CS }}")
+          [System.IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\Infrastructure\AppSecrets.cs", $bytes)
+
+      - name: Restore service_account.json
+        shell: pwsh
+        run: |
+          $bytes = [System.Convert]::FromBase64String("${{ secrets.SERVICE_ACCOUNT_JSON }}")
+          [System.IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\service_account.json", $bytes)
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Publish (self-contained, win-x64)
+        run: >
+          dotnet publish Replixer.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -o publish
+
+      - name: Install Inno Setup 6
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        run: iscc "installer\setup.iss"
+
+      # Визначаємо версію із назви тега (v1.2.3 → 1.2.3)
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+
+      # Створюємо GitHub Release і прикріплюємо інсталер
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Replixer v${{ steps.version.outputs.VERSION }}"
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: installer/Replixer-Setup.exe
+          body: |
+            ## Що нового у версії ${{ steps.version.outputs.VERSION }}
+
+            <!-- Опиши зміни тут перед тим як пушити тег, або відредагуй реліз вручну на GitHub -->
+
+            ---
+            **Для клієнтів:** програма запропонує оновлення автоматично при наступному запуску.

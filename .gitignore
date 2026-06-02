@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Secrets — never commit real credentials
+Infrastructure/AppSecrets.cs
+service_account.json
+
 # User-specific files
 *.rsuser
 *.suo

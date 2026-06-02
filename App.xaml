@@ -21,6 +21,7 @@
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
             <converters:NullToVisibilityConverter x:Key="NullToVisibility" />
+            <converters:InverseBoolConverter x:Key="InverseBool" />
 
             <!--  DataTemplates: ViewModel → View  -->
             <DataTemplate DataType="{x:Type vm:HomeViewModel}">
@@ -43,6 +44,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type dialogs:CallReportViewModel}">
                 <dialogViews:CallReportView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type dialogs:UpdateDialogViewModel}">
+                <dialogViews:UpdateDialogView />
             </DataTemplate>
 
         </ResourceDictionary>

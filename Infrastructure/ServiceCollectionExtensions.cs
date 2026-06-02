@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Replixer.Models;
+using Replixer.Services;
 using Replixer.Services.Manager;
 using Replixer.Services.Recording;
 using Replixer.Services.Upload;
@@ -14,6 +15,7 @@ internal static class ServiceCollectionExtensions
     {
         services.AddSingleton(AppSettings.Load());
         services.AddSingleton<IWindowManager, WindowManager>();
+        services.AddSingleton<UpdateService>();
 
         return services;
     }
