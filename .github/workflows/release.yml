@@ -71,7 +71,7 @@ jobs:
           $version  = "${{ steps.version.outputs.VERSION }}"
           $baseUrl  = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
           $files    = Get-ChildItem -Path publish -File |
-                        Where-Object { $_.Name -match '^Replixer\.' } |
+                        Where-Object { $_.Name -match '^Replixer\.' -and $_.Extension -ne '.pdb' } |
                         ForEach-Object {
                           [ordered]@{
                             path   = $_.Name
