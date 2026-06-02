@@ -88,10 +88,13 @@ public sealed class UpdateService
 
     public void LaunchInstallerAndExit(string installerPath)
     {
+        // /SILENT    — без діалогів інсталера
+        // /RESTARTEXITCODE=0 — повідомляє Inno Setup що після встановлення
+        //                      треба перезапустити програму
         Process.Start(new ProcessStartInfo(installerPath)
         {
             UseShellExecute = true,
-            Arguments       = "/SILENT"
+            Arguments       = "/SILENT /RESTARTEXITCODE=0"
         });
 
         System.Windows.Application.Current.Shutdown();

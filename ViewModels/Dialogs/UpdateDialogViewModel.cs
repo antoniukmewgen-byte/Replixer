@@ -42,10 +42,11 @@ public sealed class UpdateDialogViewModel : ViewModelBase
         IsDownloading = true;
         try
         {
-            var path = await _updateService.DownloadInstallerAsync(
-                _info,
-                new Progress<double>(p => DownloadProgress = p));
+            var dispatcher = System.Windows.Application.Current.Dispatcher;
+            var progress = new Progress<double>(p =>
+                dispatcher.BeginInvoke(() => DownloadProgress = p));
 
+            var path = await _updateService.DownloadInstallerAsync(_info, progress);
             _updateService.LaunchInstallerAndExit(path);
         }
         catch

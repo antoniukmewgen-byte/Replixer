@@ -44,7 +44,10 @@ Name: "{userprograms}\Видалити {#AppName}";  Filename: "{uninstallexe}"
 Name: "{userdesktop}\{#AppName}";            Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
+; Перший запуск після ручного встановлення (показується checkbox у wizard)
 Filename: "{app}\{#AppExeName}"; Description: "Запустити {#AppName}"; Flags: nowait postinstall skipifsilent
+; Автоматичний перезапуск після тихого оновлення (/SILENT)
+Filename: "{app}\{#AppExeName}"; Parameters: "--tray"; Flags: nowait skipifnotsilent
 
 [UninstallRun]
 Filename: "{app}\{#AppExeName}"; Parameters: "--uninstall"; Flags: skipifdoesntexist runhidden; RunOnceId: "RemoveAutostart"
