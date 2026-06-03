@@ -2,16 +2,15 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Upload;
+using Replixer.Infrastructure;
 using Replixer.Services;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 
 namespace Replixer.Services.Upload;
 
 public class GoogleDriveUploadService
 {
-    private const string ServiceAccountResourceName = "Replixer.service_account.json";
 
     private readonly DriveService? _service;
 
@@ -221,12 +220,11 @@ public class GoogleDriveUploadService
 
     private static DriveService CreateService()
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(ServiceAccountResourceName)
-            ?? throw new FileNotFoundException(
-                $"Embedded resource '{ServiceAccountResourceName}' not found. " +
-                "Add service_account.json to the project as EmbeddedResource.");
+        var json = AppSecrets.GoogleServiceAccountJson;
+        if (string.IsNullOrWhiteSpace(json))
+            throw new InvalidOperationException("GoogleServiceAccountJson is not configured in AppSecrets.");
 
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
         var credential = GoogleCredential.FromStream(stream)
             .CreateScoped(DriveService.Scope.Drive);
 

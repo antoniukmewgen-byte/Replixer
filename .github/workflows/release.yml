@@ -32,11 +32,15 @@ jobs:
           $bytes = [System.Convert]::FromBase64String("${{ secrets.APPSECRETS_CS }}")
           [System.IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\Infrastructure\AppSecrets.cs", $bytes)
 
-      - name: Restore service_account.json
+      - name: Inject Google credentials into AppSecrets.cs
         shell: pwsh
         run: |
-          $bytes = [System.Convert]::FromBase64String("${{ secrets.SERVICE_ACCOUNT_JSON }}")
-          [System.IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\service_account.json", $bytes)
+          $json = '${{ secrets.GOOGLE_CREDENTIALS_JSON }}'
+          $escapedJson = $json -replace '"', '""'
+          $path = "$env:GITHUB_WORKSPACE\Infrastructure\AppSecrets.cs"
+          $content = Get-Content $path -Raw
+          $content = $content -replace 'internal const string GoogleServiceAccountJson = "";', "internal const string GoogleServiceAccountJson = @`"$escapedJson`";"
+          Set-Content $path $content -Encoding utf8NoBOM
 
       - name: Restore NuGet packages
         run: dotnet restore

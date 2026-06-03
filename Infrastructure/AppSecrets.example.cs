@@ -22,6 +22,9 @@ internal static class AppSecrets
     internal static string ErrorBotToken => string.Empty; // токен бота для звітів про помилки
     internal static long   ErrorChatId   => 0L;           // ID чату куди слати звіти
 
+    // Вміст service_account.json — у GitHub Actions заповнюється з секрету GOOGLE_CREDENTIALS_JSON
+    internal const string GoogleServiceAccountJson = "";
+
     internal static readonly IReadOnlyList<TelegramChat> TelegramChats =
     [
         new TelegramChat("Назва групи", 1234567890L),
