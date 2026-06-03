@@ -70,7 +70,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _windowManager = windowManager;
         _recorder      = recorder;
 
-        _callContent = new IdleCallViewModel(StartRecording);
+        _callContent = new IdleCallViewModel(ManualStartRecording);
 
         _windowMonitor = new WindowMonitorService(new ICallDetector[]
         {
@@ -214,7 +214,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _recordingStartedAt = null;
         var callDuration    = callStartTime.HasValue ? DateTime.Now - callStartTime.Value : TimeSpan.Zero;
         OnPropertyChanged(nameof(IsRecording));
-        CallContent         = new IdleCallViewModel(StartRecording);
+        CallContent         = new IdleCallViewModel(ManualStartRecording);
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
         WireEntryEditCommand(entry);

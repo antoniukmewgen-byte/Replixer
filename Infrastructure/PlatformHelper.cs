@@ -70,13 +70,14 @@ public static class PlatformHelper
 
     public static string ToFileName(string rawName)
     {
-        if (string.IsNullOrEmpty(rawName)) return "Телеграм";
+        if (string.IsNullOrEmpty(rawName)) return "Ручний запис";
         return rawName.ToLowerInvariant() switch
         {
+            "telegram"                           => "Телеграм",
             "viber"                              => "Viber",
             var s when s.StartsWith("whatsapp") => "WhatsApp",
             var s when s.Contains("ringostat")  => "Ringostat",
-            _                                   => "Телеграм",
+            _                                   => "Ручний запис",
         };
     }
 }
