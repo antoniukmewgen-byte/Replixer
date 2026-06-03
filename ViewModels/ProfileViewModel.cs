@@ -1,5 +1,6 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using Replixer.Services.Upload;
 using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
@@ -209,6 +210,8 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             IsCheckingDrive      = false;
             IsDriveConnected     = error is null;
             DriveConnectionError = error;
+            if (error is not null)
+                ErrorReporter.Report("GOOGLE DRIVE", error);
         });
     }
 
@@ -223,6 +226,8 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             IsCheckingKommo      = false;
             IsKommoConnected     = error is null;
             KommoConnectionError = error;
+            if (error is not null)
+                ErrorReporter.Report("KOMMO CRM", error);
         });
     }
 
@@ -239,6 +244,8 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             IsAuthorizingTelegram = false;
             IsTelegramConnected   = ok ? true : (bool?)false;
             TelegramAuthError     = error;
+            if (error is not null)
+                ErrorReporter.Report("TELEGRAM AUTH", error);
         });
     }
 
