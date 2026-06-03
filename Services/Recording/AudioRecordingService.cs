@@ -40,6 +40,28 @@ public class AudioRecordingService : IDisposable
     public string? CurrentFilePath   => _finalMp3Path;
     public string? LastError         { get; private set; }
 
+    public void UpdatePlatform(string appName)
+    {
+        if (!IsRecording || _finalMp3Path is null) return;
+        try
+        {
+            string manager   = Sanitize(string.IsNullOrWhiteSpace(_settings.ManagerName) ? "Менеджер" : _settings.ManagerName);
+            string platform  = Sanitize(PlatformHelper.ToFileName(appName));
+            var    now       = DateTime.Now;
+            string dir       = Path.GetDirectoryName(_finalMp3Path)!;
+            string newName   = $"{manager}_{platform}_{now:yy.MM.dd}_{now:HH.mm}.mp3";
+            string newPath   = Path.Combine(dir, newName);
+            if (File.Exists(newPath))
+                newPath = Path.Combine(dir, $"{manager}_{platform}_{now:yy.MM.dd}_{now:HH.mm}_{now:ss}.mp3");
+            _finalMp3Path = newPath;
+            Debug.WriteLine($"[Recording] Platform updated → {newPath}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Recording] UpdatePlatform failed: {ex.Message}");
+        }
+    }
+
     public AudioRecordingService(AppSettings settings)
     {
         _settings = settings;

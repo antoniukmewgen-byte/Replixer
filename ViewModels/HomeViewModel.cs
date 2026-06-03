@@ -132,7 +132,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             _lastDetectedApp = app;
-            if (_isRecording || _hasActiveDialog) return;
+            if (_isRecording)
+            {
+                _recorder.UpdatePlatform(app);
+                if (!_hasActiveDialog) return;
+            }
+            if (_hasActiveDialog) return;
 
             ShowDialog(new CallDialogViewModel(
                 appName:        app,
