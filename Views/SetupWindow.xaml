@@ -89,427 +89,205 @@
                 </StackPanel>
             </Grid>
 
-            <ScrollViewer
-                Grid.Row="1"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Hidden">
+            <StackPanel Grid.Row="1">
                 <StackPanel Margin="16">
                     <Border
-                        Padding="16"
                         Background="{StaticResource BrushColor2}"
                         BorderBrush="{StaticResource BrushBorderColor2}"
                         BorderThickness="1"
                         CornerRadius="12">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                        <ScrollViewer
+                            Height="600"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Hidden">
+                            <Grid Margin="16">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                                <TextBlock
-                                    Margin="0,0,0,4"
-                                    HorizontalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource Text}">
-                                    Вітаємо в Replixer!
-                                </TextBlock>
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="14"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource Text}">
-                                    Заповніть інформацію для початку роботи
-                                </TextBlock>
-                            </StackPanel>
+                                <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                    <TextBlock
+                                        Margin="0,0,0,4"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="24"
+                                        FontWeight="Bold"
+                                        Foreground="{StaticResource Text}">
+                                        Вітаємо в Replixer!
+                                    </TextBlock>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource InterFont}"
+                                        FontSize="14"
+                                        FontWeight="Bold"
+                                        Foreground="{StaticResource Text}">
+                                        Заповніть інформацію для початку роботи
+                                    </TextBlock>
+                                </StackPanel>
 
-                            <StackPanel Grid.Row="1">
-                                <!--  Card: Manager name  -->
-                                <Border
-                                    Padding="16"
-                                    Background="{StaticResource BrushColor3}"
-                                    BorderBrush="{StaticResource BrushBorderColor3}"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="1">
+                                    <!--  Card: Manager name  -->
+                                    <Border
+                                        Padding="16"
+                                        Background="{StaticResource BrushColor3}"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border
-                                                Grid.Column="0"
-                                                Width="38"
-                                                Height="38"
-                                                Background="{StaticResource OtherBrushColor1}"
-                                                CornerRadius="8">
-                                                <Path
-                                                    Width="18"
-                                                    Height="18"
-                                                    Data="M384,128A128,128,0,1,1,256,0A128,128,0,0,1,384,128Z     M256,298.667c-105.99,0.118-191.882,86.01-192,192C64,502.449,73.551,512,85.333,512h341.333c11.782,0,21.333-9.551,21.333-21.333C447.882,384.677,361.99,298.784,256,298.667Z"
-                                                    Fill="{StaticResource OtherBrushSubColor1}"
-                                                    Stretch="Uniform" />
-                                            </Border>
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Margin="12,0,0,0"
-                                                VerticalAlignment="Center">
-                                                <TextBlock
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="14"
-                                                    FontWeight="Bold"
-                                                    Foreground="{StaticResource Text}">
-                                                    Ім'я та посада
-                                                </TextBlock>
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="12"
-                                                    FontWeight="Medium"
-                                                    Foreground="{StaticResource SubText}"
-                                                    TextWrapping="Wrap">
-                                                    Обов'язково · використовується для папки на Google Drive
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </Grid>
-
-                                        <Rectangle
-                                            Grid.Row="1"
-                                            Height="1"
-                                            Margin="0,12"
-                                            Fill="{StaticResource BrushBorderColor3}" />
-
-                                        <StackPanel Grid.Row="2" Orientation="Vertical">
-                                            <Border Style="{StaticResource AppInputBorder}">
-                                                <Grid>
-                                                    <TextBox
-                                                        x:Name="ManagerNameBox"
-                                                        Style="{StaticResource AppTextBox}"
-                                                        Text="{Binding ManagerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Background="{StaticResource OtherBrushColor1}"
+                                                    CornerRadius="8">
+                                                    <Path
+                                                        Width="18"
+                                                        Height="18"
+                                                        Data="M384,128A128,128,0,1,1,256,0A128,128,0,0,1,384,128Z     M256,298.667c-105.99,0.118-191.882,86.01-192,192C64,502.449,73.551,512,85.333,512h341.333c11.782,0,21.333-9.551,21.333-21.333C447.882,384.677,361.99,298.784,256,298.667Z"
+                                                        Fill="{StaticResource OtherBrushSubColor1}"
+                                                        Stretch="Uniform" />
+                                                </Border>
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="12,0,0,0"
+                                                    VerticalAlignment="Center">
                                                     <TextBlock
-                                                        VerticalAlignment="Center"
                                                         FontFamily="{StaticResource InterFont}"
                                                         FontSize="14"
-                                                        Foreground="{StaticResource SubText}"
-                                                        IsHitTestVisible="False"
-                                                        Text="Прізвище та ім'я">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Text, ElementName=ManagerNameBox}" Value="">
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
+                                                        FontWeight="Bold"
+                                                        Foreground="{StaticResource Text}">
+                                                        Ім'я та посада
                                                     </TextBlock>
-                                                </Grid>
-                                            </Border>
-                                            <ComboBox
-                                                Margin="0,8,0,0"
-                                                ItemsSource="{Binding Positions}"
-                                                SelectedItem="{Binding Position, Mode=TwoWay}"
-                                                Style="{StaticResource AppComboBox}"
-                                                Tag="Посада" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
+                                                    <TextBlock
+                                                        Margin="0,4,0,0"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="12"
+                                                        FontWeight="Medium"
+                                                        Foreground="{StaticResource SubText}"
+                                                        TextWrapping="Wrap">
+                                                        Обов'язково · використовується для папки на Google Drive
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Grid>
 
-                                <!--  Card: Google Drive  -->
-                                <Border
-                                    Margin="0,12,0,0"
-                                    Padding="16"
-                                    Background="{StaticResource BrushColor3}"
-                                    BorderBrush="{StaticResource BrushBorderColor3}"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
+                                            <Rectangle
+                                                Grid.Row="1"
+                                                Height="1"
+                                                Margin="0,12"
+                                                Fill="{StaticResource BrushBorderColor3}" />
 
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border
-                                                Grid.Column="0"
-                                                Width="38"
-                                                Height="38"
-                                                Background="{StaticResource OtherBrushColor3}"
-                                                CornerRadius="8">
-                                                <Path
-                                                    Width="18"
-                                                    Height="18"
-                                                    Data="M480.768,87.936l-56.704-56.704c-5.674-5.585-11.957-10.515-18.731-14.699V64 c-0.071,58.881-47.786,106.596-106.667,106.667h-85.333C154.452,170.596,106.737,122.881,106.667,64V0 C47.786,0.071,0.071,47.786,0,106.667v298.667C0.071,464.215,47.786,511.93,106.667,512h298.667 C464.214,511.93,511.93,464.215,512,405.334V163.35C512.08,135.049,500.833,107.893,480.768,87.936z M256,384 c-47.128,0-85.333-38.205-85.333-85.333s38.205-85.333,85.333-85.333s85.333,38.205,85.333,85.333S303.128,384,256,384z M213.333,128h85.333c35.346,0,64-28.654,64-64V1.366c-4.638-0.756-9.32-1.212-14.016-1.365H149.333v64 C149.333,99.346,177.987,128,213.333,128z"
-                                                    Fill="{StaticResource OtherBrushSubColor3}"
-                                                    Stretch="Uniform" />
-                                            </Border>
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Margin="12,0,0,0"
-                                                VerticalAlignment="Center">
-                                                <TextBlock
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="14"
-                                                    FontWeight="Bold"
-                                                    Foreground="{StaticResource Text}">
-                                                    Google Drive
-                                                </TextBlock>
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="12"
-                                                    FontWeight="Medium"
-                                                    Foreground="{StaticResource SubText}"
-                                                    TextWrapping="Wrap">
-                                                    Необов'язково · можна налаштувати пізніше
-                                                </TextBlock>
+                                            <StackPanel Grid.Row="2" Orientation="Vertical">
+                                                <Border Style="{StaticResource AppInputBorder}">
+                                                    <Grid>
+                                                        <TextBox
+                                                            x:Name="ManagerNameBox"
+                                                            Style="{StaticResource AppTextBox}"
+                                                            Text="{Binding ManagerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontFamily="{StaticResource InterFont}"
+                                                            FontSize="14"
+                                                            Foreground="{StaticResource SubText}"
+                                                            IsHitTestVisible="False"
+                                                            Text="Прізвище та ім'я">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=ManagerNameBox}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </Border>
+                                                <ComboBox
+                                                    Margin="0,8,0,0"
+                                                    ItemsSource="{Binding Positions}"
+                                                    SelectedItem="{Binding Position, Mode=TwoWay}"
+                                                    Style="{StaticResource AppComboBox}"
+                                                    Tag="Посада" />
                                             </StackPanel>
                                         </Grid>
+                                    </Border>
 
-                                        <Rectangle
-                                            Grid.Row="1"
-                                            Height="1"
-                                            Margin="0,12"
-                                            Fill="{StaticResource BrushBorderColor3}" />
+                                    <!--  Card: Google Drive  -->
+                                    <Border
+                                        Margin="0,12,0,0"
+                                        Padding="16"
+                                        Background="{StaticResource BrushColor3}"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                        <Grid Grid.Row="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
-                                                <Grid>
-                                                    <TextBox
-                                                        x:Name="FolderIdBox"
-                                                        Style="{StaticResource AppTextBox}"
-                                                        Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Background="{StaticResource OtherBrushColor3}"
+                                                    CornerRadius="8">
+                                                    <Path
+                                                        Width="18"
+                                                        Height="18"
+                                                        Data="M480.768,87.936l-56.704-56.704c-5.674-5.585-11.957-10.515-18.731-14.699V64 c-0.071,58.881-47.786,106.596-106.667,106.667h-85.333C154.452,170.596,106.737,122.881,106.667,64V0 C47.786,0.071,0.071,47.786,0,106.667v298.667C0.071,464.215,47.786,511.93,106.667,512h298.667 C464.214,511.93,511.93,464.215,512,405.334V163.35C512.08,135.049,500.833,107.893,480.768,87.936z M256,384 c-47.128,0-85.333-38.205-85.333-85.333s38.205-85.333,85.333-85.333s85.333,38.205,85.333,85.333S303.128,384,256,384z M213.333,128h85.333c35.346,0,64-28.654,64-64V1.366c-4.638-0.756-9.32-1.212-14.016-1.365H149.333v64 C149.333,99.346,177.987,128,213.333,128z"
+                                                        Fill="{StaticResource OtherBrushSubColor3}"
+                                                        Stretch="Uniform" />
+                                                </Border>
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="12,0,0,0"
+                                                    VerticalAlignment="Center">
                                                     <TextBlock
-                                                        VerticalAlignment="Center"
                                                         FontFamily="{StaticResource InterFont}"
                                                         FontSize="14"
-                                                        Foreground="{StaticResource SubText}"
-                                                        IsHitTestVisible="False"
-                                                        Text="ID головної папки (Shared Drive)">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Text, ElementName=FolderIdBox}" Value="">
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
+                                                        FontWeight="Bold"
+                                                        Foreground="{StaticResource Text}">
+                                                        Google Drive
                                                     </TextBlock>
-                                                </Grid>
-                                            </Border>
-                                            <Button
-                                                Grid.Column="1"
-                                                Margin="12,0,0,0"
-                                                Padding="12,8"
-                                                HorizontalAlignment="Right"
-                                                Command="{Binding TestDriveConnectionCommand}"
-                                                Cursor="Hand"
-                                                ToolTip="{Binding DriveConnectionError}">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
-                                                                <Setter Property="IsEnabled" Value="False" />
-                                                                <Setter Property="Cursor" Value="Arrow" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsDriveConnected}" Value="True">
-                                                                <Setter Property="IsEnabled" Value="False" />
-                                                                <Setter Property="Cursor" Value="Arrow" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border
-                                                            x:Name="Bg"
-                                                            Padding="{TemplateBinding Padding}"
-                                                            Background="{StaticResource BrushColor4}"
-                                                            BorderBrush="{StaticResource BrushBorderColor4}"
-                                                            BorderThickness="1"
-                                                            CornerRadius="16">
-                                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                                <Path
-                                                                    x:Name="CheckIcon"
-                                                                    Width="12"
-                                                                    Height="12"
-                                                                    Margin="0,0,6,0"
-                                                                    Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
-                                                                    Fill="{StaticResource OtherBrushSubColor1}"
-                                                                    Stretch="Uniform"
-                                                                    Visibility="Collapsed" />
-                                                                <Path
-                                                                    x:Name="ErrorIcon"
-                                                                    Width="12"
-                                                                    Height="12"
-                                                                    Margin="0,0,6,0"
-                                                                    Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
-                                                                    Fill="{StaticResource OtherBrushSubColor4}"
-                                                                    Stretch="Uniform"
-                                                                    Visibility="Collapsed" />
-                                                                <TextBlock
-                                                                    x:Name="Label"
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"
-                                                                    FontFamily="{StaticResource InterFont}"
-                                                                    FontSize="14"
-                                                                    FontWeight="Medium"
-                                                                    Foreground="{StaticResource SubText}"
-                                                                    Text="Перевірити" />
-                                                            </StackPanel>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
-                                                                <Setter TargetName="Label" Property="Text" Value="Перевірка..." />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsDriveConnected}" Value="True">
-                                                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                                                <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                                <Setter TargetName="Label" Property="Text" Value="Підключено" />
-                                                                <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
-                                                                <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsDriveConnected}" Value="False">
-                                                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
-                                                                <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                <Setter TargetName="Label" Property="Text" Value="Немає доступу" />
-                                                                <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
-                                                            </Trigger>
-                                                            <Trigger Property="IsPressed" Value="True">
-                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
-                                                            </Trigger>
-                                                            <Trigger Property="IsEnabled" Value="False">
-                                                                <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Border>
-
-                                <!--  Card: Kommo CRM  -->
-                                <Border
-                                    Margin="0,12,0,0"
-                                    Padding="16"
-                                    Background="{StaticResource BrushColor3}"
-                                    BorderBrush="{StaticResource BrushBorderColor3}"
-                                    BorderThickness="1"
-                                    CornerRadius="8">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border
-                                                Grid.Column="0"
-                                                Width="38"
-                                                Height="38"
-                                                Background="#1A2A3A"
-                                                CornerRadius="8">
-                                                <TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="13"
-                                                    FontWeight="Bold"
-                                                    Foreground="#4A9EFF">
-                                                    K
-                                                </TextBlock>
-                                            </Border>
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Margin="12,0,0,0"
-                                                VerticalAlignment="Center">
-                                                <TextBlock
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="14"
-                                                    FontWeight="Bold"
-                                                    Foreground="{StaticResource Text}">
-                                                    Kommo CRM
-                                                </TextBlock>
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="12"
-                                                    FontWeight="Medium"
-                                                    Foreground="{StaticResource SubText}"
-                                                    TextWrapping="Wrap">
-                                                    Необов'язково · можна налаштувати пізніше
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </Grid>
-
-                                        <Rectangle
-                                            Grid.Row="1"
-                                            Height="1"
-                                            Margin="0,12"
-                                            Fill="{StaticResource BrushBorderColor3}" />
-
-                                        <StackPanel Grid.Row="2">
-                                            <!--  Subdomain  -->
-                                            <Border Margin="0,0,0,12" Style="{StaticResource AppInputBorder}">
-                                                <Grid>
-                                                    <TextBox
-                                                        x:Name="KommoSubdomainBox"
-                                                        Style="{StaticResource AppTextBox}"
-                                                        Text="{Binding KommoSubdomain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                     <TextBlock
-                                                        VerticalAlignment="Center"
+                                                        Margin="0,4,0,0"
                                                         FontFamily="{StaticResource InterFont}"
-                                                        FontSize="14"
+                                                        FontSize="12"
+                                                        FontWeight="Medium"
                                                         Foreground="{StaticResource SubText}"
-                                                        IsHitTestVisible="False"
-                                                        Text="Субдомен (напр. movenation)">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Text, ElementName=KommoSubdomainBox}" Value="">
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
+                                                        TextWrapping="Wrap">
+                                                        Необов'язково · можна налаштувати пізніше
                                                     </TextBlock>
-                                                </Grid>
-                                            </Border>
-                                            <!--  Token + Test button  -->
-                                            <Grid>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <Rectangle
+                                                Grid.Row="1"
+                                                Height="1"
+                                                Margin="0,12"
+                                                Fill="{StaticResource BrushBorderColor3}" />
+
+                                            <Grid Grid.Row="2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
@@ -517,21 +295,21 @@
                                                 <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
                                                     <Grid>
                                                         <TextBox
-                                                            x:Name="KommoTokenBox"
+                                                            x:Name="FolderIdBox"
                                                             Style="{StaticResource AppTextBox}"
-                                                            Text="{Binding KommoApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            Text="{Binding GoogleDriveFolderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                         <TextBlock
                                                             VerticalAlignment="Center"
                                                             FontFamily="{StaticResource InterFont}"
                                                             FontSize="14"
                                                             Foreground="{StaticResource SubText}"
                                                             IsHitTestVisible="False"
-                                                            Text="API токен">
+                                                            Text="ID головної папки (Shared Drive)">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Text, ElementName=KommoTokenBox}" Value="">
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=FolderIdBox}" Value="">
                                                                             <Setter Property="Visibility" Value="Visible" />
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
@@ -545,17 +323,17 @@
                                                     Margin="12,0,0,0"
                                                     Padding="12,8"
                                                     HorizontalAlignment="Right"
-                                                    Command="{Binding TestKommoConnectionCommand}"
+                                                    Command="{Binding TestDriveConnectionCommand}"
                                                     Cursor="Hand"
-                                                    ToolTip="{Binding KommoConnectionError}">
+                                                    ToolTip="{Binding DriveConnectionError}">
                                                     <Button.Style>
                                                         <Style TargetType="Button">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsCheckingKommo}" Value="True">
+                                                                <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
                                                                     <Setter Property="IsEnabled" Value="False" />
                                                                     <Setter Property="Cursor" Value="Arrow" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsKommoConnected}" Value="True">
+                                                                <DataTrigger Binding="{Binding IsDriveConnected}" Value="True">
                                                                     <Setter Property="IsEnabled" Value="False" />
                                                                     <Setter Property="Cursor" Value="Arrow" />
                                                                 </DataTrigger>
@@ -602,23 +380,24 @@
                                                                 </StackPanel>
                                                             </Border>
                                                             <ControlTemplate.Triggers>
-                                                                <DataTrigger Binding="{Binding IsCheckingKommo}" Value="True">
+                                                                <DataTrigger Binding="{Binding IsCheckingDrive}" Value="True">
                                                                     <Setter TargetName="Label" Property="Text" Value="Перевірка..." />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsKommoConnected}" Value="True">
+                                                                <DataTrigger Binding="{Binding IsDriveConnected}" Value="True">
                                                                     <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
                                                                     <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                                    <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
+                                                                    <Setter TargetName="Label" Property="Text" Value="Підключено" />
                                                                     <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
                                                                     <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsKommoConnected}" Value="False">
+                                                                <DataTrigger Binding="{Binding IsDriveConnected}" Value="False">
                                                                     <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
                                                                     <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                    <Setter TargetName="Label" Property="Text" Value="Помилка" />
+                                                                    <Setter TargetName="Label" Property="Text" Value="Немає доступу" />
                                                                     <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
                                                                     <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
+
                                                                 <Trigger Property="IsMouseOver" Value="True">
                                                                     <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
                                                                 </Trigger>
@@ -633,97 +412,94 @@
                                                     </Button.Template>
                                                 </Button>
                                             </Grid>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-
-                                <!--  Card: Telegram  -->
-                                <Border
-                                    Margin="0,12,0,0"
-                                    Padding="16"
-                                    Background="{StaticResource BrushColor3}"
-                                    BorderBrush="{StaticResource BrushBorderColor3}"
-                                    BorderThickness="1"
-                                    CornerRadius="8"
-                                    Visibility="{Binding IsTelegramVisible, Converter={StaticResource BoolToVis}}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border
-                                                Grid.Column="0"
-                                                Width="38"
-                                                Height="38"
-                                                Background="{StaticResource BrushTelegram}"
-                                                CornerRadius="8">
-                                                <Image
-                                                    Width="18"
-                                                    Height="18"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Source="/Assets/Icons/telegram.png" />
-                                            </Border>
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Margin="12,0,0,0"
-                                                VerticalAlignment="Center">
-                                                <TextBlock
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="14"
-                                                    FontWeight="Bold"
-                                                    Foreground="{StaticResource Text}">
-                                                    Telegram
-                                                </TextBlock>
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="12"
-                                                    FontWeight="Medium"
-                                                    Foreground="{StaticResource SubText}"
-                                                    TextWrapping="Wrap">
-                                                    Необов'язково · можна налаштувати пізніше
-                                                </TextBlock>
-                                            </StackPanel>
                                         </Grid>
+                                    </Border>
 
-                                        <Rectangle
-                                            Grid.Row="1"
-                                            Height="1"
-                                            Margin="0,12"
-                                            Fill="{StaticResource BrushBorderColor3}" />
+                                    <!--  Card: Kommo CRM  -->
+                                    <Border
+                                        Margin="0,12,0,0"
+                                        Padding="16"
+                                        Background="{StaticResource BrushColor3}"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                        <StackPanel Grid.Row="2">
-                                            <Grid>
+                                            <Grid Grid.Row="0">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
-                                                <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Background="#1A2A3A"
+                                                    CornerRadius="8">
+                                                    <TextBlock
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="13"
+                                                        FontWeight="Bold"
+                                                        Foreground="#4A9EFF">
+                                                        K
+                                                    </TextBlock>
+                                                </Border>
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="12,0,0,0"
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="14"
+                                                        FontWeight="Bold"
+                                                        Foreground="{StaticResource Text}">
+                                                        Kommo CRM
+                                                    </TextBlock>
+                                                    <TextBlock
+                                                        Margin="0,4,0,0"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="12"
+                                                        FontWeight="Medium"
+                                                        Foreground="{StaticResource SubText}"
+                                                        TextWrapping="Wrap">
+                                                        Необов'язково · можна налаштувати пізніше
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <Rectangle
+                                                Grid.Row="1"
+                                                Height="1"
+                                                Margin="0,12"
+                                                Fill="{StaticResource BrushBorderColor3}" />
+
+                                            <StackPanel Grid.Row="2">
+                                                <!--  Subdomain  -->
+                                                <Border Margin="0,0,0,12" Style="{StaticResource AppInputBorder}">
                                                     <Grid>
                                                         <TextBox
-                                                            x:Name="PhoneBox"
+                                                            x:Name="KommoSubdomainBox"
                                                             Style="{StaticResource AppTextBox}"
-                                                            Text="{Binding TelegramPhone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            Text="{Binding KommoSubdomain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                         <TextBlock
                                                             VerticalAlignment="Center"
                                                             FontFamily="{StaticResource InterFont}"
                                                             FontSize="14"
                                                             Foreground="{StaticResource SubText}"
                                                             IsHitTestVisible="False"
-                                                            Text="Номер телефону">
+                                                            Text="Субдомен (напр. movenation)">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Text, ElementName=PhoneBox}" Value="">
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=KommoSubdomainBox}" Value="">
                                                                             <Setter Property="Visibility" Value="Visible" />
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
@@ -732,114 +508,339 @@
                                                         </TextBlock>
                                                     </Grid>
                                                 </Border>
-                                                <Button
+                                                <!--  Token + Test button  -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
+                                                        <Grid>
+                                                            <TextBox
+                                                                x:Name="KommoTokenBox"
+                                                                Style="{StaticResource AppTextBox}"
+                                                                Text="{Binding KommoApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                FontFamily="{StaticResource InterFont}"
+                                                                FontSize="14"
+                                                                Foreground="{StaticResource SubText}"
+                                                                IsHitTestVisible="False"
+                                                                Text="API токен">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Text, ElementName=KommoTokenBox}" Value="">
+                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Grid>
+                                                    </Border>
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Margin="12,0,0,0"
+                                                        Padding="12,8"
+                                                        HorizontalAlignment="Right"
+                                                        Command="{Binding TestKommoConnectionCommand}"
+                                                        Cursor="Hand"
+                                                        ToolTip="{Binding KommoConnectionError}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCheckingKommo}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsKommoConnected}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border
+                                                                    x:Name="Bg"
+                                                                    Padding="{TemplateBinding Padding}"
+                                                                    Background="{StaticResource BrushColor4}"
+                                                                    BorderBrush="{StaticResource BrushBorderColor4}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="16">
+                                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                                        <Path
+                                                                            x:Name="CheckIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
+                                                                            Fill="{StaticResource OtherBrushSubColor1}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <Path
+                                                                            x:Name="ErrorIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
+                                                                            Fill="{StaticResource OtherBrushSubColor4}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <TextBlock
+                                                                            x:Name="Label"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            FontFamily="{StaticResource InterFont}"
+                                                                            FontSize="14"
+                                                                            FontWeight="Medium"
+                                                                            Foreground="{StaticResource SubText}"
+                                                                            Text="Перевірити" />
+                                                                    </StackPanel>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCheckingKommo}" Value="True">
+                                                                        <Setter TargetName="Label" Property="Text" Value="Перевірка..." />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsKommoConnected}" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsKommoConnected}" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Помилка" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsPressed" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsEnabled" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!--  Card: Telegram  -->
+                                    <Border
+                                        Margin="0,12,0,0"
+                                        Padding="16"
+                                        Background="{StaticResource BrushColor3}"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Visibility="{Binding IsTelegramVisible, Converter={StaticResource BoolToVis}}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Background="{StaticResource BrushTelegram}"
+                                                    CornerRadius="8">
+                                                    <Image
+                                                        Width="18"
+                                                        Height="18"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Source="/Assets/Icons/telegram.png" />
+                                                </Border>
+                                                <StackPanel
                                                     Grid.Column="1"
                                                     Margin="12,0,0,0"
-                                                    Padding="12,8"
-                                                    HorizontalAlignment="Right"
-                                                    Command="{Binding TelegramActionCommand}"
-                                                    Cursor="Hand"
-                                                    ToolTip="{Binding TelegramAuthError}">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
-                                                                    <Setter Property="IsEnabled" Value="False" />
-                                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsTelegramConnected}" Value="True">
-                                                                    <Setter Property="IsEnabled" Value="False" />
-                                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Button.Style>
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="Button">
-                                                            <Border
-                                                                x:Name="Bg"
-                                                                Padding="{TemplateBinding Padding}"
-                                                                Background="{StaticResource BrushColor4}"
-                                                                BorderBrush="{StaticResource BrushBorderColor4}"
-                                                                BorderThickness="1"
-                                                                CornerRadius="16">
-                                                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                                    <Path
-                                                                        x:Name="CheckIcon"
-                                                                        Width="12"
-                                                                        Height="12"
-                                                                        Margin="0,0,6,0"
-                                                                        Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
-                                                                        Fill="{StaticResource OtherBrushSubColor1}"
-                                                                        Stretch="Uniform"
-                                                                        Visibility="Collapsed" />
-                                                                    <Path
-                                                                        x:Name="ErrorIcon"
-                                                                        Width="12"
-                                                                        Height="12"
-                                                                        Margin="0,0,6,0"
-                                                                        Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
-                                                                        Fill="{StaticResource OtherBrushSubColor4}"
-                                                                        Stretch="Uniform"
-                                                                        Visibility="Collapsed" />
-                                                                    <TextBlock
-                                                                        x:Name="Label"
-                                                                        HorizontalAlignment="Center"
-                                                                        VerticalAlignment="Center"
-                                                                        FontFamily="{StaticResource InterFont}"
-                                                                        FontSize="14"
-                                                                        FontWeight="Medium"
-                                                                        Foreground="{StaticResource SubText}"
-                                                                        Text="Авторизувати" />
-                                                                </StackPanel>
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
-                                                                    <Setter TargetName="Label" Property="Text" Value="Авторизація..." />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsTelegramConnected}" Value="True">
-                                                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                                                    <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                                    <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
-                                                                    <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
-                                                                    <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsTelegramConnected}" Value="False">
-                                                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
-                                                                    <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                    <Setter TargetName="Label" Property="Text" Value="Помилка" />
-                                                                    <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                    <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
-                                                                </DataTrigger>
-
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
-                                                                </Trigger>
-                                                                <Trigger Property="IsPressed" Value="True">
-                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
-                                                                </Trigger>
-                                                                <Trigger Property="IsEnabled" Value="False">
-                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="14"
+                                                        FontWeight="Bold"
+                                                        Foreground="{StaticResource Text}">
+                                                        Telegram
+                                                    </TextBlock>
+                                                    <TextBlock
+                                                        Margin="0,4,0,0"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="12"
+                                                        FontWeight="Medium"
+                                                        Foreground="{StaticResource SubText}"
+                                                        TextWrapping="Wrap">
+                                                        Необов'язково · можна налаштувати пізніше
+                                                    </TextBlock>
+                                                </StackPanel>
                                             </Grid>
 
-                                            <!--  Chat selector  -->
-                                            <ComboBox
-                                                MinWidth="150"
-                                                Margin="0,12,0,0"
-                                                ItemsSource="{Binding FilteredTelegramChats}"
-                                                SelectedItem="{Binding SelectedTelegramChat, Mode=TwoWay}"
-                                                Style="{StaticResource AppComboBox}"
-                                                Tag="Оберіть чат" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
+                                            <Rectangle
+                                                Grid.Row="1"
+                                                Height="1"
+                                                Margin="0,12"
+                                                Fill="{StaticResource BrushBorderColor3}" />
+
+                                            <StackPanel Grid.Row="2">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
+                                                        <Grid>
+                                                            <TextBox
+                                                                x:Name="PhoneBox"
+                                                                Style="{StaticResource AppTextBox}"
+                                                                Text="{Binding TelegramPhone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                FontFamily="{StaticResource InterFont}"
+                                                                FontSize="14"
+                                                                Foreground="{StaticResource SubText}"
+                                                                IsHitTestVisible="False"
+                                                                Text="Номер телефону">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Text, ElementName=PhoneBox}" Value="">
+                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Grid>
+                                                    </Border>
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Margin="12,0,0,0"
+                                                        Padding="12,8"
+                                                        HorizontalAlignment="Right"
+                                                        Command="{Binding TelegramActionCommand}"
+                                                        Cursor="Hand"
+                                                        ToolTip="{Binding TelegramAuthError}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsTelegramConnected}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border
+                                                                    x:Name="Bg"
+                                                                    Padding="{TemplateBinding Padding}"
+                                                                    Background="{StaticResource BrushColor4}"
+                                                                    BorderBrush="{StaticResource BrushBorderColor4}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="16">
+                                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                                        <Path
+                                                                            x:Name="CheckIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
+                                                                            Fill="{StaticResource OtherBrushSubColor1}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <Path
+                                                                            x:Name="ErrorIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
+                                                                            Fill="{StaticResource OtherBrushSubColor4}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <TextBlock
+                                                                            x:Name="Label"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            FontFamily="{StaticResource InterFont}"
+                                                                            FontSize="14"
+                                                                            FontWeight="Medium"
+                                                                            Foreground="{StaticResource SubText}"
+                                                                            Text="Авторизувати" />
+                                                                    </StackPanel>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsAuthorizingTelegram}" Value="True">
+                                                                        <Setter TargetName="Label" Property="Text" Value="Авторизація..." />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsTelegramConnected}" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Авторизовано" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsTelegramConnected}" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Помилка" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsPressed" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsEnabled" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!--  Chat selector  -->
+                                                <ComboBox
+                                                    MinWidth="150"
+                                                    Margin="0,12,0,0"
+                                                    ItemsSource="{Binding FilteredTelegramChats}"
+                                                    SelectedItem="{Binding SelectedTelegramChat, Mode=TwoWay}"
+                                                    Style="{StaticResource AppComboBox}"
+                                                    Tag="Оберіть чат" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
                     </Border>
 
                     <Button
@@ -898,7 +899,7 @@
                         </Button.Template>
                     </Button>
                 </StackPanel>
-            </ScrollViewer>
+            </StackPanel>
 
             <!--  Modal overlay (Telegram verification code dialog)  -->
             <Grid Grid.RowSpan="2" Visibility="{Binding Dialog, Converter={StaticResource NullToVisibility}}">
