@@ -115,12 +115,12 @@
                             <Border
                                 MinWidth="{Binding ActualWidth, ElementName=Bg}"
                                 Margin="0,4,0,0"
-                                Padding="4"
+                                Padding="2"
                                 Background="{StaticResource BrushColor2}"
                                 BorderBrush="{StaticResource BrushBorderColor2}"
                                 BorderThickness="1"
                                 CornerRadius="8"
-                                TextOptions.TextFormattingMode="Ideal"
+                                TextOptions.TextFormattingMode="Display"
                                 TextOptions.TextRenderingMode="ClearType">
                                 <ScrollViewer
                                     MaxHeight="150"
@@ -160,7 +160,7 @@
                             <ControlTemplate TargetType="ComboBoxItem">
                                 <Border
                                     x:Name="Bg"
-                                    Padding="10,7"
+                                    Padding="8,6"
                                     Background="Transparent"
                                     CornerRadius="6">
                                     <ContentPresenter

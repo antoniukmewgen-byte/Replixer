@@ -52,18 +52,42 @@
                         VerticalAlignment="Center"
                         Columns="2"
                         Rows="3">
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
-                        <Ellipse Width="2.5" Height="2.5" Margin="1.5" Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
+                        <Ellipse
+                            Width="2.5"
+                            Height="2.5"
+                            Margin="1.5"
+                            Fill="{StaticResource BrushBorderColor4}" />
                     </UniformGrid>
 
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        FontSize="11"
+                        FontSize="12"
                         FontWeight="SemiBold"
                         Foreground="{StaticResource SubText}"
                         Text="ШПАРГАЛКА" />
@@ -84,9 +108,9 @@
                                 <ControlTemplate TargetType="CheckBox">
                                     <Border
                                         x:Name="RowBg"
+                                        Padding="8,7"
                                         Background="Transparent"
-                                        CornerRadius="7"
-                                        Padding="8,7">
+                                        CornerRadius="7">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="26" />
@@ -98,8 +122,8 @@
                                                 x:Name="Badge"
                                                 Width="20"
                                                 Height="20"
-                                                VerticalAlignment="Top"
                                                 Margin="0,1,0,0"
+                                                VerticalAlignment="Top"
                                                 Background="Transparent"
                                                 BorderBrush="{StaticResource BrushBorderColor4}"
                                                 BorderThickness="1.5"
@@ -129,12 +153,12 @@
                                                 x:Name="Label"
                                                 Grid.Column="1"
                                                 Margin="8,0,0,0"
-                                                FontSize="13"
+                                                VerticalAlignment="Center"
+                                                FontSize="14"
                                                 Foreground="{StaticResource Text}"
                                                 LineHeight="18"
                                                 Text="{TemplateBinding Content}"
-                                                TextWrapping="Wrap"
-                                                VerticalAlignment="Center" />
+                                                TextWrapping="Wrap" />
                                         </Grid>
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -157,13 +181,34 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <CheckBox Style="{StaticResource HintItem}" Tag="1" Content="Привітання, тест на дебіла та встановлення рамок" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="2" Content="Первинний анамнез та підводимо лінію" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="3" Content="Вторинний анамнез, розкриваємо досвід клієнта через техніку &quot;ближче-далі&quot;" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="4" Content="Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="5" Content="Прийом &quot;чашка чаю&quot; + &quot;ваш кейс унікальний, антиприклад щойно був порожній кейс&quot;" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="6" Content="Ставимо дедлайн, вибираємо день і час" />
-                <CheckBox Style="{StaticResource HintItem}" Tag="7" Content="Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити" />
+                <CheckBox
+                    Content="Привітання, тест на дебіла та встановлення рамок"
+                    Style="{StaticResource HintItem}"
+                    Tag="1" />
+                <CheckBox
+                    Content="Первинний анамнез та підводимо лінію"
+                    Style="{StaticResource HintItem}"
+                    Tag="2" />
+                <CheckBox
+                    Content="Вторинний анамнез, розкриваємо досвід клієнта через техніку &quot;ближче-далі&quot;"
+                    Style="{StaticResource HintItem}"
+                    Tag="3" />
+                <CheckBox
+                    Content="Знайшли зачіпку, інтегруємо приклад успішного кейсу та аппрува"
+                    Style="{StaticResource HintItem}"
+                    Tag="4" />
+                <CheckBox
+                    Content="Прийом &quot;чашка чаю&quot; + &quot;ваш кейс унікальний, антиприклад щойно був порожній кейс&quot;"
+                    Style="{StaticResource HintItem}"
+                    Tag="5" />
+                <CheckBox
+                    Content="Ставимо дедлайн, вибираємо день і час"
+                    Style="{StaticResource HintItem}"
+                    Tag="6" />
+                <CheckBox
+                    Content="Закриття у дзвінку, отримуємо ім'я, прізвище, пошту. І приймаємо оплату на реквізити"
+                    Style="{StaticResource HintItem}"
+                    Tag="7" />
 
             </StackPanel>
 

@@ -5,7 +5,7 @@
     xmlns:controls="clr-namespace:Replixer.Controls"
     xmlns:views="clr-namespace:Replixer.Views"
     Width="1000"
-    Height="632"
+    Height="636"
     AllowsTransparency="True"
     Background="Transparent"
     Icon="/Assets/Icons/IconApp.png"
