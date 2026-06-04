@@ -300,8 +300,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         var vm = new CallReportViewModel(
             onComplete: data =>
             {
-                DismissCallReport();
                 tcs.TrySetResult(data);
+                DismissCallReport();
             },
             managerName: _settings.ManagerName,
             position:    _settings.Position,
@@ -396,6 +396,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         var newData = await RequestCallReportAsync(existing: entry.ReportData);
         if (newData is null) return;
 
+        newData = newData with { AppName = entry.PlatformDisplayName };
         var caption = newData.FormatCaption();
 
         var tgTask = entry.TelegramMessageId.HasValue

@@ -73,7 +73,7 @@ public static class PlatformHelper
         if (string.IsNullOrEmpty(rawName)) return "Ручний запис";
         return rawName.ToLowerInvariant() switch
         {
-            "telegram"                           => "Телеграм",
+            "telegram"                           => "Telegram",
             "viber"                              => "Viber",
             var s when s.StartsWith("whatsapp") => "WhatsApp",
             var s when s.Contains("ringostat")  => "Ringostat",
