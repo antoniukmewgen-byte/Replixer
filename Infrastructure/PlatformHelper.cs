@@ -8,8 +8,10 @@ public static class PlatformHelper
     [
         "Telegram",
         "Viber",
+        "WhatsApp",
         "WhatsApp.Root",
         "Ringostat Smart Phone",
+        "Ringostat",
     ];
 
     private static readonly IReadOnlyDictionary<string, string> s_relativeIconPaths =
@@ -17,7 +19,9 @@ public static class PlatformHelper
         {
             ["Telegram"]              = "/Assets/Icons/telegram.png",
             ["Viber"]                 = "/Assets/Icons/viber.png",
+            ["WhatsApp"]              = "/Assets/Icons/whatsapp.png",
             ["WhatsApp.Root"]         = "/Assets/Icons/whatsapp.png",
+            ["Ringostat"]             = "/Assets/Icons/ringostat.png",
             ["Ringostat Smart Phone"] = "/Assets/Icons/ringostat.png",
         };
 

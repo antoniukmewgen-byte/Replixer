@@ -33,8 +33,14 @@
                             <DataTrigger Binding="{Binding Platform}" Value="Viber">
                                 <Setter Property="Background" Value="{StaticResource BrushViber}" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding Platform}" Value="WhatsApp">
+                                <Setter Property="Background" Value="{StaticResource BrushWhatsApp}" />
+                            </DataTrigger>
                             <DataTrigger Binding="{Binding Platform}" Value="WhatsApp.Root">
                                 <Setter Property="Background" Value="{StaticResource BrushWhatsApp}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Platform}" Value="Ringostat">
+                                <Setter Property="Background" Value="{StaticResource BrushRingostat}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Platform}" Value="Ringostat Smart Phone">
                                 <Setter Property="Background" Value="{StaticResource BrushRingostat}" />
