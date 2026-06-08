@@ -68,7 +68,7 @@ jobs:
           $ver = $tag.TrimStart('v')
           echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
 
-      # Генеруємо manifest.json: SHA256 для кожного Replixer.* файлу в publish/
+      # Генеруємо manifest.json і version.json: SHA256 для кожного Replixer.* файлу в publish/
       - name: Generate update manifest
         shell: pwsh
         run: |
@@ -83,9 +83,21 @@ jobs:
                             url    = "$baseUrl/$($_.Name)"
                           }
                         }
-          [ordered]@{ version = $version; files = @($files) } |
-            ConvertTo-Json -Depth 3 |
-            Out-File -FilePath manifest.json -Encoding utf8NoBOM
+          $manifest = [ordered]@{ version = $version; files = @($files) }
+          $manifest | ConvertTo-Json -Depth 3 | Out-File -FilePath manifest.json  -Encoding utf8NoBOM
+          $manifest | ConvertTo-Json -Depth 3 | Out-File -FilePath version.json   -Encoding utf8NoBOM
+
+      # Комітимо version.json у main щоб застосунок міг читати його без API
+      - name: Commit version.json to main
+        shell: pwsh
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git add version.json
+          git commit -m "chore: update version.json to ${{ steps.version.outputs.VERSION }}"
+          git push origin main
 
       # Створюємо GitHub Release: інсталер + manifest.json + окремі Replixer.* файли
       - name: Create GitHub Release

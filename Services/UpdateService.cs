@@ -22,9 +22,10 @@ public sealed record UpdateInfo(Version NewVersion, UpdateManifest Manifest);
 
 public sealed class UpdateService
 {
-    private const string Owner  = "antoniukmewgen-byte";
-    private const string Repo   = "Replixer";
-    private const string ApiUrl = $"https://api.github.com/repos/{Owner}/{Repo}/releases/latest";
+    private const string Owner      = "antoniukmewgen-byte";
+    private const string Repo       = "Replixer";
+    private const string Branch     = "main";
+    private const string VersionUrl = $"https://raw.githubusercontent.com/{Owner}/{Repo}/{Branch}/version.json";
 
     private static readonly HttpClient _http = new();
 
@@ -41,30 +42,17 @@ public sealed class UpdateService
     {
         try
         {
-            var json = await _http.GetStringAsync(ApiUrl, ct);
-            using var doc  = JsonDocument.Parse(json);
-            var root = doc.RootElement;
+            var json     = await _http.GetStringAsync(VersionUrl, ct);
+            var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
+            if (manifest is null) return null;
 
-            var tagName = root.GetProperty("tag_name").GetString() ?? "";
-            if (!Version.TryParse(tagName.TrimStart('v'), out var remoteVersion))
+            if (!Version.TryParse(manifest.Version.TrimStart('v'), out var remoteVersion))
                 return null;
 
             if (remoteVersion <= GetCurrentVersion())
                 return null;
 
-            foreach (var asset in root.GetProperty("assets").EnumerateArray())
-            {
-                var name = asset.GetProperty("name").GetString() ?? "";
-                if (!name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var manifestUrl  = asset.GetProperty("browser_download_url").GetString() ?? "";
-                var manifestJson = await _http.GetStringAsync(manifestUrl, ct);
-                var manifest     = JsonSerializer.Deserialize<UpdateManifest>(manifestJson);
-                if (manifest is null) return null;
-
-                return new UpdateInfo(remoteVersion, manifest);
-            }
+            return new UpdateInfo(remoteVersion, manifest);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
