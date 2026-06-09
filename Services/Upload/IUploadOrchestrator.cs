@@ -15,7 +15,8 @@ public readonly record struct UploadResult
     public bool    KommoAttempted    { get; init; }
     public string? KommoWarning      { get; init; }
 
-    public string? DriveWarning      { get; init; }
+    public string? DriveWarning       { get; init; }
+    public string? LocalPathWarning   { get; init; }
 }
 
 public interface IUploadOrchestrator

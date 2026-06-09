@@ -84,9 +84,12 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         var (kommoId, kommoWarn) = await PostKommoAsync(
             kommoLeadUrl, telegramCaption, driveUrl: null, callStartTime, leadSource, callType);
 
+        var localPath = MoveToRecordingsFolder(filePath);
+
         return new UploadResult
         {
-            LocalPath         = MoveToRecordingsFolder(filePath),
+            LocalPath         = localPath,
+            LocalPathWarning  = localPath is null ? "Не вдалося зберегти файл у папку записів" : null,
             TelegramMessageId = tgMsgId,
             TelegramChatId    = _settings.TelegramChatId,
             TelegramTopicId   = _settings.TelegramTopicId,
@@ -171,6 +174,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         catch (Exception ex)
         {
             Debug.WriteLine($"[Upload] Local save failed: {ex.Message}");
+            ErrorReporter.Report("UPLOAD", $"Не вдалося перемістити запис у папку збереження: {ex.Message}", ex);
             return null;
         }
     }

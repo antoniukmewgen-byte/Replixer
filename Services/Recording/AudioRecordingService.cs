@@ -1,5 +1,6 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using NAudio.CoreAudioApi;
 using NAudio.Lame;
 using NAudio.Wave;
@@ -254,6 +255,7 @@ public class AudioRecordingService : IDisposable
         {
             Debug.WriteLine($"[Recording] Mix failed: {ex.Message}");
             LastError = ex.Message;
+            ErrorReporter.Report("RECORDING", $"Помилка мікшування аудіо: {ex.Message}", ex);
             return null;
         }
         finally
@@ -303,6 +305,10 @@ public class AudioRecordingService : IDisposable
         if (IsRecording)
         {
             IsRecording = false;
+            // Set stopped flags before StopRecording() so DataAvailable callbacks
+            // bail out immediately and never touch writers that CleanupCaptures() is about to dispose.
+            _loopbackStopped = true;
+            _micStopped      = true;
             _loopbackCapture?.StopRecording();
             _micCapture?.StopRecording();
         }

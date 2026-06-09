@@ -82,13 +82,13 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public async Task StartupUpdateCheckAsync()
     {
-        if (_settings.UpdateDismissedDate?.Date == DateTime.Today)
-            return;
-
         _pendingUpdate = await _updateService.CheckForUpdateAsync();
         if (_pendingUpdate is null) return;
 
         UpdateAvailable = true;
+
+        if (_settings.UpdateDismissedDate?.Date == DateTime.Today) return;
+
         ShowUpdateDialog(_pendingUpdate);
     }
 

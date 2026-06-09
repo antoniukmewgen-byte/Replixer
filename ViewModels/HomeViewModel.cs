@@ -273,6 +273,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 return;
             }
 
+            if (upload.LocalPathWarning is not null)
+            {
+                entry.Status = RecordingStatus.Error;
+                NotificationService.ShowError($"Запис не збережено:\n{upload.LocalPathWarning}");
+                return;
+            }
+
             entry.Status = RecordingStatus.Saved;
             ShowUploadNotification(upload);
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
