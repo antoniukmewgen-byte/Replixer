@@ -34,6 +34,8 @@
     <SolidColorBrush x:Key="OtherBrushColor5" Color="#1E1A2D" />
     <SolidColorBrush x:Key="OtherBrushSubColor5" Color="#9B6EF5" />
 
+    <SolidColorBrush x:Key="OtherBrushColor6" Color="#1E2028" />
+
     <!--    -->
     <SolidColorBrush x:Key="BrushTelegram" Color="#1A3A5C" />
     <SolidColorBrush x:Key="BrushViber" Color="#3A1A4A" />

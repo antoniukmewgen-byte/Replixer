@@ -1,4 +1,5 @@
 using Replixer.Models;
+using Replixer.Services;
 using Replixer.Services.Manager;
 using System.ComponentModel;
 
@@ -7,6 +8,8 @@ namespace Replixer.ViewModels;
 public sealed class SettingsViewModel : ViewModelBase, IDisposable
 {
     private readonly AppSettings _settings;
+
+    public string AppVersion => $"v{UpdateService.GetCurrentVersion().ToString(3)}";
 
     public bool IsWindowMonitorActive
     {

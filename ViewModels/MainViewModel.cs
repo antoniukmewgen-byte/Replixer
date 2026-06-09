@@ -138,6 +138,15 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     {
         CloseToast();
         _toast = new CallToastWindow(vm);
+        // If the user closes the toast without clicking any button (e.g. via Alt+F4),
+        // we must still dismiss the dialog so _hasActiveDialog resets to false —
+        // otherwise no future call dialog will ever appear in this session.
+        _toast.Closed += (_, _) =>
+        {
+            if (_toast?.DataContext is CallDialogViewModel toastVm)
+                toastVm.SecondaryCommand.Execute(null);
+            _toast = null;
+        };
         _toast.Show();
     }
 

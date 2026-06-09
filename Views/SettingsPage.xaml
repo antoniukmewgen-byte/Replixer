@@ -3,272 +3,337 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <StackPanel Margin="16">
-        <Border
-            Padding="16"
-            Background="{StaticResource BrushColor2}"
-            BorderBrush="{StaticResource BrushBorderColor2}"
-            BorderThickness="1"
-            CornerRadius="12">
-            <StackPanel>
-                <TextBlock
-                    Margin="0,0,0,12"
-                    FontFamily="{StaticResource InterFont}"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Foreground="{StaticResource SubText}">
-                    МЕТОД ВИЯВЛЕННЯ ДЗВІНКІВ
-                </TextBlock>
-                <!--  Microphone Monitor  -->
-                <Border
-                    Margin="0,0,0,12"
-                    Padding="16"
-                    Background="{StaticResource BrushColor3}"
-                    BorderBrush="{StaticResource BrushBorderColor3}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.Column="0"
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource OtherBrushColor2}"
-                            CornerRadius="8">
-                            <Path
-                                Width="18"
-                                Height="18"
-                                Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
-                                Fill="{StaticResource OtherBrushSubColor2}"
-                                Stretch="Uniform" />
-                        </Border>
-                        <StackPanel
-                            Grid.Column="1"
-                            Margin="12,0,12,0"
-                            VerticalAlignment="Center">
-                            <TextBlock
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Foreground="{StaticResource Text}">
-                                Моніторинг мікрофонів
-                            </TextBlock>
-                            <TextBlock
-                                Margin="0,4,0,0"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}"
-                                TextWrapping="Wrap">
-                                Відстежується мікрофон та відтворення аудіо
-                            </TextBlock>
-                        </StackPanel>
-                        <ToggleButton
-                            Grid.Column="2"
-                            IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
-                            Style="{StaticResource ToggleSwitch}" />
-                    </Grid>
-                </Border>
-                <!--  Window Monitor  -->
-                <Border
-                    Padding="16"
-                    Background="{StaticResource BrushColor3}"
-                    BorderBrush="{StaticResource BrushBorderColor3}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.Column="0"
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource OtherBrushColor1}"
-                            CornerRadius="8">
-                            <Path
-                                Width="18"
-                                Height="18"
-                                Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
-                                Fill="{StaticResource OtherBrushSubColor1}"
-                                Stretch="Uniform" />
-                        </Border>
-                        <StackPanel
-                            Grid.Column="1"
-                            Margin="12,0,12,0"
-                            VerticalAlignment="Center">
-                            <TextBlock
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Foreground="{StaticResource Text}">
-                                Моніторинг вікон
-                            </TextBlock>
-                            <TextBlock
-                                Margin="0,4,0,0"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}"
-                                TextWrapping="Wrap">
-                                Відстежує вікна дзвінків через UI Automation
-                            </TextBlock>
-                        </StackPanel>
-                        <ToggleButton
-                            Grid.Column="2"
-                            IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
-                            Style="{StaticResource ToggleSwitch}" />
-                    </Grid>
-                </Border>
-            </StackPanel>
-        </Border>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+        <StackPanel Margin="16">
+            <Border
+                Padding="16"
+                Background="{StaticResource BrushColor2}"
+                BorderBrush="{StaticResource BrushBorderColor2}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}">
+                        МЕТОД ВИЯВЛЕННЯ ДЗВІНКІВ
+                    </TextBlock>
+                    <!--  Microphone Monitor  -->
+                    <Border
+                        Margin="0,0,0,12"
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor2}"
+                                CornerRadius="8">
+                                <Path
+                                    Width="18"
+                                    Height="18"
+                                    Data="M5,22a2,2,0,0,0,2-2V14a2,2,0,0,0-2-2V11a7,7,0,0,1,14,0v1a2,2,0,0,0-2,2v6H14a1,1,0,0,0,0,2h5a5,5,0,0,0,2-9.576V11A9,9,0,0,0,3,11v1.424A5,5,0,0,0,5,22Z"
+                                    Fill="{StaticResource OtherBrushSubColor2}"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,12,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Моніторинг мікрофонів
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    TextWrapping="Wrap">
+                                    Відстежується мікрофон та відтворення аудіо
+                                </TextBlock>
+                            </StackPanel>
+                            <ToggleButton
+                                Grid.Column="2"
+                                IsChecked="{Binding IsMicrophoneMonitorActive, Mode=TwoWay}"
+                                Style="{StaticResource ToggleSwitch}" />
+                        </Grid>
+                    </Border>
+                    <!--  Window Monitor  -->
+                    <Border
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor1}"
+                                CornerRadius="8">
+                                <Path
+                                    Width="18"
+                                    Height="18"
+                                    Data="M24,8v-2c0-2.76-2.24-5-5-5H5C2.24,1,0,3.24,0,6v2H24Zm-4.5-5c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm-4,0c.83,0,1.5,.67,1.5,1.5s-.67,1.5-1.5,1.5-1.5-.67-1.5-1.5,.67-1.5,1.5-1.5Zm12.5,7v8c0,2.76-2.24,5-5,5H5c-2.76,0-5-2.24-5-5V10H24Z"
+                                    Fill="{StaticResource OtherBrushSubColor1}"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,12,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Моніторинг вікон
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    TextWrapping="Wrap">
+                                    Відстежує вікна дзвінків через UI Automation
+                                </TextBlock>
+                            </StackPanel>
+                            <ToggleButton
+                                Grid.Column="2"
+                                IsChecked="{Binding IsWindowMonitorActive, Mode=TwoWay}"
+                                Style="{StaticResource ToggleSwitch}" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
 
-        <Border
-            Margin="0,12,0,0"
-            Padding="16"
-            Background="{StaticResource BrushColor2}"
-            BorderBrush="{StaticResource BrushBorderColor2}"
-            BorderThickness="1"
-            CornerRadius="12">
-            <StackPanel>
-                <TextBlock
-                    Margin="0,0,0,12"
-                    FontFamily="{StaticResource InterFont}"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Foreground="{StaticResource SubText}">
-                    СПОВІЩЕННЯ
-                </TextBlock>
-                <Border
-                    Padding="16"
-                    Background="{StaticResource BrushColor3}"
-                    BorderBrush="{StaticResource BrushBorderColor3}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.Column="0"
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource OtherBrushColor5}"
-                            CornerRadius="8">
-                            <Path
-                                Width="18"
-                                Height="18"
-                                Data="M4.068,18H19.724a3,3,0,0,0,2.821-4.021L19.693,6.094A8.323,8.323,0,0,0,11.675,0h0A8.321,8.321,0,0,0,3.552,6.516l-2.35,7.6A3,3,0,0,0,4.068,18Z M7.1,20a5,5,0,0,0,9.8,0Z"
-                                Fill="{StaticResource OtherBrushSubColor5}"
-                                Stretch="Uniform" />
-                        </Border>
-                        <StackPanel
-                            Grid.Column="1"
-                            Margin="12,0,12,0"
-                            VerticalAlignment="Center">
-                            <TextBlock
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Foreground="{StaticResource Text}">
-                                Показувати сповіщення
-                            </TextBlock>
-                            <TextBlock
-                                Margin="0,4,0,0"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}"
-                                TextWrapping="Wrap">
-                                Тости з результатами запису у правому нижньому куті
-                            </TextBlock>
-                        </StackPanel>
-                        <ToggleButton
-                            Grid.Column="2"
-                            IsChecked="{Binding IsNotificationsEnabled, Mode=TwoWay}"
-                            Style="{StaticResource ToggleSwitch}" />
-                    </Grid>
-                </Border>
-            </StackPanel>
-        </Border>
+            <Border
+                Margin="0,12,0,0"
+                Padding="16"
+                Background="{StaticResource BrushColor2}"
+                BorderBrush="{StaticResource BrushBorderColor2}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}">
+                        СПОВІЩЕННЯ
+                    </TextBlock>
+                    <Border
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor5}"
+                                CornerRadius="8">
+                                <Path
+                                    Width="18"
+                                    Height="18"
+                                    Data="M4.068,18H19.724a3,3,0,0,0,2.821-4.021L19.693,6.094A8.323,8.323,0,0,0,11.675,0h0A8.321,8.321,0,0,0,3.552,6.516l-2.35,7.6A3,3,0,0,0,4.068,18Z M7.1,20a5,5,0,0,0,9.8,0Z"
+                                    Fill="{StaticResource OtherBrushSubColor5}"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,12,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Показувати сповіщення
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    TextWrapping="Wrap">
+                                    Тости з результатами запису у правому нижньому куті
+                                </TextBlock>
+                            </StackPanel>
+                            <ToggleButton
+                                Grid.Column="2"
+                                IsChecked="{Binding IsNotificationsEnabled, Mode=TwoWay}"
+                                Style="{StaticResource ToggleSwitch}" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
 
-        <Border
-            Margin="0,12,0,0"
-            Padding="16"
-            Background="{StaticResource BrushColor2}"
-            BorderBrush="{StaticResource BrushBorderColor2}"
-            BorderThickness="1"
-            CornerRadius="12">
-            <StackPanel>
-                <TextBlock
-                    Margin="0,0,0,12"
-                    FontFamily="{StaticResource InterFont}"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Foreground="{StaticResource SubText}">
-                    НАЛАШТУВАННЯ АВТОЗАПУСКУ
-                </TextBlock>
-                <Border
-                    Padding="16"
-                    Background="{StaticResource BrushColor3}"
-                    BorderBrush="{StaticResource BrushBorderColor3}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            Grid.Column="0"
-                            Width="38"
-                            Height="38"
-                            Background="{StaticResource OtherBrushColor4}"
-                            CornerRadius="8">
-                            <Path
-                                Width="18"
-                                Height="18"
-                                Data="M256.061,0L256.061,0c17.673,0,32,14.327,32,32v106.667c0,17.673-14.327,32-32,32l0,0c-17.673,0-32-14.327-32-32V32   C224.061,14.327,238.387,0,256.061,0z M330.727,105.387L330.727,105.387c-0.157,10.742,5.259,20.8,14.315,26.581c80.432,49.143,105.796,154.185,56.652,234.616   S247.51,472.38,167.078,423.237S61.282,269.052,110.426,188.62c14.042-22.982,33.324-42.315,56.269-56.418   c9.211-5.781,14.773-15.92,14.699-26.795l0,0c0.049-17.673-14.238-32.039-31.911-32.088c-6.07-0.017-12.02,1.693-17.155,4.931   C22.233,146.634-11.58,291.318,56.803,401.412s213.067,143.907,323.161,75.524s143.907-213.067,75.524-323.161   c-19.035-30.645-44.879-56.489-75.524-75.524c-14.997-9.461-34.824-4.973-44.285,10.024   C332.447,93.397,330.731,99.33,330.727,105.387z"
-                                Fill="{StaticResource OtherBrushSubColor4}"
-                                Stretch="Uniform" />
-                        </Border>
-                        <StackPanel
-                            Grid.Column="1"
-                            Margin="12,0,12,0"
-                            VerticalAlignment="Center">
-                            <TextBlock
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Foreground="{StaticResource Text}">
-                                Автозапуск
-                            </TextBlock>
-                            <TextBlock
-                                Margin="0,4,0,0"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}"
-                                TextWrapping="Wrap">
-                                Запускає Replixer автоматично при вході в систему
-                            </TextBlock>
-                        </StackPanel>
-                        <ToggleButton
-                            Grid.Column="2"
-                            IsChecked="{Binding IsAutoStartEnabled, Mode=TwoWay}"
-                            Style="{StaticResource ToggleSwitch}" />
-                    </Grid>
-                </Border>
-            </StackPanel>
-        </Border>
-    </StackPanel>
+            <Border
+                Margin="0,12,0,0"
+                Padding="16"
+                Background="{StaticResource BrushColor2}"
+                BorderBrush="{StaticResource BrushBorderColor2}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}">
+                        НАЛАШТУВАННЯ АВТОЗАПУСКУ
+                    </TextBlock>
+                    <Border
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor4}"
+                                CornerRadius="8">
+                                <Path
+                                    Width="18"
+                                    Height="18"
+                                    Data="M256.061,0L256.061,0c17.673,0,32,14.327,32,32v106.667c0,17.673-14.327,32-32,32l0,0c-17.673,0-32-14.327-32-32V32   C224.061,14.327,238.387,0,256.061,0z M330.727,105.387L330.727,105.387c-0.157,10.742,5.259,20.8,14.315,26.581c80.432,49.143,105.796,154.185,56.652,234.616   S247.51,472.38,167.078,423.237S61.282,269.052,110.426,188.62c14.042-22.982,33.324-42.315,56.269-56.418   c9.211-5.781,14.773-15.92,14.699-26.795l0,0c0.049-17.673-14.238-32.039-31.911-32.088c-6.07-0.017-12.02,1.693-17.155,4.931   C22.233,146.634-11.58,291.318,56.803,401.412s213.067,143.907,323.161,75.524s143.907-213.067,75.524-323.161   c-19.035-30.645-44.879-56.489-75.524-75.524c-14.997-9.461-34.824-4.973-44.285,10.024   C332.447,93.397,330.731,99.33,330.727,105.387z"
+                                    Fill="{StaticResource OtherBrushSubColor4}"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,12,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Автозапуск
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    TextWrapping="Wrap">
+                                    Запускає Replixer автоматично при вході в систему
+                                </TextBlock>
+                            </StackPanel>
+                            <ToggleButton
+                                Grid.Column="2"
+                                IsChecked="{Binding IsAutoStartEnabled, Mode=TwoWay}"
+                                Style="{StaticResource ToggleSwitch}" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="0,12,0,0"
+                Padding="16"
+                Background="{StaticResource BrushColor2}"
+                BorderBrush="{StaticResource BrushBorderColor2}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}">
+                        ПРО ДОДАТОК
+                    </TextBlock>
+                    <Border
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor6}"
+                                ClipToBounds="True"
+                                CornerRadius="8">
+                                <Image
+                                    Width="18"
+                                    Height="18"
+                                    Source="/Assets/Icons/IconApp.png"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Replixer
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    Text="{Binding AppVersion}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

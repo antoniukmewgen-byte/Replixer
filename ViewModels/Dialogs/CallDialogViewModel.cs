@@ -50,8 +50,8 @@ public class CallDialogViewModel : ViewModelBase, IDisposable
         PrimaryLabel  = primaryLabel;
         SecondaryLabel = secondaryLabel;
 
-        PrimaryCommand   = new RelayCommand(() => { Dispose(); onPrimary(); });
-        SecondaryCommand = new RelayCommand(() => { Dispose(); onSecondary(); });
+        PrimaryCommand   = new RelayCommand(() => { if (_disposed) return; Dispose(); onPrimary(); });
+        SecondaryCommand = new RelayCommand(() => { if (_disposed) return; Dispose(); onSecondary(); });
 
         if (recordingStartedAt.HasValue)
         {
@@ -70,5 +70,11 @@ public class CallDialogViewModel : ViewModelBase, IDisposable
         RecordingDuration = elapsed.ToString(@"hh\:mm\:ss");
     }
 
-    public void Dispose() => _timer?.Stop();
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _timer?.Stop();
+    }
 }
