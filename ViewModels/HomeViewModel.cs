@@ -492,6 +492,11 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
+        // Unblock any awaiting report dialog before waiting on the stop task —
+        // otherwise we deadlock: UI thread is blocked here while StopRecordingAsync
+        // is suspended waiting for a TCS that only completes via a UI interaction.
+        _reportTcs?.TrySetResult(null);
+
         _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
         _currentDialog?.Dispose();
         _settings.PropertyChanged -= OnSettingsChanged;

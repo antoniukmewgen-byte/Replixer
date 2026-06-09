@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Replixer.ViewModels;
 
-public class RecordingsViewModel : ViewModelBase
+public class RecordingsViewModel : ViewModelBase, IDisposable
 {
     private static readonly string SavePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -127,11 +127,24 @@ public class RecordingsViewModel : ViewModelBase
         catch (Exception ex)
         {
             Debug.WriteLine($"[Recordings] Save failed: {ex.Message}");
+            ErrorReporter.Report("RECORDINGS", "Не вдалося зберегти список записів", ex);
         }
         finally
         {
             _saveLock.Release();
         }
+    }
+
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        // Wait for any in-flight SaveAsync to finish before the semaphore is torn down.
+        // Without this, an incomplete File.WriteAllTextAsync on exit can corrupt recordings.json.
+        _saveLock.Wait(millisecondsTimeout: 5_000);
+        _saveLock.Dispose();
     }
 
     private record RecordingDto(

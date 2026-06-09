@@ -2,6 +2,7 @@ using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using System.Diagnostics;
+using Replixer.Services;
 
 namespace Replixer.Services.Audio;
 
@@ -10,6 +11,7 @@ public class MicrophoneMonitorService : IMonitorService
     private Timer? _pollTimer;
     private volatile bool _isCallActive;
     private string _activeApp = string.Empty;
+    private bool _registryErrorReported;
 
     public event Action<string>? CallDetected;
     public event Action<string>? CallEnded;
@@ -57,46 +59,66 @@ public class MicrophoneMonitorService : IMonitorService
         const string rootPath =
             @"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone";
 
-        using var rootKey = Registry.CurrentUser.OpenSubKey(rootPath);
-        if (rootKey == null) return null;
-
-        using var nonPackagedKey = rootKey.OpenSubKey("NonPackaged");
-        if (nonPackagedKey != null)
+        // The registry key can be absent (privacy tools, kiosk images) or become
+        // temporarily inaccessible between GetSubKeyNames() and OpenSubKey() (TOCTOU).
+        // An unhandled exception here would crash the process because this runs on a
+        // ThreadPool timer callback in .NET 5+.
+        try
         {
-            foreach (var keyName in nonPackagedKey.GetSubKeyNames())
+            using var rootKey = Registry.CurrentUser.OpenSubKey(rootPath);
+            _registryErrorReported = false; // reset: successful access
+            if (rootKey == null) return null;
+
+            using var nonPackagedKey = rootKey.OpenSubKey("NonPackaged");
+            if (nonPackagedKey != null)
             {
+                foreach (var keyName in nonPackagedKey.GetSubKeyNames())
+                {
+                    var match = _targetProcesses.FirstOrDefault(p =>
+                        keyName.Contains(p, StringComparison.OrdinalIgnoreCase));
+
+                    if (match != null && IsMicActiveInSubKey(nonPackagedKey.OpenSubKey(keyName)))
+                        return match;
+                }
+            }
+
+            foreach (var subKeyName in rootKey.GetSubKeyNames())
+            {
+                if (subKeyName == "NonPackaged") continue;
+
                 var match = _targetProcesses.FirstOrDefault(p =>
-                    keyName.Contains(p, StringComparison.OrdinalIgnoreCase));
+                    subKeyName.Contains(p, StringComparison.OrdinalIgnoreCase));
 
-                if (match != null && IsMicActiveInSubKey(nonPackagedKey.OpenSubKey(keyName)))
+                if (match == null) continue;
+
+                using var pkgKey = rootKey.OpenSubKey(subKeyName);
+                if (pkgKey == null) continue;
+
+                var directStop = pkgKey.GetValue("LastUsedTimeStop");
+                if (directStop is long t0 && t0 == 0)
                     return match;
-            }
-        }
 
-        foreach (var subKeyName in rootKey.GetSubKeyNames())
+                foreach (var childName in pkgKey.GetSubKeyNames())
+                {
+                    if (IsMicActiveInSubKey(pkgKey.OpenSubKey(childName)))
+                        return match;
+                }
+            }
+
+            return null;
+        }
+        catch (Exception ex)
         {
-            if (subKeyName == "NonPackaged") continue;
-
-            var match = _targetProcesses.FirstOrDefault(p =>
-                subKeyName.Contains(p, StringComparison.OrdinalIgnoreCase));
-
-            if (match == null) continue;
-
-            using var pkgKey = rootKey.OpenSubKey(subKeyName);
-            if (pkgKey == null) continue;
-
-            var directStop = pkgKey.GetValue("LastUsedTimeStop");
-            if (directStop is long t0 && t0 == 0)
-                return match;
-
-            foreach (var childName in pkgKey.GetSubKeyNames())
+            Debug.WriteLine($"[AudioMonitor] Registry read failed: {ex.Message}");
+            // Report only the first occurrence — the poll runs every second, so we
+            // suppress repeats until the next successful read resets the flag.
+            if (!_registryErrorReported)
             {
-                if (IsMicActiveInSubKey(pkgKey.OpenSubKey(childName)))
-                    return match;
+                _registryErrorReported = true;
+                ErrorReporter.Report("MIC_MONITOR", $"Помилка читання реєстру мікрофону: {ex.Message}", ex);
             }
+            return null;
         }
-
-        return null;
     }
 
     private static bool IsMicActiveInSubKey(RegistryKey? subKey)

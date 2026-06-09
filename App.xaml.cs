@@ -6,6 +6,7 @@ using Replixer.Services;
 using Replixer.Services.Manager;
 using Replixer.ViewModels;
 using Replixer.Views;
+using System.IO;
 using System.Windows;
 
 namespace Replixer;
@@ -37,6 +38,7 @@ public partial class App : Application
 
         ErrorReporter.Configure(settings);
         _ = ErrorReporter.FlushQueueAsync();
+        ReportPendingUpdateError();
 
         DispatcherUnhandledException += (_, e) =>
             ErrorReporter.ReportCrash("CRASH", e.Exception.Message, e.Exception);
@@ -112,13 +114,34 @@ public partial class App : Application
         if (_mainWindowStarted)
             _services?.GetService<MainViewModel>()?.Dispose();
 
-        _services?.GetService<NotificationsViewModel>()?.Dispose();
+        // Flush pending recordings.json write before ServiceProvider tears down singletons.
+        _services?.GetService<RecordingsViewModel>()?.Dispose();
 
+        _services?.GetService<NotificationsViewModel>()?.Dispose();
         _services?.GetService<TrayViewModel>()?.Dispose();
 
         _notifyIcon?.Dispose();
         _services?.Dispose();
         base.OnExit(e);
+    }
+
+    // If the PowerShell update script failed, it writes the error to this log file.
+    // We pick it up on the next launch so the failure reaches Telegram via ErrorReporter.
+    private static void ReportPendingUpdateError()
+    {
+        var logPath = Path.Combine(Path.GetTempPath(), "replixer_update.log");
+        try
+        {
+            if (!File.Exists(logPath)) return;
+            var text = File.ReadAllText(logPath).Trim();
+            File.Delete(logPath);
+            if (!string.IsNullOrEmpty(text))
+                ErrorReporter.Report("UPDATE_SCRIPT", $"Помилка PS-скрипту оновлення:\n{text}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] ReportPendingUpdateError failed: {ex.Message}");
+        }
     }
 
     private static ServiceProvider BuildServices()

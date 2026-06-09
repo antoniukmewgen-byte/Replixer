@@ -60,7 +60,7 @@ public sealed class UpdateDialogViewModel : ViewModelBase
         catch (Exception ex)
         {
             IsDownloading = false;
-            NotificationService.ShowError($"Помилка оновлення: {ex.Message}");
+            ErrorReporter.Report("UPDATE", $"Помилка завантаження оновлення до v{_info.NewVersion}: {ex.Message}", ex);
         }
     }
 }
