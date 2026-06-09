@@ -84,10 +84,11 @@
 
                 <MenuItem Command="{Binding RecordCommand}">
                     <MenuItem.Header>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding RecordLabel}" VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding RecordLabel}" />
                             <Ellipse
-                                Width="7" Height="7"
+                                Width="7"
+                                Height="7"
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center">
                                 <Ellipse.Style>
