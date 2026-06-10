@@ -24,6 +24,12 @@ public class WindowMonitorService : IMonitorService
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+
     public WindowMonitorService(IEnumerable<ICallDetector> detectors)
     {
         _detectors = detectors.ToList();
@@ -83,6 +89,11 @@ public class WindowMonitorService : IMonitorService
                 {
                     GetWindowThreadProcessId(hWnd, out uint pid);
                     if (pid != (uint)process.Id) return true;
+
+                    if (!IsWindowVisible(hWnd)) return true;
+
+                    var titleBuf = new System.Text.StringBuilder(256);
+                    if (GetWindowText(hWnd, titleBuf, titleBuf.Capacity) == 0) return true;
 
                     try
                     {
