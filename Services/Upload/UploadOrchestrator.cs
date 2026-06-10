@@ -1,5 +1,6 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
+using Replixer.Services;
 using System.Diagnostics;
 using System.IO;
 
@@ -20,7 +21,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         _kommo    = kommo;
     }
 
-    public bool IsTelegramReady => _settings.IsTelegramEnabled && _telegram.IsAuthorized;
+    public bool IsTelegramReady => _settings.IsTelegramEnabled && (_telegram.IsReady || _telegram.IsAuthorized);
     public bool IsKommoEnabled  => _kommo.IsEnabled;
 
     public async Task<UploadResult> UploadAsync(
@@ -129,6 +130,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
             ? kommoBase
             : kommoBase + $"\n💾 Google Drive: {driveUrl}";
+        kommoNote += $"\n🔖 v{ErrorReporter.AppVersion}";
 
         long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource, callType);
 

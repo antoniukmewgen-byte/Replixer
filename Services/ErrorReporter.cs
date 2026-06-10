@@ -24,7 +24,7 @@ internal static class ErrorReporter
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "Replixer", "error_queue.json");
 
-    private static readonly string _appVersion =
+    public static readonly string AppVersion =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?";
 
     public static void Configure(AppSettings settings)
@@ -168,7 +168,7 @@ internal static class ErrorReporter
     {
         Timestamp  = DateTime.Now,
         User       = _userName,
-        AppVersion = _appVersion,
+        AppVersion = AppVersion,
         Category   = category,
         Message    = message,
         Detail     = ex?.ToString()

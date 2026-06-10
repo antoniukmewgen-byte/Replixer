@@ -24,6 +24,14 @@ public class TelegramUploadService : IDisposable
     private string? _pendingPhone;
     private readonly SemaphoreSlim _clientLock = new(1, 1);
 
+    // Cached after first successful ResolvePeerAsync — avoids two heavy API calls per upload.
+    private TL.InputPeer? _cachedPeer;
+    private long          _cachedPeerForChatId;
+
+    // True only when the client is actually connected and session restored, not just when
+    // the session file exists. Updated atomically inside the client lock.
+    private volatile bool _isReady;
+
     public Func<string, Task<string?>>? InputHandler { get; set; }
 
     /// <summary>
@@ -34,10 +42,21 @@ public class TelegramUploadService : IDisposable
 
     public TelegramUploadService(AppSettings settings) => _settings = settings;
 
+    /// <summary>
+    /// True when the MTProto session is established and the client is ready to send.
+    /// More reliable than checking only for the session file — the file can exist while
+    /// the client is null (before the first EnsureClientAsync) or already disposed.
+    /// </summary>
+    public bool IsReady => _isReady;
+
+    // Keep backward-compatible property so callers that only care about "was ever logged in"
+    // can still check file existence (used by ProfileViewModel initial state restore).
     public bool IsAuthorized => File.Exists(SessionPath);
 
     public void Logout()
     {
+        _isReady = false;
+        InvalidatePeerCache();
         _client?.Dispose();
         _client = null;
         if (File.Exists(SessionPath))
@@ -51,6 +70,8 @@ public class TelegramUploadService : IDisposable
     // page shows the re-auth prompt on next open.
     private void HandleAuthKeyUnregistered()
     {
+        _isReady = false;
+        InvalidatePeerCache();
         _client?.Dispose();
         _client = null;
         if (File.Exists(SessionPath))
@@ -59,6 +80,12 @@ public class TelegramUploadService : IDisposable
         Debug.WriteLine("[TG] Session invalidated due to AUTH_KEY_UNREGISTERED");
         ErrorReporter.Report("TELEGRAM", "Сесія Telegram анульована. Потрібна повторна авторизація у налаштуваннях.");
         SessionInvalidated?.Invoke();
+    }
+
+    private void InvalidatePeerCache()
+    {
+        _cachedPeer          = null;
+        _cachedPeerForChatId = 0;
     }
 
     public async Task<(bool ok, string? error)> AuthorizeAsync(string phone)
@@ -70,15 +97,19 @@ public class TelegramUploadService : IDisposable
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SessionPath)!);
+            _isReady = false;
+            InvalidatePeerCache();
             _client?.Dispose();
             _client = new WTelegram.Client(ConfigProvider);
             var user = await _client.LoginUserIfNeeded();
+            _isReady = user != null;
             Debug.WriteLine($"[TG] Authorized as: {user?.username ?? user?.first_name}");
             return user != null ? (true, null) : (false, "Авторизація не вдалася");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] Auth failed: {ex.Message}");
+            _isReady = false;
             _client?.Dispose();
             _client = null;
             return (false, ex.Message);
@@ -180,28 +211,49 @@ public class TelegramUploadService : IDisposable
 
     private static (string text, TL.MessageEntity[]? entities) BuildCaption(string caption, string? driveUrl)
     {
+        var version = $"\n🔖 v{AppVersion}";
+
         if (string.IsNullOrWhiteSpace(driveUrl))
-            return (caption, null);
+            return (caption + version, null);
 
         var (body, hashtagLine) = CaptionHelper.SplitHashtagSuffix(caption);
         var text = body + $"\n💾 Google Drive: {driveUrl}"
-                       + (hashtagLine is null ? string.Empty : "\n" + hashtagLine);
+                       + (hashtagLine is null ? string.Empty : "\n" + hashtagLine)
+                       + version;
         return (text, null);
     }
 
+    private static string AppVersion => ErrorReporter.AppVersion;
+
     private async Task<TL.InputPeer?> ResolvePeerAsync(long chatId)
     {
+        if (_cachedPeerForChatId == chatId && _cachedPeer is not null)
+        {
+            Debug.WriteLine($"[TG] Peer resolved from cache: {_cachedPeer}");
+            return _cachedPeer;
+        }
+
         var allChats = await _client!.Messages_GetAllChats();
         if (allChats.chats.TryGetValue(chatId, out var chatBase))
+        {
+            _cachedPeer          = chatBase;
+            _cachedPeerForChatId = chatId;
             return chatBase;
+        }
 
         Debug.WriteLine($"[TG] Not found in GetAllChats ({allChats.chats.Count} entries), trying GetAllDialogs…");
 
         var dialogs = await _client.Messages_GetAllDialogs();
-        if (dialogs.chats.TryGetValue(chatId, out var dialogChat))
-            return dialogChat;
-        if (dialogs.users.TryGetValue(chatId, out var user))
-            return user;
+        TL.InputPeer? resolved = null;
+        if (dialogs.chats.TryGetValue(chatId, out var dialogChat)) resolved = dialogChat;
+        else if (dialogs.users.TryGetValue(chatId, out var user))  resolved = user;
+
+        if (resolved is not null)
+        {
+            _cachedPeer          = resolved;
+            _cachedPeerForChatId = chatId;
+            return resolved;
+        }
 
         Debug.WriteLine($"[TG] ✗ Peer {chatId} not found in any source.");
         Debug.WriteLine($"[TG]   Chats in GetAllChats    : {allChats.chats.Count}");
@@ -235,8 +287,8 @@ public class TelegramUploadService : IDisposable
 
     private async Task EnsureClientAsync()
     {
-        // Fast path — client already ready, no locking needed.
-        if (_client != null) return;
+        // Fast path — session is already live, skip locking entirely.
+        if (_isReady && _client != null) return;
         if (!IsAuthorized) return;
 
         await _clientLock.WaitAsync();
@@ -244,10 +296,29 @@ public class TelegramUploadService : IDisposable
         {
             // Re-check inside the lock — another concurrent call may have already
             // initialized the client while we were waiting.
-            if (_client != null) return;
+            if (_isReady && _client != null) return;
 
             _client = new WTelegram.Client(ConfigProvider);
-            await _client.LoginUserIfNeeded();
+
+            // LoginUserIfNeeded() has no built-in timeout — a hung MTProto handshake
+            // would block the calling thread indefinitely and freeze the UI for up to 30s
+            // (HomeViewModel.Dispose waits on _pendingStopTask). We impose a hard 30s cap.
+            using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var loginTask  = _client.LoginUserIfNeeded();
+            var completed  = await Task.WhenAny(loginTask, Task.Delay(Timeout.Infinite, cts.Token));
+
+            if (completed != loginTask)
+            {
+                Debug.WriteLine("[TG] ✗ Session restore timed out after 30 s");
+                ErrorReporter.Report("TELEGRAM", "Відновлення сесії Telegram перевищило 30 с — перевірте з'єднання.");
+                _client.Dispose();
+                _client  = null;
+                _isReady = false;
+                return;
+            }
+
+            await loginTask; // propagate any exception from the completed task
+            _isReady = true;
             Debug.WriteLine("[TG] Session restored from file");
         }
         catch (TL.RpcException ex) when (ex.Code == 401)
@@ -259,7 +330,8 @@ public class TelegramUploadService : IDisposable
         {
             Debug.WriteLine($"[TG] ✗ Failed to restore session: {ex.Message}");
             ErrorReporter.Report("TELEGRAM", $"Не вдалося відновити сесію: {ex.Message}", ex);
-            _client = null;
+            _isReady = false;
+            _client  = null;
         }
         finally
         {

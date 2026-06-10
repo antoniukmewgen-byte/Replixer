@@ -38,7 +38,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private Task? _pendingStopTask;
 
     public bool IsRecording => _isRecording;
-    private string _lastDetectedApp = string.Empty;
+    private string _lastDetectedApp = "Ручний запис";
     private DateTime? _recordingStartedAt;
 
     private CallDialogViewModel?                  _currentDialog;
@@ -168,7 +168,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     public void ManualStartRecording()
     {
         if (_isRecording || _isStopping) return;
-        _lastDetectedApp = "Ручний запис";
+        _lastDetectedApp = "Ручний запис";  // explicit override regardless of prior detector value
         StartRecording();
     }
 
@@ -181,9 +181,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         if (_isStopping) return;
         DismissDialog();
-
-        if (string.IsNullOrEmpty(_lastDetectedApp))
-            _lastDetectedApp = "Ручний запис";
 
         _isRecording        = true;
         _recordingStartedAt = DateTime.Now;

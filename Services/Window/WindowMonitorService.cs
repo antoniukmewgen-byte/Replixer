@@ -141,6 +141,12 @@ public class WindowMonitorService : IMonitorService
         var automation = _automation;
         _automation    = null;
         automation?.Dispose();
+
+        // Reset all call states so that when this monitor is restarted (or swapped out
+        // for another monitor mode) stale "active" flags don't produce phantom CallEnded
+        // or suppress the first real CallDetected event.
+        foreach (var key in _callState.Keys)
+            _callState[key] = false;
     }
 
     public void Dispose() => Stop();
