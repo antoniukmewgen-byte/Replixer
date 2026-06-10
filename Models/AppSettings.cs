@@ -19,20 +19,6 @@ public class AppSettings : INotifyPropertyChanged
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private MonitorMode _monitorMode = MonitorMode.Microphone;
-
-    public MonitorMode MonitorMode
-    {
-        get => _monitorMode;
-        set
-        {
-            if (_monitorMode == value) return;
-            _monitorMode = value;
-            OnPropertyChanged();
-            Save();
-        }
-    }
-
     private string _recordingsFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
         "Replixer", "Recordings");

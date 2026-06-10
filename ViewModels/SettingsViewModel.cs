@@ -11,26 +11,6 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
 
     public string AppVersion => $"v{UpdateService.GetCurrentVersion().ToString(3)}";
 
-    public bool IsWindowMonitorActive
-    {
-        get => _settings.MonitorMode == MonitorMode.Window;
-        set
-        {
-            if (!value) return;
-            _settings.MonitorMode = MonitorMode.Window;
-        }
-    }
-
-    public bool IsMicrophoneMonitorActive
-    {
-        get => _settings.MonitorMode == MonitorMode.Microphone;
-        set
-        {
-            if (!value) return;
-            _settings.MonitorMode = MonitorMode.Microphone;
-        }
-    }
-
     public bool IsAutoStartEnabled
     {
         get => _settings.IsAutoStartEnabled;
@@ -57,12 +37,7 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
 
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(AppSettings.MonitorMode))
-        {
-            OnPropertyChanged(nameof(IsWindowMonitorActive));
-            OnPropertyChanged(nameof(IsMicrophoneMonitorActive));
-        }
-        else if (e.PropertyName == nameof(AppSettings.IsAutoStartEnabled))
+        if (e.PropertyName == nameof(AppSettings.IsAutoStartEnabled))
         {
             OnPropertyChanged(nameof(IsAutoStartEnabled));
         }

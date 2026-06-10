@@ -5,12 +5,9 @@ using Replixer.Services.Audio;
 using Replixer.Services.Manager;
 using Replixer.Services.Recording;
 using Replixer.Services.Upload;
-using Replixer.Services.Window;
-using Replixer.Services.Window.Detectors;
 using Replixer.ViewModels.Call;
 using Replixer.ViewModels.Dialogs;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -26,11 +23,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly AppSettings _settings;
     private readonly IUploadOrchestrator _orchestrator;
     private readonly RecordingsViewModel _recordingsVm;
-    private readonly IMonitorService _windowMonitor;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
     private readonly IWindowManager _windowManager;
-    private IMonitorService _activeMonitor;
 
     private bool  _isRecording;
     private bool  _isStopping;
@@ -72,20 +67,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _callContent = new IdleCallViewModel(ManualStartRecording);
 
-        _windowMonitor = new WindowMonitorService(new ICallDetector[]
-        {
-            new TelegramCallDetector(),
-            new WhatsAppCallDetector(),
-            new ViberCallDetector(),
-            new RingostatCallDetector(),
-        });
         _micMonitor = new MicrophoneMonitorService();
-
-        _activeMonitor = GetMonitorForMode(_settings.MonitorMode);
-        Subscribe(_activeMonitor);
-        _activeMonitor.Start();
-
-        _settings.PropertyChanged += OnSettingsChanged;
+        _micMonitor.CallDetected += OnCallDetected;
+        _micMonitor.CallEnded    += OnCallEnded;
+        _micMonitor.Start();
 
         foreach (var entry in _recordingsVm.Recordings)
         {
@@ -94,37 +79,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
 
         _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
-    }
-
-    private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(AppSettings.MonitorMode)) return;
-
-        var prev = _activeMonitor;
-        var next = GetMonitorForMode(_settings.MonitorMode);
-        if (next == prev) return;
-
-        Unsubscribe(prev);
-        prev.Stop();
-
-        _activeMonitor = next;
-        Subscribe(next);
-        next.Start();
-    }
-
-    private IMonitorService GetMonitorForMode(MonitorMode mode)
-        => mode == MonitorMode.Microphone ? _micMonitor : _windowMonitor;
-
-    private void Subscribe(IMonitorService monitor)
-    {
-        monitor.CallDetected += OnCallDetected;
-        monitor.CallEnded    += OnCallEnded;
-    }
-
-    private void Unsubscribe(IMonitorService monitor)
-    {
-        monitor.CallDetected -= OnCallDetected;
-        monitor.CallEnded    -= OnCallEnded;
     }
 
     private void OnCallDetected(string app)
@@ -501,11 +455,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
         _currentDialog?.Dispose();
-        _settings.PropertyChanged -= OnSettingsChanged;
         _recordingsVm.Recordings.CollectionChanged -= OnRecordingsChanged;
-        Unsubscribe(_activeMonitor);
-        _activeMonitor.Stop();
-        _windowMonitor.Dispose();
+        _micMonitor.CallDetected -= OnCallDetected;
+        _micMonitor.CallEnded    -= OnCallEnded;
+        _micMonitor.Stop();
         _micMonitor.Dispose();
     }
 }
