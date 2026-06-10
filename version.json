@@ -8,12 +8,12 @@
     },
     {
       "path": "Replixer.dll",
-      "sha256": "d9325f433e9153566b0d0aefd7970828cb9ddc70b5081972769ed5df5938f961",
+      "sha256": "b9cd568e1d58f7d0fd4779efb9742ab3c7a96a13edcff76aced85fd936a5db33",
       "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.3.9/Replixer.dll"
     },
     {
       "path": "Replixer.exe",
-      "sha256": "426c8972e1f9a02392360f2afbefd11123e3f43ca97f7092d720c93083e639d8",
+      "sha256": "bf64856976a19a7a1a016f0675c6cbb53996a1b97a626a77da98059f4a99b172",
       "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.3.9/Replixer.exe"
     },
     {
