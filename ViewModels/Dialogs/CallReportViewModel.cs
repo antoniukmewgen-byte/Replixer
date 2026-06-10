@@ -198,15 +198,24 @@ public class CallReportViewModel : ViewModelBase
         }
     }
 
+    public const int NoteMaxLength = 500;
+
     public string Note
     {
         get => _note;
         set
         {
             if (SetField(ref _note, value))
+            {
+                OnPropertyChanged(nameof(NoteLength));
+                OnPropertyChanged(nameof(IsNoteNearLimit));
                 CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
+
+    public int  NoteLength      => _note.Length;
+    public bool IsNoteNearLimit => _note.Length >= NoteMaxLength - 50;
 
     public string SubmitLabel => _isEditing ? "Зберегти" : "Відправити";
 

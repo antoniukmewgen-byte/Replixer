@@ -291,20 +291,38 @@
 
                         <!--  Примітка  -->
                         <StackPanel Margin="0,12,0,0" Visibility="{Binding IsNoteVisible, Converter={StaticResource BoolToVis}}">
-                            <TextBlock
-                                Margin="0,0,0,4"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}">
-                                Примітки
-                            </TextBlock>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}">
+                                    Примітки
+                                </TextBlock>
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource SubText}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsNoteNearLimit}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <Run Text="{Binding NoteLength, Mode=OneWay}" /><Run Text=" / 500" />
+                                </TextBlock>
+                            </Grid>
                             <Border Style="{StaticResource AppInputBorder}">
                                 <Grid>
                                     <TextBox
                                         x:Name="NotesBox"
                                         MinHeight="60"
                                         MaxHeight="100"
+                                        MaxLength="500"
                                         VerticalAlignment="Top"
                                         AcceptsReturn="True"
                                         Style="{StaticResource AppTextBox}"

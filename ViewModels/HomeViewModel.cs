@@ -254,10 +254,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 };
             string? caption = reportData?.FormatCaption();
 
-            bool isRingostat  = _lastDetectedApp.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
             bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
             string? callType  = ResolveCallType(reportData);
-            var upload = await _orchestrator.UploadAsync(path, caption, isRingostat ? null : reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram, callType);
+            var upload = await _orchestrator.UploadAsync(path, caption, reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram, callType);
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;
@@ -360,13 +359,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         {
             var caption      = reportData?.FormatCaption();
             var crmUrl       = reportData?.CrmUrl;
-            bool isRingostat = entry.Platform.Contains("Ringostat", StringComparison.OrdinalIgnoreCase);
             string? callType = ResolveCallType(reportData);
 
             var upload = await _orchestrator.UploadAsync(
                 retryPath,
                 caption,
-                isRingostat ? null : crmUrl,
+                crmUrl,
                 entry.StartedAt,
                 reportData?.LeadSource,
                 callType: callType);
