@@ -119,18 +119,17 @@ public class WindowMonitorService : IMonitorService
 
     public void Stop()
     {
-        // Timer.Dispose(WaitHandle) signals the handle only after any in-progress
-        // callback finishes — guaranteeing Poll() is not using _automation when we dispose it.
-        if (_pollTimer is { } timer)
-        {
-            using var done = new System.Threading.ManualResetEventSlim(false);
-            timer.Dispose(done.WaitHandle);
-            _pollTimer = null;
-            done.Wait(TimeSpan.FromSeconds(5));
-        }
+        // Change() disables future firings immediately without blocking.
+        // We null out _automation before disposing it so that any Poll() callback
+        // already running captures null on its next check and exits early,
+        // rather than calling into a half-disposed UIA3Automation instance.
+        _pollTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _pollTimer?.Dispose();
+        _pollTimer = null;
 
-        _automation?.Dispose();
-        _automation = null;
+        var automation = _automation;
+        _automation    = null;
+        automation?.Dispose();
     }
 
     public void Dispose() => Stop();
