@@ -16,6 +16,7 @@ public partial class App : Application
     private ServiceProvider? _services;
     private TaskbarIcon? _notifyIcon;
     private bool _mainWindowStarted;
+    private Mutex? _instanceMutex;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -26,6 +27,30 @@ public partial class App : Application
             AutoStartManager.SetState(false);
             Shutdown();
             return;
+        }
+
+        // Prevent two instances from running simultaneously — a second instance would
+        // try to open the same WTelegram session file and fail with IOException.
+        // "Local\" scope is sufficient (same user session); "Global\" can throw
+        // UnauthorizedAccessException in restricted environments.
+        const string MutexName = "Local\\Replixer_SingleInstance";
+        try
+        {
+            _instanceMutex = new Mutex(initiallyOwned: true, MutexName, out bool createdNew);
+            if (!createdNew)
+            {
+                _instanceMutex.Dispose();
+                _instanceMutex = null;
+                BringExistingInstanceToFront();
+                Shutdown();
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] Mutex check failed: {ex.Message}");
+            // If we can't create the mutex at all, allow the instance to start
+            // rather than blocking the app entirely.
         }
 
         bool startInTray = e.Args.Contains("--tray");
@@ -122,7 +147,31 @@ public partial class App : Application
 
         _notifyIcon?.Dispose();
         _services?.Dispose();
+
+        _instanceMutex?.ReleaseMutex();
+        _instanceMutex?.Dispose();
+
         base.OnExit(e);
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    private static void BringExistingInstanceToFront()
+    {
+        var current = System.Diagnostics.Process.GetCurrentProcess();
+        var existing = System.Diagnostics.Process
+            .GetProcessesByName(current.ProcessName)
+            .FirstOrDefault(p => p.Id != current.Id);
+
+        if (existing?.MainWindowHandle is { } hwnd && hwnd != IntPtr.Zero)
+        {
+            ShowWindow(hwnd, 9 /* SW_RESTORE */);
+            SetForegroundWindow(hwnd);
+        }
     }
 
     // If the PowerShell update script failed, it writes the error to this log file.

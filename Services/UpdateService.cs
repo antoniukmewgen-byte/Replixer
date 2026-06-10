@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -208,7 +209,50 @@ public sealed class UpdateService
         return Convert.ToHexString(sha.ComputeHash(stream)).ToLowerInvariant();
     }
 
+    // Transient errors that are safe to retry (network blip, VPN reconnect, etc.).
+    // OperationCanceledException and non-retriable HTTP errors bubble straight out.
+    private static bool IsTransient(Exception ex) => ex is
+        HttpRequestException { StatusCode: null or
+            System.Net.HttpStatusCode.RequestTimeout or
+            System.Net.HttpStatusCode.TooManyRequests or
+            System.Net.HttpStatusCode.ServiceUnavailable or
+            System.Net.HttpStatusCode.GatewayTimeout } or
+        IOException or
+        SocketException;
+
+    private const int RetryCount = 3;
+    private static readonly TimeSpan[] RetryDelays =
+        [TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(8)];
+
     private async Task DownloadFileAsync(
+        string             url,
+        string             destPath,
+        IProgress<double>? progress,
+        CancellationToken  ct)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            if (attempt > 0) progress?.Report(0);
+
+            try
+            {
+                await DownloadFileOnceAsync(url, destPath, progress, ct);
+                return;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex) when (attempt < RetryCount && IsTransient(ex))
+            {
+                var delay = RetryDelays[attempt];
+                Debug.WriteLine($"[Update] Attempt {attempt + 1} failed ({ex.Message}). Retrying in {delay.TotalSeconds}s…");
+                await Task.Delay(delay, ct);
+            }
+        }
+    }
+
+    private async Task DownloadFileOnceAsync(
         string             url,
         string             destPath,
         IProgress<double>? progress,

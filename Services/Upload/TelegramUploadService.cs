@@ -22,6 +22,7 @@ public class TelegramUploadService : IDisposable
     private readonly AppSettings _settings;
     private WTelegram.Client? _client;
     private string? _pendingPhone;
+    private readonly SemaphoreSlim _clientLock = new(1, 1);
 
     public Func<string, Task<string?>>? InputHandler { get; set; }
 
@@ -215,17 +216,36 @@ public class TelegramUploadService : IDisposable
 
     public void Dispose()
     {
-        _client?.Dispose();
+        var client = _client;
         _client = null;
+        _clientLock.Dispose();
+
+        if (client is null) return;
+
+        // WTelegram.Client.Dispose() sends a graceful disconnect packet and waits for
+        // the server ACK — this blocks for 1-3 s on the calling thread. Since we're
+        // shutting down we fire-and-forget it on the thread pool; the OS will reclaim
+        // all handles when the process exits regardless.
+        Task.Run(() =>
+        {
+            try   { client.Dispose(); }
+            catch { /* suppress: process is exiting */ }
+        });
     }
 
     private async Task EnsureClientAsync()
     {
+        // Fast path — client already ready, no locking needed.
         if (_client != null) return;
         if (!IsAuthorized) return;
 
+        await _clientLock.WaitAsync();
         try
         {
+            // Re-check inside the lock — another concurrent call may have already
+            // initialized the client while we were waiting.
+            if (_client != null) return;
+
             _client = new WTelegram.Client(ConfigProvider);
             await _client.LoginUserIfNeeded();
             Debug.WriteLine("[TG] Session restored from file");
@@ -240,6 +260,10 @@ public class TelegramUploadService : IDisposable
             Debug.WriteLine($"[TG] ✗ Failed to restore session: {ex.Message}");
             ErrorReporter.Report("TELEGRAM", $"Не вдалося відновити сесію: {ex.Message}", ex);
             _client = null;
+        }
+        finally
+        {
+            _clientLock.Release();
         }
     }
 
