@@ -196,7 +196,8 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         TestKommoConnectionCommand = new AsyncRelayCommand(TestKommoConnectionAsync);
         ClearAllDataCommand        = new RelayCommand(ClearAllData);
 
-        _settings.PropertyChanged += OnSettingsChanged;
+        _settings.PropertyChanged    += OnSettingsChanged;
+        _telegram.SessionInvalidated += OnSessionInvalidated;
     }
 
     private async Task TestDriveConnectionAsync()
@@ -318,7 +319,20 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
     }
 
-    public void Dispose() => _settings.PropertyChanged -= OnSettingsChanged;
+    private void OnSessionInvalidated()
+    {
+        // Dispatched to UI thread because this can be called from a background task.
+        System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            IsTelegramConnected = false;
+        });
+    }
+
+    public void Dispose()
+    {
+        _settings.PropertyChanged    -= OnSettingsChanged;
+        _telegram.SessionInvalidated -= OnSessionInvalidated;
+    }
 
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
     {

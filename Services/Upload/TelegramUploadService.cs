@@ -25,6 +25,12 @@ public class TelegramUploadService : IDisposable
 
     public Func<string, Task<string?>>? InputHandler { get; set; }
 
+    /// <summary>
+    /// Fired when the remote session is revoked (AUTH_KEY_UNREGISTERED).
+    /// Subscribers should reset their "connected" state and prompt re-auth.
+    /// </summary>
+    public event Action? SessionInvalidated;
+
     public TelegramUploadService(AppSettings settings) => _settings = settings;
 
     public bool IsAuthorized => File.Exists(SessionPath);
@@ -36,6 +42,22 @@ public class TelegramUploadService : IDisposable
         if (File.Exists(SessionPath))
             File.Delete(SessionPath);
         Debug.WriteLine("[TG] Logged out, session deleted");
+    }
+
+    // Called when Telegram returns 401 AUTH_KEY_UNREGISTERED — the session was
+    // revoked remotely (user terminated it in Telegram settings or it expired).
+    // We wipe the local session so IsAuthorized becomes false and the settings
+    // page shows the re-auth prompt on next open.
+    private void HandleAuthKeyUnregistered()
+    {
+        _client?.Dispose();
+        _client = null;
+        if (File.Exists(SessionPath))
+            File.Delete(SessionPath);
+
+        Debug.WriteLine("[TG] Session invalidated due to AUTH_KEY_UNREGISTERED");
+        ErrorReporter.Report("TELEGRAM", "Сесія Telegram анульована. Потрібна повторна авторизація у налаштуваннях.");
+        SessionInvalidated?.Invoke();
     }
 
     public async Task<(bool ok, string? error)> AuthorizeAsync(string phone)
@@ -99,6 +121,12 @@ public class TelegramUploadService : IDisposable
             Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msg?.id}");
             return msg?.id;
         }
+        catch (TL.RpcException ex) when (ex.Code == 401)
+        {
+            Debug.WriteLine($"[TG] ✗ Auth key unregistered — invalidating session");
+            HandleAuthKeyUnregistered();
+            return null;
+        }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] ✗ Send failed: {ex.Message}");
@@ -131,6 +159,12 @@ public class TelegramUploadService : IDisposable
             await _client.Messages_EditMessage(peer, messageId, message: msgText, entities: entities);
             Debug.WriteLine("[TG] ✓ Edited successfully");
             return null;
+        }
+        catch (TL.RpcException ex) when (ex.Code == 401)
+        {
+            Debug.WriteLine($"[TG] ✗ Auth key unregistered — invalidating session");
+            HandleAuthKeyUnregistered();
+            return "Telegram: сесія анульована, потрібна повторна авторизація";
         }
         catch (Exception ex)
         {
@@ -195,6 +229,11 @@ public class TelegramUploadService : IDisposable
             _client = new WTelegram.Client(ConfigProvider);
             await _client.LoginUserIfNeeded();
             Debug.WriteLine("[TG] Session restored from file");
+        }
+        catch (TL.RpcException ex) when (ex.Code == 401)
+        {
+            Debug.WriteLine($"[TG] ✗ Auth key unregistered on session restore — invalidating");
+            HandleAuthKeyUnregistered();
         }
         catch (Exception ex)
         {
