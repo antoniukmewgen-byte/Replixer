@@ -143,11 +143,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         if (!_recorder.StartRecording(_lastDetectedApp))
         {
             Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
+            _isRecording        = false;
+            _recordingStartedAt = null;
+            OnPropertyChanged(nameof(IsRecording));
+            CallContent = new IdleCallViewModel(ManualStartRecording);
             var reason = _recorder.LastError;
             var msg    = string.IsNullOrWhiteSpace(reason)
                 ? "Не вдалося запустити запис. Перевірте мікрофон."
                 : $"Не вдалося запустити запис.\n{reason}";
             NotificationService.ShowError(msg);
+            return;
         }
 
         CallContent = new ActiveCallViewModel(StopRecording);
@@ -318,6 +323,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 crmUrl,
                 entry.StartedAt,
                 reportData?.LeadSource,
+                skipTelegram: entry.TelegramMessageId.HasValue,
                 callType: callType);
 
             entry.DriveUrl          = upload.DriveUrl;
