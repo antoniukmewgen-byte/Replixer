@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace Replixer.Models;
 
-public enum RecordingStatus { Loading, Saved, Error }
+public enum RecordingStatus { Loading, Saved, Error, Draft }
 
 public class RecordingEntry : INotifyPropertyChanged
 {
@@ -118,6 +118,20 @@ public class RecordingEntry : INotifyPropertyChanged
         set { if (_retryCommand == value) return; _retryCommand = value; OnPropertyChanged(); }
     }
 
+    private ICommand? _resumeDraftCommand;
+    public ICommand? ResumeDraftCommand
+    {
+        get => _resumeDraftCommand;
+        set { if (_resumeDraftCommand == value) return; _resumeDraftCommand = value; OnPropertyChanged(); }
+    }
+
+    private TimeSpan _callDuration;
+    public TimeSpan CallDuration
+    {
+        get => _callDuration;
+        set { if (_callDuration == value) return; _callDuration = value; OnPropertyChanged(); }
+    }
+
     private RecordingStatus _status = RecordingStatus.Loading;
     public RecordingStatus Status
     {
@@ -129,10 +143,12 @@ public class RecordingEntry : INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(IsError));
+            OnPropertyChanged(nameof(IsDraft));
         }
     }
 
     public bool IsError => _status == RecordingStatus.Error;
+    public bool IsDraft => _status == RecordingStatus.Draft;
 
     public bool    IsManual            => !PlatformHelper.IsKnownPlatform(Platform);
 
@@ -148,6 +164,7 @@ public class RecordingEntry : INotifyPropertyChanged
         RecordingStatus.Loading => "Завантаження...",
         RecordingStatus.Saved   => "Збережено та відправлено",
         RecordingStatus.Error   => "Помилка",
+        RecordingStatus.Draft   => "Дозаповніть форму",
         _                       => string.Empty
     };
 

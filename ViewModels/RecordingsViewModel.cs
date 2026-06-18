@@ -83,6 +83,7 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
                     TelegramTopicId   = dto.TelegramTopicId,
                     KommoNoteId       = dto.KommoNoteId,
                     ReportData        = dto.ReportData,
+                    CallDuration      = dto.CallDuration,
                 };
                 SubscribeEntry(entry);
                 Recordings.Add(entry);
@@ -105,7 +106,8 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
         _pendingSave = Recordings
             .Select(e => new RecordingDto(
                 e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath, e.SourcePath,
-                e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.KommoNoteId, e.ReportData))
+                e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.KommoNoteId, e.ReportData,
+                e.CallDuration))
             .ToList();
 
         _ = SaveAsync();
@@ -126,8 +128,7 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Recordings] Save failed: {ex.Message}");
-            ErrorReporter.Report("RECORDINGS", "Не вдалося зберегти список записів", ex);
+            ErrorReporter.Report("RECORDINGS_SAVE", "Не вдалося зберегти список записів.", ex);
         }
         finally
         {
@@ -158,5 +159,6 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
         long            TelegramChatId,
         int?            TelegramTopicId,
         long?           KommoNoteId,
-        CallReportData? ReportData);
+        CallReportData? ReportData,
+        TimeSpan        CallDuration = default);
 }

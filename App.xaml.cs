@@ -17,6 +17,12 @@ public partial class App : Application
     private TaskbarIcon? _notifyIcon;
     private bool _mainWindowStarted;
     private Mutex? _instanceMutex;
+    private EventWaitHandle? _showSignal;
+    private RegisteredWaitHandle? _showSignalWait;
+
+    // Signaled by a second instance (e.g. desktop shortcut) to ask the running
+    // instance to restore its window from the tray.
+    private const string ShowSignalName = "Local\\Replixer_ShowWindow";
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -41,10 +47,19 @@ public partial class App : Application
             {
                 _instanceMutex.Dispose();
                 _instanceMutex = null;
-                BringExistingInstanceToFront();
+                SignalExistingInstance();
                 Shutdown();
                 return;
             }
+
+            // First instance: listen for the "show window" signal from later launches.
+            _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, ShowSignalName);
+            _showSignalWait = ThreadPool.RegisterWaitForSingleObject(
+                _showSignal,
+                (_, _) => Dispatcher.BeginInvoke(RestoreMainWindow),
+                state: null,
+                millisecondsTimeOutInterval: -1,
+                executeOnlyOnce: false);
         }
         catch (Exception ex)
         {
@@ -148,30 +163,47 @@ public partial class App : Application
         _notifyIcon?.Dispose();
         _services?.Dispose();
 
+        _showSignalWait?.Unregister(null);
+        _showSignal?.Dispose();
+
         _instanceMutex?.ReleaseMutex();
         _instanceMutex?.Dispose();
 
         base.OnExit(e);
     }
 
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-    private static void BringExistingInstanceToFront()
+    private static void SignalExistingInstance()
     {
-        var current = System.Diagnostics.Process.GetCurrentProcess();
-        var existing = System.Diagnostics.Process
-            .GetProcessesByName(current.ProcessName)
-            .FirstOrDefault(p => p.Id != current.Id);
-
-        if (existing?.MainWindowHandle is { } hwnd && hwnd != IntPtr.Zero)
+        try
         {
-            ShowWindow(hwnd, 9 /* SW_RESTORE */);
-            SetForegroundWindow(hwnd);
+            if (EventWaitHandle.TryOpenExisting(ShowSignalName, out var signal))
+            {
+                using (signal)
+                    signal.Set();
+            }
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] SignalExistingInstance failed: {ex.Message}");
+        }
+    }
+
+    // Runs on the UI thread: restores the main window from tray / minimized state.
+    private void RestoreMainWindow()
+    {
+        var window = MainWindow;
+        if (window is null) return;
+
+        if (!window.IsVisible)
+            window.Show();
+
+        if (window.WindowState == WindowState.Minimized)
+            window.WindowState = WindowState.Normal;
+
+        window.Activate();
+        window.Topmost = true;   // pull above other windows,
+        window.Topmost = false;  // then release so it behaves normally
+        window.Focus();
     }
 
     // If the PowerShell update script failed, it writes the error to this log file.

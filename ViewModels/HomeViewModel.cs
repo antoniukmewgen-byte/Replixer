@@ -8,7 +8,6 @@ using Replixer.Services.Upload;
 using Replixer.ViewModels.Call;
 using Replixer.ViewModels.Dialogs;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using RecordingStatus = Replixer.Models.RecordingStatus;
@@ -38,6 +37,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private CallDialogViewModel?                  _currentDialog;
     private TaskCompletionSource<CallReportData?>? _reportTcs;
+    private CallReportViewModel?                   _activeReportVm;
+    private bool             _reportInterrupted;
+    private CallReportData?  _interruptedDraft;
 
     private ViewModelBase _callContent;
     public RecordingsViewModel RecordingsVm => _recordingsVm;
@@ -76,6 +78,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         {
             WireEntryEditCommand(entry);
             WireEntryRetryCommand(entry);
+            WireEntryResumeDraftCommand(entry);
         }
 
         _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
@@ -142,7 +145,6 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         if (!_recorder.StartRecording(_lastDetectedApp))
         {
-            Debug.WriteLine("[HomeVM] AudioRecordingService failed to start");
             _isRecording        = false;
             _recordingStartedAt = null;
             OnPropertyChanged(nameof(IsRecording));
@@ -151,7 +153,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             var msg    = string.IsNullOrWhiteSpace(reason)
                 ? "Не вдалося запустити запис. Перевірте мікрофон."
                 : $"Не вдалося запустити запис.\n{reason}";
-            NotificationService.ShowError(msg);
+            ErrorReporter.Report("RECORDING_START", msg);
             return;
         }
 
@@ -175,6 +177,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
         WireEntryEditCommand(entry);
         WireEntryRetryCommand(entry);
+        WireEntryResumeDraftCommand(entry);
         entry.SourcePath = _recorder.CurrentFilePath;
         try
         {
@@ -188,6 +191,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             _windowManager.CloseCheatSheet();
 
             CallReportData? reportData = await reportTask;
+            bool wasInterrupted = _reportInterrupted;
+            _reportInterrupted  = false;
 
             if (path is null)
             {
@@ -196,11 +201,20 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 var msg    = string.IsNullOrWhiteSpace(reason)
                     ? "Помилка обробки аудіо. Файл не збережено."
                     : $"Помилка обробки аудіо.\n{reason}";
-                NotificationService.ShowError(msg);
+                ErrorReporter.Report("AUDIO_STOP", msg);
                 return;
             }
 
             entry.SourcePath = path;
+
+            if (wasInterrupted)
+            {
+                entry.CallDuration = callDuration;
+                entry.ReportData   = _interruptedDraft;
+                _interruptedDraft  = null;
+                entry.Status       = RecordingStatus.Draft;
+                return;
+            }
 
             if (reportData is not null)
                 reportData = reportData with
@@ -224,14 +238,14 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             if (upload.DriveWarning is not null)
             {
                 entry.Status = RecordingStatus.Error;
-                NotificationService.ShowError($"Запис не збережено:\n{upload.DriveWarning}");
+                ErrorReporter.Report("UPLOAD_DRIVE", $"Запис не збережено:\n{upload.DriveWarning}");
                 return;
             }
 
             if (upload.LocalPathWarning is not null)
             {
                 entry.Status = RecordingStatus.Error;
-                NotificationService.ShowError($"Запис не збережено:\n{upload.LocalPathWarning}");
+                ErrorReporter.Report("UPLOAD_LOCAL", $"Запис не збережено:\n{upload.LocalPathWarning}");
                 return;
             }
 
@@ -241,10 +255,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[HomeVM] StopRecording error: {ex.Message}");
             _windowManager.CloseCheatSheet();
             entry.Status = RecordingStatus.Error;
-            NotificationService.ShowError($"Помилка збереження запису.\n{ex.Message}");
+            ErrorReporter.Report("STOP_RECORDING", "Помилка збереження запису.", ex);
         }
         finally
         {
@@ -268,16 +281,23 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             managerName: _settings.ManagerName,
             position:    _settings.Position,
             existing:    existing);
+        _activeReportVm = vm;
         CallReportRequested?.Invoke(vm);
         return tcs.Task;
     }
 
-    private void DismissCallReport()
+    private void DismissCallReport(bool interrupted = false)
     {
         // Complete any pending report task with null so StopRecordingAsync never hangs
         // when the dialog is dismissed externally (new call, app closing, manual dismiss).
+        if (interrupted && _reportTcs is not null)
+        {
+            _reportInterrupted  = true;
+            _interruptedDraft   = _activeReportVm?.CaptureDraft();
+        }
         _reportTcs?.TrySetResult(null);
-        _reportTcs = null;
+        _reportTcs      = null;
+        _activeReportVm = null;
         CallReportRequested?.Invoke(null);
     }
 
@@ -293,6 +313,83 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         entry.RetryCommand = new RelayCommand(
             execute:    () => _ = RetryEntryAsync(entry),
             canExecute: () => entry.Status == RecordingStatus.Error && entry.HasRetryableFile);
+    }
+
+    private void WireEntryResumeDraftCommand(RecordingEntry entry)
+    {
+        entry.ResumeDraftCommand = new RelayCommand(
+            execute:    () => _ = ResumeDraftAsync(entry),
+            canExecute: () => entry.Status == RecordingStatus.Draft && entry.HasRetryableFile);
+    }
+
+    private async Task ResumeDraftAsync(RecordingEntry entry)
+    {
+        var filePath = (!string.IsNullOrEmpty(entry.SourcePath) && File.Exists(entry.SourcePath)) ? entry.SourcePath
+                     : (!string.IsNullOrEmpty(entry.FilePath)   && File.Exists(entry.FilePath))   ? entry.FilePath
+                     : null;
+        if (filePath is null)
+        {
+            entry.Status = RecordingStatus.Error;
+            NotificationService.ShowError("Файл запису не знайдено.");
+            return;
+        }
+
+        var reportData = await RequestCallReportAsync(existing: entry.ReportData);
+        if (reportData is null) return;
+
+        reportData = reportData with
+        {
+            AppName  = entry.PlatformDisplayName,
+            Duration = entry.CallDuration,
+        };
+
+        entry.Status = RecordingStatus.Loading;
+        try
+        {
+            bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, entry.CallDuration);
+            string? callType  = ResolveCallType(reportData);
+            string? caption   = reportData.FormatCaption();
+
+            var upload = await _orchestrator.UploadAsync(
+                filePath,
+                caption,
+                reportData.CrmUrl,
+                entry.StartedAt,
+                reportData.LeadSource,
+                skipTelegram,
+                callType);
+
+            entry.DriveUrl          = upload.DriveUrl;
+            entry.FilePath          = upload.LocalPath ?? entry.FilePath;
+            entry.TelegramMessageId = upload.TelegramMessageId;
+            entry.TelegramChatId    = upload.TelegramChatId;
+            entry.TelegramTopicId   = upload.TelegramTopicId;
+            entry.KommoNoteId       = upload.KommoNoteId;
+            entry.ReportData        = reportData;
+
+            if (upload.DriveWarning is not null)
+            {
+                entry.Status = RecordingStatus.Error;
+                ErrorReporter.Report("RESUME_DRIVE", $"Запис не збережено:\n{upload.DriveWarning}");
+                return;
+            }
+
+            if (upload.LocalPathWarning is not null)
+            {
+                entry.Status = RecordingStatus.Error;
+                ErrorReporter.Report("RESUME_LOCAL", $"Запис не збережено:\n{upload.LocalPathWarning}");
+                return;
+            }
+
+            entry.Status = RecordingStatus.Saved;
+            ShowUploadNotification(upload);
+            System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+        }
+        catch (Exception ex)
+        {
+            entry.Status = RecordingStatus.Error;
+            ErrorReporter.Report("RESUME_DRAFT", "Повторна відправка не вдалась.", ex);
+        }
     }
 
     private async Task RetryEntryAsync(RecordingEntry entry)
@@ -337,7 +434,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             if (upload.DriveWarning is not null)
             {
                 entry.Status = RecordingStatus.Error;
-                NotificationService.ShowError($"Запис не збережено:\n{upload.DriveWarning}");
+                ErrorReporter.Report("RETRY_DRIVE", $"Запис не збережено:\n{upload.DriveWarning}");
                 return;
             }
 
@@ -347,9 +444,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[HomeVM] Retry failed: {ex.Message}");
             entry.Status = RecordingStatus.Error;
-            NotificationService.ShowError($"Повторна відправка не вдалась.\n{ex.Message}");
+            ErrorReporter.Report("RETRY_UPLOAD", "Повторна відправка не вдалась.", ex);
         }
     }
 
@@ -394,8 +490,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             if (tgError    is not null) errors.Add(tgError);
             if (kommoError is not null) errors.Add(kommoError);
             var reason = string.Join("\n", errors);
-            Debug.WriteLine($"[HomeVM] Edit failed: {reason}");
-            NotificationService.ShowError($"Не вдалося оновити звіт.\n{reason}");
+            ErrorReporter.Report("EDIT_REPORT", $"Не вдалося оновити звіт.\n{reason}");
         }
     }
 
@@ -404,8 +499,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         if (e.NewItems is null) return;
         foreach (RecordingEntry entry in e.NewItems)
         {
-            if (entry.EditReportCommand is null) WireEntryEditCommand(entry);
-            if (entry.RetryCommand      is null) WireEntryRetryCommand(entry);
+            if (entry.EditReportCommand  is null) WireEntryEditCommand(entry);
+            if (entry.RetryCommand       is null) WireEntryRetryCommand(entry);
+            if (entry.ResumeDraftCommand is null) WireEntryResumeDraftCommand(entry);
         }
     }
 
@@ -438,6 +534,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private void ShowDialog(CallDialogViewModel vm)
     {
+        DismissCallReport(interrupted: true);
         _currentDialog?.Dispose();
         _currentDialog   = vm;
         _hasActiveDialog = true;
@@ -458,6 +555,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         // otherwise we deadlock: UI thread is blocked here while StopRecordingAsync
         // is suspended waiting for a TCS that only completes via a UI interaction.
         _reportTcs?.TrySetResult(null);
+        _activeReportVm = null;
 
         _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
         _currentDialog?.Dispose();

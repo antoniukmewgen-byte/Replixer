@@ -276,4 +276,23 @@ public class CallReportViewModel : ViewModelBase
             Position      = _position,
             CustomOutcome = IsCustomOutcomeVisible ? _customOutcome : null,
         });
+
+    // Captures whatever the user has typed so far — no validation.
+    // Used when the form is interrupted by a new call so the draft can be restored later.
+    public CallReportData CaptureDraft() =>
+        new CallReportData(
+            Manager:            _managerName,
+            CallType:           _selectedCallType ?? string.Empty,
+            CustomCallType:     _customCallType,
+            LeadSource:         _selectedLeadSource ?? string.Empty,
+            CrmUrl:             _crmUrl,
+            Rating:             _selectedRating ?? string.Empty,
+            Outcome:            _selectedOutcome ?? string.Empty,
+            IsInvoicePaid:      _isInvoicePaid,
+            PaymentProbability: _selectedPaymentProbability ?? string.Empty,
+            Note:               _note)
+        {
+            Position      = _position,
+            CustomOutcome = _customOutcome,
+        };
 }
