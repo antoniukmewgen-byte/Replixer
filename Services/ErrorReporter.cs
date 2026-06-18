@@ -76,11 +76,12 @@ internal static class ErrorReporter
     {
         try
         {
-            var token  = AppSecrets.ErrorBotToken;
-            var chatId = AppSecrets.ErrorChatId;
-            if (string.IsNullOrEmpty(token) || chatId == 0) return true;
+            var token   = AppSecrets.ErrorBotToken;
+            var chatIds = AppSecrets.ErrorChatIds;
+            if (string.IsNullOrEmpty(token) || chatIds.Length == 0) return true;
 
             var chunks = SplitIntoChunks(FormatMessage(entry), maxLength: 4096);
+            foreach (var chatId in chatIds)
             foreach (var chunk in chunks)
             {
                 var payload = JsonSerializer.Serialize(new { chat_id = chatId, text = chunk });
@@ -90,7 +91,7 @@ internal static class ErrorReporter
                     Content = new StringContent(payload, Encoding.UTF8, "application/json")
                 };
                 var res = await _http.SendAsync(req);
-                Debug.WriteLine($"[ErrorReporter] {(int)res.StatusCode}");
+                Debug.WriteLine($"[ErrorReporter] {chatId}: {(int)res.StatusCode}");
                 if (!res.IsSuccessStatusCode) return false;
             }
             return true;
