@@ -19,7 +19,6 @@ public class KommoService : IDisposable
     })
     { Timeout = TimeSpan.FromSeconds(30) };
 
-    private Dictionary<(long pid, long sid), (string pipeline, string status)>? _pipelineCache;
     private long? _firstContactFieldId;
     private long? _processingSpeedFieldId;
     private long? _leadSourceFieldId;
@@ -69,12 +68,8 @@ public class KommoService : IDisposable
 
         await EnsureAllFieldIdsAsync(baseUrl, token);
 
-        bool skipDates = KommoRules.ShouldSkipDates(leadSource);
-        if (skipDates)
-            Debug.WriteLine($"[Kommo] Skipping first-contact/speed fields for source '{leadSource}'");
-
         var noteTask     = PostNoteAsync(baseUrl, token, leadId, noteText);
-        var dateTask     = callStartTime.HasValue && !skipDates
+        var dateTask     = callStartTime.HasValue
             ? TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime.Value)
             : Task.CompletedTask;
         var callTypeTask = !string.IsNullOrWhiteSpace(callType)
@@ -181,27 +176,9 @@ public class KommoService : IDisposable
             var (pipelineId, statusId, createdAt, isFieldAlreadySet, crmSource) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId, fieldId.Value, sourceFieldId);
 
-            if (KommoRules.ShouldSkipDates(crmSource))
-            {
-                Debug.WriteLine($"[Kommo] Skipping first-contact/speed — CRM source '{crmSource}' is excluded");
-                return;
-            }
-
             if (isFieldAlreadySet)
             {
                 Debug.WriteLine("[Kommo] First-contact field already has a value — skipping");
-                return;
-            }
-
-            if (pipelineId is null || statusId is null) return;
-
-            var (pipelineName, statusName) = await ResolvePipelineStatusNamesAsync(
-                baseUrl, token, pipelineId.Value, statusId.Value);
-            Debug.WriteLine($"[Kommo] Lead pipeline='{pipelineName}' status='{statusName}'");
-
-            if (!KommoRules.ShouldSetFirstContact(pipelineName, statusName))
-            {
-                Debug.WriteLine("[Kommo] No first-contact rule matched — skipping date update");
                 return;
             }
 
@@ -288,57 +265,6 @@ public class KommoService : IDisposable
         }
     }
 
-    private async Task<(string pipeline, string status)> ResolvePipelineStatusNamesAsync(
-        string baseUrl, string token, long pipelineId, long statusId)
-    {
-        if (_pipelineCache is null)
-            _pipelineCache = await FetchPipelineCacheAsync(baseUrl, token);
-
-        if (_pipelineCache.TryGetValue((pipelineId, statusId), out var names))
-            return names;
-
-        Debug.WriteLine($"[Kommo] pipeline_id={pipelineId} status_id={statusId} not found in cache ({_pipelineCache.Count} entries)");
-        return (string.Empty, string.Empty);
-    }
-
-    private async Task<Dictionary<(long, long), (string pipeline, string status)>> FetchPipelineCacheAsync(string baseUrl, string token)
-    {
-        var cache = new Dictionary<(long, long), (string, string)>();
-        try
-        {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/pipelines?limit=250");
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            Debug.WriteLine($"[Kommo] Pipelines GET → {(int)res.StatusCode}");
-            if (!res.IsSuccessStatusCode) return cache;
-
-            using var doc = JsonDocument.Parse(body);
-            if (!doc.RootElement.TryGetProperty("_embedded", out var emb)) return cache;
-            if (!emb.TryGetProperty("pipelines", out var pipelines))       return cache;
-
-            foreach (var pipeline in pipelines.EnumerateArray())
-            {
-                long   pid   = pipeline.GetProperty("id").GetInt64();
-                string pname = pipeline.GetProperty("name").GetString() ?? string.Empty;
-                Debug.WriteLine($"[Kommo]   Pipeline id={pid} name='{pname}'");
-
-                if (!pipeline.TryGetProperty("_embedded", out var pEmb)) continue;
-                if (!pEmb.TryGetProperty("statuses", out var statuses))   continue;
-
-                foreach (var status in statuses.EnumerateArray())
-                {
-                    long   sid   = status.GetProperty("id").GetInt64();
-                    string sname = status.GetProperty("name").GetString() ?? string.Empty;
-                    Debug.WriteLine($"[Kommo]     Status id={sid} name='{sname}'");
-                    cache[(pid, sid)] = (pname, sname);
-                }
-            }
-            Debug.WriteLine($"[Kommo] Pipeline cache loaded: {cache.Count} entries");
-        }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] FetchPipelineCache failed: {ex.Message}"); }
-        return cache;
-    }
 
     private async Task EnsureAllFieldIdsAsync(string baseUrl, string token)
     {
