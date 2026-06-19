@@ -148,6 +148,13 @@ public sealed class UpdateService
                 try {
                     $proc = Get-Process -Id {{pid}} -ErrorAction SilentlyContinue
                     if ($proc) { $proc.WaitForExit(30000) }
+                    Start-Sleep -Milliseconds 500
+
+                    # Remove obsolete files that are no longer shipped
+                    @('FlaUI.UIA3.dll', 'FlaUI.Core.dll', 'Interop.UIAutomationClient.dll') | ForEach-Object {
+                        $obsolete = Join-Path '{{Esc(installDir)}}' $_
+                        if (Test-Path $obsolete) { Remove-Item -LiteralPath $obsolete -Force -ErrorAction SilentlyContinue }
+                    }
 
                     Get-ChildItem -LiteralPath '{{Esc(stagingDir)}}' -File -Recurse | ForEach-Object {
                         $rel     = $_.FullName.Substring('{{Esc(stagingDir)}}'.Length).TrimStart('\')
