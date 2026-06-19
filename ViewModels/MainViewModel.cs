@@ -86,9 +86,6 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         if (_pendingUpdate is null) return;
 
         UpdateAvailable = true;
-
-        if (_settings.UpdateDismissedDate?.Date == DateTime.Today) return;
-
         ShowUpdateDialog(_pendingUpdate);
     }
 
@@ -108,11 +105,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     private void ShowUpdateDialog(UpdateInfo info)
     {
-        var vm = new UpdateDialogViewModel(_updateService, info, onDismiss: () =>
-        {
-            _settings.UpdateDismissedDate = DateTime.Today;
-            Dialog = null;
-        });
+        var vm = new UpdateDialogViewModel(_updateService, info);
         RestoreIfMinimized();
         Dialog = vm;
     }

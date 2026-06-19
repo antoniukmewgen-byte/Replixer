@@ -32,17 +32,12 @@ public sealed class UpdateDialogViewModel : ViewModelBase
 
     public string DownloadProgressText => $"{_downloadProgress * 100:0}%";
 
-    public AsyncRelayCommand UpdateNowCommand { get; }
-    public RelayCommand      DismissCommand   { get; }
-
-    public UpdateDialogViewModel(UpdateService updateService, UpdateInfo info,
-        Action onDismiss)
+    public UpdateDialogViewModel(UpdateService updateService, UpdateInfo info)
     {
         _updateService = updateService;
         _info          = info;
 
-        UpdateNowCommand = new AsyncRelayCommand(DownloadAndInstallAsync);
-        DismissCommand   = new RelayCommand(onDismiss);
+        _ = DownloadAndInstallAsync();
     }
 
     private async Task DownloadAndInstallAsync()
