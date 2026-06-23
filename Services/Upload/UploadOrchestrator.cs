@@ -132,7 +132,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             : kommoBase + $"\n💾 Google Drive: {driveUrl}";
         kommoNote += $"\n🔖 v{ErrorReporter.AppVersion}";
 
-        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, leadSource, callType);
+        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, callType);
 
         string? warning = noteId is null && _kommo.IsEnabled
             ? "Kommo: не вдалося створити нотатку"
