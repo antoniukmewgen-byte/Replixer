@@ -116,10 +116,15 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         {
             if (Dialog is CallDialogViewModel) Dialog = null;
             CloseToast();
+            if (Application.Current.MainWindow is { } win)
+                win.Topmost = false;
             return;
         }
 
         RestoreIfMinimized();
+
+        if (Application.Current.MainWindow is { } mainWin)
+            mainWin.Topmost = true;
 
         if (Application.Current.MainWindow?.IsVisible == true)
             Dialog = vm;
