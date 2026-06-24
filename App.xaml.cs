@@ -91,9 +91,17 @@ public partial class App : Application
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            ErrorReporter.Report("TASK_ERROR",
-                e.Exception.InnerException?.Message ?? e.Exception.Message, e.Exception);
             e.SetObserved();
+
+            // WTelegram fires background KeepAlive/Reactor tasks that throw IOException
+            // on network drops — this is expected and not actionable by the user.
+            var inner = e.Exception.InnerException ?? e.Exception;
+            if (inner is System.IO.IOException or System.Net.Sockets.SocketException &&
+                (e.Exception.StackTrace ?? inner.StackTrace ?? "").Contains("WTelegram"))
+                return;
+
+            ErrorReporter.Report("TASK_ERROR",
+                inner.Message, e.Exception);
         };
 
         if (!settings.IsSetupComplete)

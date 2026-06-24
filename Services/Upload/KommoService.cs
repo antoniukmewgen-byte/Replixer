@@ -126,40 +126,53 @@ public class KommoService : IDisposable
 
     private async Task<long?> PostNoteAsync(string baseUrl, string token, string leadId, string text)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            var payload = JsonSerializer.Serialize(new[]
+            try
             {
-                new { entity_id = long.Parse(leadId), note_type = "common", @params = new { text } }
-            });
+                var payload = JsonSerializer.Serialize(new[]
+                {
+                    new { entity_id = long.Parse(leadId), note_type = "common", @params = new { text } }
+                });
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/leads/{leadId}/notes")
-            {
-                Content = new StringContent(payload, Encoding.UTF8, "application/json")
-            };
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using var req = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/leads/{leadId}/notes")
+                {
+                    Content = new StringContent(payload, Encoding.UTF8, "application/json")
+                };
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            Debug.WriteLine($"[Kommo] Note POST → {(int)res.StatusCode}");
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                Debug.WriteLine($"[Kommo] Note POST → {(int)res.StatusCode} (attempt {attempt})");
 
-            if (!res.IsSuccessStatusCode)
-            {
-                ErrorReporter.Report("KOMMO", $"PostNote HTTP {(int)res.StatusCode} — lead {leadId}");
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"PostNote HTTP {(int)res.StatusCode} — lead {leadId}: {snippet}");
+                    return null;
+                }
+
+                using var doc = JsonDocument.Parse(body);
+                if (doc.RootElement.TryGetProperty("_embedded", out var emb) &&
+                    emb.TryGetProperty("notes", out var notes) &&
+                    notes.GetArrayLength() > 0 &&
+                    notes[0].TryGetProperty("id", out var idProp))
+                    return idProp.GetInt64();
+
                 return null;
             }
-
-            using var doc = JsonDocument.Parse(body);
-            if (doc.RootElement.TryGetProperty("_embedded", out var emb) &&
-                emb.TryGetProperty("notes", out var notes) &&
-                notes.GetArrayLength() > 0 &&
-                notes[0].TryGetProperty("id", out var idProp))
-                return idProp.GetInt64();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] PostNote failed: {ex.Message}");
-            ErrorReporter.Report("KOMMO", $"PostNote exception — lead {leadId}: {ex.Message}", ex);
+            catch (HttpRequestException ex) when (attempt < maxAttempts)
+            {
+                Debug.WriteLine($"[Kommo] PostNote attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] PostNote failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"PostNote exception — lead {leadId}: {ex.Message}", ex);
+                return null;
+            }
         }
         return null;
     }

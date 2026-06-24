@@ -120,9 +120,12 @@ public class TelegramUploadService : IDisposable
         }
     }
 
-    public async Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null)
+    public Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null)
+        => SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: false);
+
+    private async Task<int?> SendFileCoreAsync(string filePath, long chatId, int? topicId, string? caption, string? driveUrl, bool isRetry)
     {
-        Debug.WriteLine($"[TG] ── SendFileAsync ──────────────────────────────");
+        Debug.WriteLine($"[TG] ── SendFileAsync{(isRetry ? " (retry)" : "")} ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
         Debug.WriteLine($"[TG] ChatId : {chatId}");
         try
@@ -158,6 +161,17 @@ public class TelegramUploadService : IDisposable
             Debug.WriteLine($"[TG] ✗ Auth key unregistered — invalidating session");
             HandleAuthKeyUnregistered();
             return null;
+        }
+        catch (NullReferenceException ex) when (!isRetry)
+        {
+            // WTelegram's internal DC connection became null (network drop while _isReady was true).
+            // Reset client and retry once so the user doesn't see a false failure.
+            Debug.WriteLine($"[TG] ✗ WTelegram internal null (DC client lost) — resetting and retrying: {ex.Message}");
+            _isReady = false;
+            InvalidatePeerCache();
+            _client?.Dispose();
+            _client = null;
+            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
         }
         catch (Exception ex)
         {
