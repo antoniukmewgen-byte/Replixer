@@ -105,8 +105,8 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     public Task<string?> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null)
         => _telegram.EditMessageAsync(messageId, chatId, topicId, caption, driveUrl);
 
-    public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText)
-        => _kommo.EditNoteAsync(leadUrl, noteId, noteText);
+    public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
+        => _kommo.EditNoteAsync(leadUrl, noteId, noteText, callType);
 
     private async Task<(int? MessageId, string? Warning)> SendTelegramAsync(
         bool send, string filePath, string? caption, string? driveUrl)

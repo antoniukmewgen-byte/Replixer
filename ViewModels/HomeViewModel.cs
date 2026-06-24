@@ -227,6 +227,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
             string? callType  = ResolveCallType(reportData);
             var upload = await _orchestrator.UploadAsync(path, caption, reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram, callType);
+            entry.CallDuration      = callDuration;
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;
@@ -404,7 +405,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             reportData = reportData with
             {
                 AppName  = entry.PlatformDisplayName,
-                Duration = entry.ReportData?.Duration ?? TimeSpan.Zero,
+                Duration = entry.ReportData?.Duration ?? entry.CallDuration,
             };
 
         entry.Status = RecordingStatus.Loading;
@@ -420,7 +421,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 crmUrl,
                 entry.StartedAt,
                 reportData?.LeadSource,
-                skipTelegram: entry.TelegramMessageId.HasValue,
+                skipTelegram: entry.TelegramMessageId.HasValue || PositionPolicy.ShouldSkipTelegram(_settings.Position, entry.ReportData?.Duration ?? entry.CallDuration),
                 callType: callType);
 
             entry.DriveUrl          = upload.DriveUrl;
@@ -455,7 +456,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         if (newData is null) return;
 
         newData = newData with { AppName = entry.PlatformDisplayName };
-        var caption = newData.FormatCaption();
+        var caption  = newData.FormatCaption();
+        var callType = ResolveCallType(newData);
 
         var tgTask = entry.TelegramMessageId.HasValue
             ? _orchestrator.EditTelegramCaptionAsync(
@@ -471,7 +473,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             ? kommoBase
             : kommoBase + $"\n💾 Google Drive: {entry.DriveUrl}";
         var kommoTask = entry.KommoNoteId.HasValue && !string.IsNullOrWhiteSpace(newData.CrmUrl)
-            ? _orchestrator.EditKommoNoteAsync(newData.CrmUrl, entry.KommoNoteId.Value, kommoNote)
+            ? _orchestrator.EditKommoNoteAsync(newData.CrmUrl, entry.KommoNoteId.Value, kommoNote, callType)
             : Task.FromResult<string?>(null);
 
         await Task.WhenAll(tgTask, kommoTask);

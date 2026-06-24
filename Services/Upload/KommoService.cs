@@ -76,7 +76,7 @@ public class KommoService : IDisposable
         return await noteTask;
     }
 
-    public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText)
+    public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
     {
         if (!IsEnabled) return "Kommo: інтеграція вимкнена";
 
@@ -108,13 +108,20 @@ public class KommoService : IDisposable
             var res  = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
             Debug.WriteLine($"[Kommo] Note PATCH → {(int)res.StatusCode}  {body[..Math.Min(500, body.Length)]}");
-            return res.IsSuccessStatusCode ? null : $"Kommo: помилка {(int)res.StatusCode}";
+
+            if (!res.IsSuccessStatusCode)
+                return $"Kommo: помилка {(int)res.StatusCode}";
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] EditNote failed: {ex.Message}");
             return $"Kommo: {ex.Message}";
         }
+
+        if (!string.IsNullOrWhiteSpace(callType))
+            await PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType);
+
+        return null;
     }
 
     private async Task<long?> PostNoteAsync(string baseUrl, string token, string leadId, string text)
