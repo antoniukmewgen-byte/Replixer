@@ -100,7 +100,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 appName:        app,
                 message:        "Виявлено дзвінок. Бажаєте розпочати запис розмови?",
                 primaryLabel:   "Почати запис", onPrimary:   StartRecording,
-                secondaryLabel: "Пропустити",   onSecondary: DismissDialog
+                secondaryLabel: "Пропустити",   onSecondary: DismissDialog,
+                confirmSecondary: true
             ));
         });
     }

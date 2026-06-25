@@ -9,7 +9,9 @@ namespace Replixer.ViewModels.Dialogs;
 public class CallDialogViewModel : ViewModelBase, IDisposable
 {
     private readonly DispatcherTimer? _timer;
+    private readonly string _originalMessage;
     private string _recordingDuration = "00:00:00";
+    private bool _isConfirming;
 
     public string      AppName           { get; }
     public ImageSource AppIconSource     { get; }
@@ -18,11 +20,24 @@ public class CallDialogViewModel : ViewModelBase, IDisposable
     public Brush       PrimaryAccent     { get; }
     public string      StatusText        { get; }
     public Brush       StatusColor       { get; }
-    public string      Message           { get; }
     public string      PrimaryLabel      { get; }
     public string      SecondaryLabel    { get; }
     public ICommand    PrimaryCommand    { get; }
     public ICommand    SecondaryCommand  { get; }
+
+    public bool IsConfirming
+    {
+        get => _isConfirming;
+        private set
+        {
+            if (SetField(ref _isConfirming, value))
+                OnPropertyChanged(nameof(DisplayMessage));
+        }
+    }
+
+    public string DisplayMessage => _isConfirming
+        ? "Ви впевнені що хочете відмінити?"
+        : _originalMessage;
 
     public string RecordingDuration
     {
@@ -35,8 +50,11 @@ public class CallDialogViewModel : ViewModelBase, IDisposable
         string message,
         string primaryLabel,   Action onPrimary,
         string secondaryLabel, Action onSecondary,
-        DateTime? recordingStartedAt = null)
+        DateTime? recordingStartedAt = null,
+        bool confirmSecondary = false)
     {
+        _originalMessage = message;
+
         AppName       = PlatformHelper.ToDisplayName(appName);
         AppIconSource = new BitmapImage(new Uri(PlatformHelper.ToIconUri(appName)));
         AppBackground = (Brush)System.Windows.Application.Current.Resources[PlatformHelper.ToBrushKey(appName)];
@@ -46,12 +64,24 @@ public class CallDialogViewModel : ViewModelBase, IDisposable
         PrimaryAccent     = new SolidColorBrush(isStop ? Color.FromRgb(0xC6, 0x44, 0x44) : Color.FromRgb(0x22, 0xC6, 0x79));
         StatusText        = isStop ? "Завершився" : "Активний";
         StatusColor       = new SolidColorBrush(isStop ? Color.FromRgb(0xC6, 0x44, 0x44) : Color.FromRgb(0x22, 0xC6, 0x79));
-        Message       = message;
         PrimaryLabel  = primaryLabel;
         SecondaryLabel = secondaryLabel;
 
-        PrimaryCommand   = new RelayCommand(() => { if (_disposed) return; Dispose(); onPrimary(); });
-        SecondaryCommand = new RelayCommand(() => { if (_disposed) return; Dispose(); onSecondary(); });
+        PrimaryCommand = new RelayCommand(() =>
+        {
+            if (_disposed) return;
+            if (_isConfirming) { IsConfirming = false; return; }
+            Dispose();
+            onPrimary();
+        });
+
+        SecondaryCommand = new RelayCommand(() =>
+        {
+            if (_disposed) return;
+            if (confirmSecondary && !_isConfirming) { IsConfirming = true; return; }
+            Dispose();
+            onSecondary();
+        });
 
         if (recordingStartedAt.HasValue)
         {
