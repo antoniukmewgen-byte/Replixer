@@ -81,16 +81,34 @@ public class GoogleDriveUploadService
 
     public async Task<string?> UploadAsync(string filePath, string? folderId, CancellationToken ct = default)
     {
-        Debug.WriteLine($"[GDrive] ── UploadAsync ─────────────────────────────");
-        Debug.WriteLine($"[GDrive] File     : {filePath}");
-        Debug.WriteLine($"[GDrive] FolderId : {(folderId ?? "(root)")}");
-
         if (_service is null)
         {
             const string err = "Service account not initialized. Check that service_account.json is embedded.";
             Debug.WriteLine($"[GDrive] ✗ {err}");
             return null;
         }
+
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            var (link, isNetworkError, ex) = await TryUploadOnceAsync(filePath, folderId, attempt, ct);
+            if (link is not null) return link;
+            if (!isNetworkError) return null;
+            if (attempt == maxAttempts) break;
+            Debug.WriteLine($"[GDrive] Network error, retrying in 5s (attempt {attempt}/{maxAttempts})…");
+            await Task.Delay(5000, ct);
+        }
+
+        ErrorReporter.Report("GOOGLE_DRIVE", "Немає з'єднання з Google Drive після 3 спроб — перевірте інтернет.");
+        return null;
+    }
+
+    private async Task<(string? link, bool isNetworkError, Exception? ex)> TryUploadOnceAsync(
+        string filePath, string? folderId, int attempt, CancellationToken ct)
+    {
+        Debug.WriteLine($"[GDrive] ── UploadAsync (attempt {attempt}) ──────────────────");
+        Debug.WriteLine($"[GDrive] File     : {filePath}");
+        Debug.WriteLine($"[GDrive] FolderId : {(folderId ?? "(root)")}");
 
         try
         {
@@ -114,8 +132,8 @@ public class GoogleDriveUploadService
             long totalBytes = stream.Length;
             Debug.WriteLine($"[GDrive] File size : {totalBytes:N0} bytes ({totalBytes / 1024.0 / 1024.0:F2} MB)");
 
-            var request = _service.Files.Create(metadata, stream, "audio/mpeg");
-            request.Fields           = "id,webContentLink,name";
+            var request = _service!.Files.Create(metadata, stream, "audio/mpeg");
+            request.Fields            = "id,webContentLink,name";
             request.SupportsAllDrives = true;
 
             int lastReported = 0;
@@ -124,7 +142,6 @@ public class GoogleDriveUploadService
                 if (p.Status == UploadStatus.Uploading && totalBytes > 0)
                 {
                     int pct = (int)(p.BytesSent * 100 / totalBytes);
-
                     if (pct / 25 > lastReported / 25)
                     {
                         lastReported = pct;
@@ -143,33 +160,47 @@ public class GoogleDriveUploadService
 
             if (result.Status == UploadStatus.Completed)
             {
-                string id   = request.ResponseBody?.Id          ?? "(no id)";
-                string name = request.ResponseBody?.Name        ?? "(no name)";
+                string id   = request.ResponseBody?.Id             ?? "(no id)";
+                string name = request.ResponseBody?.Name           ?? "(no name)";
                 string link = request.ResponseBody?.WebContentLink ?? string.Empty;
                 Debug.WriteLine($"[GDrive] ✓ File id      : {id}");
                 Debug.WriteLine($"[GDrive] ✓ File name    : {name}");
                 Debug.WriteLine($"[GDrive] ✓ Content link : {link}");
-                return link;
+                return (link, false, null);
             }
 
             string error = result.Exception is not null
                 ? $"{result.Exception.GetType().Name}: {result.Exception.Message}"
                 : "Unknown error";
             Debug.WriteLine($"[GDrive] ✗ Upload failed: {error}");
-            ErrorReporter.Report("GOOGLE_DRIVE", $"Upload failed: {error}", result.Exception);
-            return null;
+
+            bool isNet = result.Exception is System.Net.Http.HttpRequestException
+                                          or System.Net.Sockets.SocketException;
+            if (!isNet)
+                ErrorReporter.Report("GOOGLE_DRIVE", $"Upload failed: {error}", result.Exception);
+            return (null, isNet, result.Exception);
         }
         catch (OperationCanceledException)
         {
             Debug.WriteLine("[GDrive] Upload cancelled");
-            return null;
+            return (null, false, null);
+        }
+        catch (System.Net.Http.HttpRequestException ex)
+        {
+            Debug.WriteLine($"[GDrive] ✗ Network error: {ex.Message}");
+            return (null, true, ex);
+        }
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            Debug.WriteLine($"[GDrive] ✗ Socket error: {ex.Message}");
+            return (null, true, ex);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[GDrive] ✗ Exception: {ex.GetType().Name}: {ex.Message}");
             Debug.WriteLine($"[GDrive]   StackTrace: {ex.StackTrace}");
             ErrorReporter.Report("GOOGLE_DRIVE", $"Upload exception: {ex.Message}", ex);
-            return null;
+            return (null, false, ex);
         }
         finally
         {

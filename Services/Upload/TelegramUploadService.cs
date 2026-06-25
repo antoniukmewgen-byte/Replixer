@@ -164,13 +164,14 @@ public class TelegramUploadService : IDisposable
         }
         catch (NullReferenceException ex) when (!isRetry)
         {
-            // WTelegram's internal DC connection became null (network drop while _isReady was true).
-            // Reset client and retry once so the user doesn't see a false failure.
+            // WTelegram's internal DC connection became null (network drop or session restored
+            // before DC map was populated). Reset client, wait for DC init, then retry once.
             Debug.WriteLine($"[TG] ✗ WTelegram internal null (DC client lost) — resetting and retrying: {ex.Message}");
             _isReady = false;
             InvalidatePeerCache();
             _client?.Dispose();
             _client = null;
+            await Task.Delay(2000);
             return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
         }
         catch (Exception ex)

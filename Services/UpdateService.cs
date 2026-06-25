@@ -147,7 +147,11 @@ public sealed class UpdateService
                 $logPath = '{{Esc(logPath)}}'
                 try {
                     $proc = Get-Process -Id {{pid}} -ErrorAction SilentlyContinue
-                    if ($proc) { $proc.WaitForExit(30000) }
+                    if ($proc) {
+                        $exited = $proc.WaitForExit(30000)
+                        if (-not $exited) { $proc.Kill() }
+                        $proc.WaitForExit(5000)
+                    }
                     Start-Sleep -Milliseconds 500
 
                     # Remove obsolete files that are no longer shipped

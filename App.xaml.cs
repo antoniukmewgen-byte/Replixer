@@ -95,11 +95,10 @@ public partial class App : Application
 
             // WTelegram fires background KeepAlive/Reactor tasks that throw IOException
             // on network drops — this is expected and not actionable by the user.
-            var inner = e.Exception.InnerException ?? e.Exception;
-            if (inner is System.IO.IOException or System.Net.Sockets.SocketException &&
-                (e.Exception.StackTrace ?? inner.StackTrace ?? "").Contains("WTelegram"))
+            if (IsWTelegramNetworkError(e.Exception))
                 return;
 
+            var inner = e.Exception.InnerException ?? e.Exception;
             ErrorReporter.Report("TASK_ERROR",
                 inner.Message, e.Exception);
         };
@@ -232,6 +231,11 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"[App] ReportPendingUpdateError failed: {ex.Message}");
         }
     }
+
+    private static bool IsWTelegramNetworkError(AggregateException ex)
+        => ex.Flatten().InnerExceptions.All(inner =>
+               inner is System.IO.IOException or System.Net.Sockets.SocketException &&
+               (inner.StackTrace ?? "").Contains("WTelegram"));
 
     private static ServiceProvider BuildServices()
         => new ServiceCollection()
