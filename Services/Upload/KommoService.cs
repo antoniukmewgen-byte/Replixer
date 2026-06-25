@@ -196,7 +196,7 @@ public class KommoService : IDisposable
             if (createdAt.HasValue)
             {
                 var leadCreated = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
-                int minutes     = (int)Math.Round((callStartTime.ToUniversalTime() - leadCreated).TotalMinutes);
+                int minutes     = Math.Max(0, (int)Math.Round((leadCreated - callStartTime.ToUniversalTime()).TotalMinutes));
                 Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreated:u}, callStart={callStartTime.ToUniversalTime():u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
             }
