@@ -115,7 +115,7 @@ public class GoogleDriveUploadService
             Debug.WriteLine($"[GDrive] File size : {totalBytes:N0} bytes ({totalBytes / 1024.0 / 1024.0:F2} MB)");
 
             var request = _service.Files.Create(metadata, stream, "audio/mpeg");
-            request.Fields           = "id,webViewLink,name";
+            request.Fields           = "id,webContentLink,name";
             request.SupportsAllDrives = true;
 
             int lastReported = 0;
@@ -145,10 +145,10 @@ public class GoogleDriveUploadService
             {
                 string id   = request.ResponseBody?.Id          ?? "(no id)";
                 string name = request.ResponseBody?.Name        ?? "(no name)";
-                string link = request.ResponseBody?.WebViewLink ?? string.Empty;
-                Debug.WriteLine($"[GDrive] ✓ File id   : {id}");
-                Debug.WriteLine($"[GDrive] ✓ File name : {name}");
-                Debug.WriteLine($"[GDrive] ✓ View link : {link}");
+                string link = request.ResponseBody?.WebContentLink ?? string.Empty;
+                Debug.WriteLine($"[GDrive] ✓ File id      : {id}");
+                Debug.WriteLine($"[GDrive] ✓ File name    : {name}");
+                Debug.WriteLine($"[GDrive] ✓ Content link : {link}");
                 return link;
             }
 
