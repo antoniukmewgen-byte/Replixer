@@ -1,5 +1,5 @@
 #define AppName      "Replixer"
-#define AppVersion   "1.4.7"
+#define AppVersion   "1.4.8"
 #define AppPublisher "RE Studio"
 #define AppExeName   "Replixer.exe"
 #define SourceDir    "..\publish"
