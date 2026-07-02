@@ -456,7 +456,11 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         var newData = await RequestCallReportAsync(existing: entry.ReportData);
         if (newData is null) return;
 
-        newData = newData with { AppName = entry.PlatformDisplayName };
+        newData = newData with
+        {
+            AppName  = entry.PlatformDisplayName,
+            Duration = entry.ReportData?.Duration ?? entry.CallDuration,
+        };
         var caption  = newData.FormatCaption();
         var callType = ResolveCallType(newData);
 
