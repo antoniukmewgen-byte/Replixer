@@ -20,6 +20,7 @@ public record CallReportData(
     public string?  CustomOutcome { get; init; }
     public string   AppName       { get; init; } = string.Empty;
     public TimeSpan Duration      { get; init; } = TimeSpan.Zero;
+    public bool     IsNoLink      { get; init; } = false;
 
     public string FormatCaption()
     {
@@ -99,6 +100,7 @@ public class CallReportViewModel : ViewModelBase
     private string _customOutcome = string.Empty;
     private bool _isInvoicePaid;
     private string? _selectedPaymentProbability;
+    private bool _isNoLink;
     private string _crmUrl = string.Empty;
     private string _note = string.Empty;
 
@@ -188,6 +190,21 @@ public class CallReportViewModel : ViewModelBase
         set => SetField(ref _selectedPaymentProbability, value);
     }
 
+    public bool IsNoLink
+    {
+        get => _isNoLink;
+        set
+        {
+            if (SetField(ref _isNoLink, value))
+            {
+                OnPropertyChanged(nameof(IsCrmUrlVisible));
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+    }
+
+    public bool IsCrmUrlVisible => !_isNoLink;
+
     public string CrmUrl
     {
         get => _crmUrl;
@@ -239,6 +256,7 @@ public class CallReportViewModel : ViewModelBase
             _customOutcome              = existing.CustomOutcome ?? string.Empty;
             _isInvoicePaid              = existing.IsInvoicePaid ?? false;
             _selectedPaymentProbability = existing.PaymentProbability;
+            _isNoLink                   = existing.IsNoLink;
             _crmUrl                     = existing.CrmUrl;
             _note                       = existing.Note;
         }
@@ -248,15 +266,15 @@ public class CallReportViewModel : ViewModelBase
 
     private bool CanSubmit() => _position switch
     {
-        "Діагност"     => !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
-        "Кваліфікатор" => _selectedLeadSource is not null && !string.IsNullOrWhiteSpace(_crmUrl) && !string.IsNullOrWhiteSpace(_note),
+        "Діагност"     => (_isNoLink || !string.IsNullOrWhiteSpace(_crmUrl)) && !string.IsNullOrWhiteSpace(_note),
+        "Кваліфікатор" => _selectedLeadSource is not null && (_isNoLink || !string.IsNullOrWhiteSpace(_crmUrl)) && !string.IsNullOrWhiteSpace(_note),
         _ =>
             _selectedCallType   is not null &&
             _selectedLeadSource is not null &&
             (!IsRatingVisible  || _selectedRating  is not null) &&
             (!IsOutcomeVisible || _selectedOutcome is not null) &&
             (!IsPaymentProbabilityVisible || _selectedPaymentProbability is not null) &&
-            !string.IsNullOrWhiteSpace(_crmUrl) &&
+            (_isNoLink || !string.IsNullOrWhiteSpace(_crmUrl)) &&
             !string.IsNullOrWhiteSpace(_note),
     };
 
@@ -266,7 +284,7 @@ public class CallReportViewModel : ViewModelBase
             CallType:           IsCallTypeVisible ? _selectedCallType! : string.Empty,
             CustomCallType:     IsCustomCallTypeVisible ? _customCallType : null,
             LeadSource:         IsLeadSourceVisible ? _selectedLeadSource! : string.Empty,
-            CrmUrl:             _crmUrl,
+            CrmUrl:             _isNoLink ? string.Empty : _crmUrl,
             Rating:             IsRatingVisible  ? _selectedRating!  : string.Empty,
             Outcome:            IsOutcomeVisible ? _selectedOutcome! : string.Empty,
             IsInvoicePaid:      IsInvoiceCheckboxVisible ? _isInvoicePaid : null,
@@ -275,6 +293,7 @@ public class CallReportViewModel : ViewModelBase
         {
             Position      = _position,
             CustomOutcome = IsCustomOutcomeVisible ? _customOutcome : null,
+            IsNoLink      = _isNoLink,
         });
 
     // Captures whatever the user has typed so far — no validation.
@@ -294,5 +313,6 @@ public class CallReportViewModel : ViewModelBase
         {
             Position      = _position,
             CustomOutcome = _customOutcome,
+            IsNoLink      = _isNoLink,
         };
 }

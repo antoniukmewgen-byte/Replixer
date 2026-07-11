@@ -37,4 +37,6 @@ public interface IUploadOrchestrator
     Task<string?> EditTelegramCaptionAsync(int messageId, long chatId, int? topicId, string caption, string? driveUrl = null);
 
     Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null);
+
+    Task<string?> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null);
 }

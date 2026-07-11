@@ -18,6 +18,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 {
     public event Action<CallDialogViewModel?>?  DialogRequested;
     public event Action<CallReportViewModel?>?  CallReportRequested;
+    public event Action<MissedCallReportViewModel?>? MissedCallReportRequested;
 
     private readonly AppSettings _settings;
     private readonly IUploadOrchestrator _orchestrator;
@@ -67,7 +68,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _windowManager = windowManager;
         _recorder      = recorder;
 
-        _callContent = new IdleCallViewModel(ManualStartRecording);
+        _callContent = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
 
         _micMonitor = new MicrophoneMonitorService();
         _micMonitor.CallDetected += OnCallDetected;
@@ -149,7 +150,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             _isRecording        = false;
             _recordingStartedAt = null;
             OnPropertyChanged(nameof(IsRecording));
-            CallContent = new IdleCallViewModel(ManualStartRecording);
+            CallContent = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
             var reason = _recorder.LastError;
             var msg    = string.IsNullOrWhiteSpace(reason)
                 ? "Не вдалося запустити запис. Перевірте мікрофон."
@@ -173,7 +174,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _recordingStartedAt = null;
         var callDuration    = callStartTime.HasValue ? DateTime.Now - callStartTime.Value : TimeSpan.Zero;
         OnPropertyChanged(nameof(IsRecording));
-        CallContent         = new IdleCallViewModel(ManualStartRecording);
+        CallContent         = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
 
         var entry = _recordingsVm.AddEntry(_lastDetectedApp);
         WireEntryEditCommand(entry);
@@ -301,6 +302,38 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _reportTcs      = null;
         _activeReportVm = null;
         CallReportRequested?.Invoke(null);
+    }
+
+    public void ReportMissedCall()
+    {
+        if (_isRecording || _isStopping || _hasActiveDialog) return;
+
+        _windowManager.ShowMainWindow();
+
+        var vm = new MissedCallReportViewModel(
+            onComplete: data =>
+            {
+                MissedCallReportRequested?.Invoke(null);
+                if (data is not null) _ = SubmitMissedCallAsync(data);
+            },
+            managerName: _settings.ManagerName);
+        MissedCallReportRequested?.Invoke(vm);
+    }
+
+    private async Task SubmitMissedCallAsync(MissedCallReportData data)
+    {
+        try
+        {
+            string? warning = await _orchestrator.PostKommoNoteAsync(data.CrmUrl, data.FormatCaption(), DateTime.Now, data.CallType);
+            if (warning is null)
+                NotificationService.ShowSuccess("Недодзвон зафіксовано.");
+            else
+                ErrorReporter.Report("MISSED_CALL", $"Не вдалося зафіксувати недодзвон у Kommo.\n{warning}");
+        }
+        catch (Exception ex)
+        {
+            ErrorReporter.Report("MISSED_CALL", "Помилка при фіксації недодзвону.", ex);
+        }
     }
 
     private void WireEntryEditCommand(RecordingEntry entry)

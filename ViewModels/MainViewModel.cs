@@ -69,8 +69,9 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
         _telegram.InputHandler = HandleTelegramInputAsync;
 
-        _homeVm.DialogRequested     += OnCallDialogRequested;
-        _homeVm.CallReportRequested += OnCallReportRequested;
+        _homeVm.DialogRequested            += OnCallDialogRequested;
+        _homeVm.CallReportRequested        += OnCallReportRequested;
+        _homeVm.MissedCallReportRequested  += OnMissedCallReportRequested;
         _currentViewModel = _homeVm;
 
         NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
@@ -165,6 +166,17 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         Dialog = vm;
     }
 
+    private void OnMissedCallReportRequested(MissedCallReportViewModel? vm)
+    {
+        if (vm is null)
+        {
+            if (Dialog is MissedCallReportViewModel) Dialog = null;
+            return;
+        }
+        RestoreIfMinimized();
+        Dialog = vm;
+    }
+
     public void ShowInputDialog(InputDialogViewModel vm)
     {
         RestoreIfMinimized();
@@ -199,8 +211,9 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     public void Dispose()
     {
         _telegram.InputHandler = null;
-        _homeVm.DialogRequested     -= OnCallDialogRequested;
-        _homeVm.CallReportRequested -= OnCallReportRequested;
+        _homeVm.DialogRequested           -= OnCallDialogRequested;
+        _homeVm.CallReportRequested       -= OnCallReportRequested;
+        _homeVm.MissedCallReportRequested -= OnMissedCallReportRequested;
         _homeVm.Dispose();
         _settingsVm.Dispose();
         _profileVm.Dispose();

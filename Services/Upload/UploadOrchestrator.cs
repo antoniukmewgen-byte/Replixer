@@ -108,6 +108,12 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
         => _kommo.EditNoteAsync(leadUrl, noteId, noteText, callType);
 
+    public async Task<string?> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null)
+    {
+        var (_, warning) = await PostKommoAsync(kommoLeadUrl, note, driveUrl: null, callStartTime, leadSource: null, callType);
+        return warning;
+    }
+
     private async Task<(int? MessageId, string? Warning)> SendTelegramAsync(
         bool send, string filePath, string? caption, string? driveUrl)
     {
