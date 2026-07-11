@@ -1,3 +1,4 @@
+using PhoneNumbers;
 using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
@@ -19,9 +20,11 @@ public class KommoService : IDisposable
     })
     { Timeout = TimeSpan.FromSeconds(30) };
 
-    private const long FirstContactFieldId    = 1225821;
-    private const long ProcessingSpeedFieldId = 1225823;
-    private const long CallTypeFieldId        = 1226157;
+    private const long FirstContactFieldId             = 1225821;
+    private const long ProcessingSpeedFieldId          = 1225823;
+    private const long CallTypeFieldId                 = 1226157;
+    private const long ProcessingSpeedLocalTimeFieldId = 1227531;
+    private const long ContactPhoneFieldId             = 458590;
 
     public KommoService(AppSettings settings) => _settings = settings;
 
@@ -181,7 +184,7 @@ public class KommoService : IDisposable
     {
         try
         {
-            var (createdAt, isFieldAlreadySet) =
+            var (createdAt, isFieldAlreadySet, contactId) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId);
 
             if (isFieldAlreadySet)
@@ -195,10 +198,17 @@ public class KommoService : IDisposable
 
             if (createdAt.HasValue)
             {
-                var leadCreated = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
-                int minutes     = (int)Math.Round(Math.Abs((leadCreated - callStartTime.ToUniversalTime()).TotalMinutes));
-                Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreated:u}, callStart={callStartTime.ToUniversalTime():u})");
+                var leadCreatedUtc = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
+                var callStartUtc   = callStartTime.ToUniversalTime();
+
+                int minutes = (int)Math.Round(Math.Abs((leadCreatedUtc - callStartUtc).TotalMinutes));
+                Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, callStart={callStartUtc:u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
+
+                if (contactId is not null)
+                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, leadCreatedUtc, callStartUtc);
+                else
+                    ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту — поле 'Скорость обработки в рабочее время' не заповнено");
             }
             else
             {
@@ -208,17 +218,109 @@ public class KommoService : IDisposable
         catch (Exception ex) { Debug.WriteLine($"[Kommo] TrySetFirstContact failed: {ex.Message}"); }
     }
 
-    private async Task<(long? createdAt, bool isFieldSet)> GetLeadDetailsAsync(
+    private async Task TrySetLocalTimeProcessingSpeedAsync(
+        string baseUrl, string token, string leadId, string contactId, DateTime leadCreatedUtc, DateTime callStartUtc)
+    {
+        var phone = await GetContactPhoneAsync(baseUrl, token, contactId);
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            Debug.WriteLine("[Kommo] Contact has no phone — skipping local-time processing speed");
+            ErrorReporter.Report("KOMMO", $"Контакт {contactId} (лід {leadId}) без телефону — поле 'Скорость обработки в рабочее время' не заповнено");
+            return;
+        }
+
+        var timeZone = TryResolveTimeZoneFromPhone(phone);
+        if (timeZone is null)
+        {
+            Debug.WriteLine($"[Kommo] Could not resolve timezone for phone '{phone}' — skipping local-time processing speed");
+            ErrorReporter.Report("KOMMO", $"Не вдалося визначити часовий пояс за номером '{phone}' (контакт {contactId}, лід {leadId}) — поле 'Скорость обработки в рабочее время' не заповнено");
+            return;
+        }
+
+        var leadCreatedLocal = TimeZoneInfo.ConvertTimeFromUtc(leadCreatedUtc, timeZone);
+        var callStartLocal   = TimeZoneInfo.ConvertTimeFromUtc(callStartUtc, timeZone);
+        int minutes = (int)Math.Round(Math.Abs((leadCreatedLocal - callStartLocal).TotalMinutes));
+
+        Debug.WriteLine($"[Kommo] Processing speed (local, {timeZone.Id}): {minutes} min");
+        await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedLocalTimeFieldId, minutes);
+    }
+
+    private static TimeZoneInfo? TryResolveTimeZoneFromPhone(string rawPhone)
+    {
+        try
+        {
+            var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+            var timeZonesMapper = PhoneNumberToTimeZonesMapper.GetInstance();
+            var phoneNumber      = phoneNumberUtil.Parse(rawPhone, null);
+            var timeZones        = timeZonesMapper.GetTimeZonesForNumber(phoneNumber);
+
+            var ianaId = timeZones.FirstOrDefault();
+            if (string.IsNullOrEmpty(ianaId) || ianaId == "Etc/Unknown") return null;
+
+            return TimeZoneInfo.FindSystemTimeZoneById(ianaId);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] TryResolveTimeZoneFromPhone failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"Помилка визначення часового поясу за номером '{rawPhone}': {ex.Message}", ex);
+            return null;
+        }
+    }
+
+    private async Task<string?> GetContactPhoneAsync(string baseUrl, string token, string contactId)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/contacts/{contactId}");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
+            if (!res.IsSuccessStatusCode)
+            {
+                var snippet = body.Length > 300 ? body[..300] : body;
+                ErrorReporter.Report("KOMMO", $"GetContactPhone HTTP {(int)res.StatusCode} — контакт {contactId}: {snippet}");
+                return null;
+            }
+
+            using var doc = JsonDocument.Parse(body);
+            if (!doc.RootElement.TryGetProperty("custom_fields_values", out var fields) ||
+                fields.ValueKind != JsonValueKind.Array)
+                return null;
+
+            foreach (var field in fields.EnumerateArray())
+            {
+                if (!field.TryGetProperty("field_id", out var fid) || fid.GetInt64() != ContactPhoneFieldId)
+                    continue;
+
+                if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                    foreach (var v in vals.EnumerateArray())
+                        if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String)
+                            return val.GetString();
+
+                break;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] GetContactPhone failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"GetContactPhone exception — контакт {contactId}: {ex.Message}", ex);
+            return null;
+        }
+    }
+
+    private async Task<(long? createdAt, bool isFieldSet, string? contactId)> GetLeadDetailsAsync(
         string baseUrl, string token, string leadId)
     {
         try
         {
             using var req = new HttpRequestMessage(HttpMethod.Get,
-                $"{baseUrl}/leads/{leadId}?with=custom_fields");
+                $"{baseUrl}/leads/{leadId}?with=contacts,custom_fields");
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var res  = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode) return (null, false);
+            if (!res.IsSuccessStatusCode) return (null, false, null);
 
             using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
@@ -243,12 +345,27 @@ public class KommoService : IDisposable
                 }
             }
 
-            return (createdAt, isFieldSet);
+            string? contactId = null;
+            if (root.TryGetProperty("_embedded", out var emb) &&
+                emb.TryGetProperty("contacts", out var contacts) &&
+                contacts.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var c in contacts.EnumerateArray())
+                {
+                    if (!c.TryGetProperty("id", out var idProp)) continue;
+                    bool isMain = c.TryGetProperty("is_main", out var im) && im.ValueKind == JsonValueKind.True;
+                    if (isMain || contactId is null)
+                        contactId = idProp.GetInt64().ToString();
+                    if (isMain) break;
+                }
+            }
+
+            return (createdAt, isFieldSet, contactId);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
-            return (null, false);
+            return (null, false, null);
         }
     }
 

@@ -18,6 +18,7 @@
     <PackageReference Include="NAudio.Lame" Version="2.1.0" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.69.0.3674" />
     <PackageReference Include="WTelegramClient" Version="4.4.4" />
+    <PackageReference Include="libphonenumber-csharp" Version="9.0.34" />
   </ItemGroup>
 
   <ItemGroup>
