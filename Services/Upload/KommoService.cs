@@ -251,13 +251,36 @@ public class KommoService : IDisposable
         {
             var phoneNumberUtil = PhoneNumberUtil.GetInstance();
             var timeZonesMapper = PhoneNumberToTimeZonesMapper.GetInstance();
-            var phoneNumber      = phoneNumberUtil.Parse(rawPhone, null);
-            var timeZones        = timeZonesMapper.GetTimeZonesForNumber(phoneNumber);
+
+            PhoneNumber phoneNumber;
+            try
+            {
+                phoneNumber = phoneNumberUtil.Parse(rawPhone, null);
+            }
+            catch (NumberParseException) when (!rawPhone.TrimStart().StartsWith('+'))
+            {
+                // No "+" and no default region to fall back on — assume the digits already
+                // include a country calling code, just missing the leading "+".
+                phoneNumber = phoneNumberUtil.Parse("+" + rawPhone.TrimStart(), null);
+            }
+
+            // Skips the strict validity check and always returns a best-effort geographic guess
+            // (a single "typical" zone even for non-geographic mobile prefixes), instead of
+            // GetTimeZonesForNumber's exhaustive candidate list for ambiguous numbers.
+            var timeZones = timeZonesMapper.GetTimeZonesForGeographicalNumber(phoneNumber);
 
             var ianaId = timeZones.FirstOrDefault();
             if (string.IsNullOrEmpty(ianaId) || ianaId == "Etc/Unknown") return null;
 
-            return TimeZoneInfo.FindSystemTimeZoneById(ianaId);
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById(ianaId);
+            }
+            catch (TimeZoneNotFoundException) when (ianaId == "Europe/Kyiv")
+            {
+                // Some Windows builds haven't picked up the 2022 IANA rename (Kiev -> Kyiv) in their ICU data.
+                return TimeZoneInfo.FindSystemTimeZoneById("Europe/Kiev");
+            }
         }
         catch (Exception ex)
         {
