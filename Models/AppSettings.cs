@@ -168,6 +168,20 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_isNotificationsEnabled == value) return; _isNotificationsEnabled = value; OnPropertyChanged(); Save(); }
     }
 
+    private TimeSpan _workDayStart = TimeSpan.FromHours(9);
+    public TimeSpan WorkDayStart
+    {
+        get => _workDayStart;
+        set { if (_workDayStart == value) return; _workDayStart = value; OnPropertyChanged(); Save(); }
+    }
+
+    private TimeSpan _workDayEnd = TimeSpan.FromHours(20);
+    public TimeSpan WorkDayEnd
+    {
+        get => _workDayEnd;
+        set { if (_workDayEnd == value) return; _workDayEnd = value; OnPropertyChanged(); Save(); }
+    }
+
 
     private SynchronizationContext? _uiContext;
     private Timer? _saveDebounce;

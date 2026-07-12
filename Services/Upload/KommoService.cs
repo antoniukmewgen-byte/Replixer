@@ -26,9 +26,6 @@ public class KommoService : IDisposable
     private const long ProcessingSpeedLocalTimeFieldId = 1227531;
     private const long ContactPhoneFieldId             = 458590;
 
-    private static readonly TimeSpan WorkDayStart = TimeSpan.FromHours(9);
-    private static readonly TimeSpan WorkDayEnd   = TimeSpan.FromHours(20);
-
     public KommoService(AppSettings settings) => _settings = settings;
 
     public bool IsEnabled =>
@@ -243,7 +240,7 @@ public class KommoService : IDisposable
         var leadCreatedLocal = TimeZoneInfo.ConvertTimeFromUtc(leadCreatedUtc, timeZone);
         var callStartLocal   = TimeZoneInfo.ConvertTimeFromUtc(callStartUtc, timeZone);
 
-        var workingDuration = CalculateWorkingHoursDuration(leadCreatedLocal, callStartLocal, WorkDayStart, WorkDayEnd);
+        var workingDuration = CalculateWorkingHoursDuration(leadCreatedLocal, callStartLocal, _settings.WorkDayStart, _settings.WorkDayEnd);
         int minutes = (int)Math.Round(workingDuration.TotalMinutes);
 
         Debug.WriteLine($"[Kommo] Processing speed (working hours, {timeZone.Id}): {minutes} min");

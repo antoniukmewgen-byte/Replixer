@@ -1,7 +1,8 @@
 <UserControl
     x:Class="Replixer.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Replixer.Views.Controls">
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
         <StackPanel Margin="16">
@@ -146,6 +147,120 @@
                     </Border>
                 </StackPanel>
             </Border>
+            <Border
+                Margin="0,12,0,0"
+                Padding="16"
+                Background="{StaticResource BrushColor2}"
+                BorderBrush="{StaticResource BrushBorderColor2}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontFamily="{StaticResource InterFont}"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource SubText}">
+                        РОБОЧИЙ ЧАС КЛІЄНТА
+                    </TextBlock>
+                    <Border
+                        Padding="16"
+                        Background="{StaticResource BrushColor3}"
+                        BorderBrush="{StaticResource BrushBorderColor3}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="38"
+                                Height="38"
+                                Background="{StaticResource OtherBrushColor2}"
+                                CornerRadius="8">
+                                <Path
+                                    Width="18"
+                                    Height="18"
+                                    Data="M256,0C114.844,0,0,114.844,0,256s114.844,256,256,256s256-114.844,256-256S397.156,0,256,0z M256,472c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z M280,128h-40v144l126.211,75.727l20.363-33.454L280,240.271V128z"
+                                    Fill="{StaticResource OtherBrushSubColor2}"
+                                    Stretch="Uniform" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="12,0,12,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    Робочі години
+                                </TextBlock>
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource SubText}"
+                                    TextWrapping="Wrap">
+                                    Використовується для розрахунку поля «Скорость обработки в рабочее время»
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <controls:NumberWheel
+                                    Maximum="23"
+                                    Minimum="0"
+                                    Value="{Binding WorkDayStartHour, Mode=TwoWay}" />
+                                <TextBlock
+                                    Margin="1,0"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    :
+                                </TextBlock>
+                                <controls:NumberWheel
+                                    Maximum="59"
+                                    Minimum="0"
+                                    Value="{Binding WorkDayStartMinute, Mode=TwoWay}" />
+                                <TextBlock
+                                    Margin="6,0"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="12"
+                                    Foreground="{StaticResource SubText}">
+                                    –
+                                </TextBlock>
+                                <controls:NumberWheel
+                                    Maximum="23"
+                                    Minimum="0"
+                                    Value="{Binding WorkDayEndHour, Mode=TwoWay}" />
+                                <TextBlock
+                                    Margin="1,0"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource InterFont}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Text}">
+                                    :
+                                </TextBlock>
+                                <controls:NumberWheel
+                                    Maximum="59"
+                                    Minimum="0"
+                                    Value="{Binding WorkDayEndMinute, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
             <Border
                 Margin="0,12,0,0"
                 Padding="16"

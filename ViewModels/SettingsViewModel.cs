@@ -27,6 +27,30 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         set => _settings.IsNotificationsEnabled = value;
     }
 
+    public int WorkDayStartHour
+    {
+        get => _settings.WorkDayStart.Hours;
+        set => _settings.WorkDayStart = new TimeSpan(value, _settings.WorkDayStart.Minutes, 0);
+    }
+
+    public int WorkDayStartMinute
+    {
+        get => _settings.WorkDayStart.Minutes;
+        set => _settings.WorkDayStart = new TimeSpan(_settings.WorkDayStart.Hours, value, 0);
+    }
+
+    public int WorkDayEndHour
+    {
+        get => _settings.WorkDayEnd.Hours;
+        set => _settings.WorkDayEnd = new TimeSpan(value, _settings.WorkDayEnd.Minutes, 0);
+    }
+
+    public int WorkDayEndMinute
+    {
+        get => _settings.WorkDayEnd.Minutes;
+        set => _settings.WorkDayEnd = new TimeSpan(_settings.WorkDayEnd.Hours, value, 0);
+    }
+
     public SettingsViewModel(AppSettings settings)
     {
         _settings = settings;
@@ -44,6 +68,16 @@ public sealed class SettingsViewModel : ViewModelBase, IDisposable
         else if (e.PropertyName == nameof(AppSettings.IsNotificationsEnabled))
         {
             OnPropertyChanged(nameof(IsNotificationsEnabled));
+        }
+        else if (e.PropertyName == nameof(AppSettings.WorkDayStart))
+        {
+            OnPropertyChanged(nameof(WorkDayStartHour));
+            OnPropertyChanged(nameof(WorkDayStartMinute));
+        }
+        else if (e.PropertyName == nameof(AppSettings.WorkDayEnd))
+        {
+            OnPropertyChanged(nameof(WorkDayEndHour));
+            OnPropertyChanged(nameof(WorkDayEndMinute));
         }
     }
 }
