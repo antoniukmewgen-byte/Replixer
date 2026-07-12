@@ -41,27 +41,38 @@ public sealed class UpdateService
 
     public async Task<UpdateInfo?> CheckForUpdateAsync(CancellationToken ct = default)
     {
-        try
+        for (var attempt = 0; ; attempt++)
         {
-            var json     = await _http.GetStringAsync(VersionUrl, ct);
-            var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
-            if (manifest is null) return null;
+            try
+            {
+                var json     = await _http.GetStringAsync(VersionUrl, ct);
+                var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
+                if (manifest is null) return null;
 
-            if (!Version.TryParse(manifest.Version.TrimStart('v'), out var remoteVersion))
+                if (!Version.TryParse(manifest.Version.TrimStart('v'), out var remoteVersion))
+                    return null;
+
+                if (remoteVersion <= GetCurrentVersion())
+                    return null;
+
+                return new UpdateInfo(remoteVersion, manifest);
+            }
+            catch (OperationCanceledException)
+            {
                 return null;
-
-            if (remoteVersion <= GetCurrentVersion())
+            }
+            catch (Exception ex) when (attempt < RetryCount && IsTransient(ex))
+            {
+                var delay = RetryDelays[attempt];
+                Debug.WriteLine($"[Update] Check attempt {attempt + 1} failed ({ex.Message}). Retrying in {delay.TotalSeconds}s…");
+                await Task.Delay(delay, ct);
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.Report("UpdateService", "Не вдалося перевірити оновлення", ex);
                 return null;
-
-            return new UpdateInfo(remoteVersion, manifest);
+            }
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            ErrorReporter.Report("UpdateService", "Не вдалося перевірити оновлення", ex);
-        }
-
-        return null;
     }
 
     /// <returns>
