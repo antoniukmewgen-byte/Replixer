@@ -221,7 +221,11 @@ public class KommoService : IDisposable
                 Debug.WriteLine("[Kommo] created_at not available — skipping processing speed");
             }
         }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] TrySetFirstContact failed: {ex.Message}"); }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] TrySetFirstContact failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"TrySetFirstContact exception — лід {leadId}: {ex.Message}", ex);
+        }
     }
 
     private async Task TrySetLocalTimeProcessingSpeedAsync(
@@ -327,140 +331,181 @@ public class KommoService : IDisposable
 
     private async Task<string?> GetContactPhoneAsync(string baseUrl, string token, string contactId)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/contacts/{contactId}");
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode)
+            try
             {
-                var snippet = body.Length > 300 ? body[..300] : body;
-                ErrorReporter.Report("KOMMO", $"GetContactPhone HTTP {(int)res.StatusCode} — контакт {contactId}: {snippet}");
+                using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/contacts/{contactId}");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"GetContactPhone HTTP {(int)res.StatusCode} — контакт {contactId}: {snippet}");
+                    return null;
+                }
+
+                using var doc = JsonDocument.Parse(body);
+                if (!doc.RootElement.TryGetProperty("custom_fields_values", out var fields) ||
+                    fields.ValueKind != JsonValueKind.Array)
+                    return null;
+
+                foreach (var field in fields.EnumerateArray())
+                {
+                    if (!field.TryGetProperty("field_id", out var fid) || fid.GetInt64() != ContactPhoneFieldId)
+                        continue;
+
+                    if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                        foreach (var v in vals.EnumerateArray())
+                            if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String)
+                                return val.GetString();
+
+                    break;
+                }
+
                 return null;
             }
-
-            using var doc = JsonDocument.Parse(body);
-            if (!doc.RootElement.TryGetProperty("custom_fields_values", out var fields) ||
-                fields.ValueKind != JsonValueKind.Array)
-                return null;
-
-            foreach (var field in fields.EnumerateArray())
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                if (!field.TryGetProperty("field_id", out var fid) || fid.GetInt64() != ContactPhoneFieldId)
-                    continue;
-
-                if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
-                    foreach (var v in vals.EnumerateArray())
-                        if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String)
-                            return val.GetString();
-
-                break;
+                Debug.WriteLine($"[Kommo] GetContactPhone attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] GetContactPhone failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"GetContactPhone exception — контакт {contactId}: {ex.Message}", ex);
+                return null;
+            }
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] GetContactPhone failed: {ex.Message}");
-            ErrorReporter.Report("KOMMO", $"GetContactPhone exception — контакт {contactId}: {ex.Message}", ex);
-            return null;
-        }
+        return null;
     }
 
     private async Task<(long? createdAt, long? firstContactUnix, string? contactId)> GetLeadDetailsAsync(
         string baseUrl, string token, string leadId)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get,
-                $"{baseUrl}/leads/{leadId}?with=contacts,custom_fields");
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode) return (null, null, null);
-
-            using var doc = JsonDocument.Parse(body);
-            var root = doc.RootElement;
-            long? createdAt = root.TryGetProperty("created_at", out var ca) ? ca.GetInt64() : null;
-
-            long? firstContactUnix = null;
-            if (root.TryGetProperty("custom_fields_values", out var fields) &&
-                fields.ValueKind == JsonValueKind.Array)
+            try
             {
-                foreach (var field in fields.EnumerateArray())
+                using var req = new HttpRequestMessage(HttpMethod.Get,
+                    $"{baseUrl}/leads/{leadId}?with=contacts,custom_fields");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+
+                if (!res.IsSuccessStatusCode)
                 {
-                    if (!field.TryGetProperty("field_id", out var fid) ||
-                        fid.GetInt64() != FirstContactFieldId) continue;
-
-                    if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
-                        foreach (var v in vals.EnumerateArray())
-                            if (v.TryGetProperty("value", out var val) &&
-                                val.ValueKind == JsonValueKind.Number &&
-                                val.GetInt64() != 0)
-                            { firstContactUnix = val.GetInt64(); break; }
-                    break;
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"GetLeadDetails HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
+                    return (null, null, null);
                 }
-            }
 
-            string? contactId = null;
-            if (root.TryGetProperty("_embedded", out var emb) &&
-                emb.TryGetProperty("contacts", out var contacts) &&
-                contacts.ValueKind == JsonValueKind.Array)
+                using var doc = JsonDocument.Parse(body);
+                var root = doc.RootElement;
+                long? createdAt = root.TryGetProperty("created_at", out var ca) ? ca.GetInt64() : null;
+
+                long? firstContactUnix = null;
+                if (root.TryGetProperty("custom_fields_values", out var fields) &&
+                    fields.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var field in fields.EnumerateArray())
+                    {
+                        if (!field.TryGetProperty("field_id", out var fid) ||
+                            fid.GetInt64() != FirstContactFieldId) continue;
+
+                        if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                            foreach (var v in vals.EnumerateArray())
+                                if (v.TryGetProperty("value", out var val) &&
+                                    val.ValueKind == JsonValueKind.Number &&
+                                    val.GetInt64() != 0)
+                                { firstContactUnix = val.GetInt64(); break; }
+                        break;
+                    }
+                }
+
+                string? contactId = null;
+                if (root.TryGetProperty("_embedded", out var emb) &&
+                    emb.TryGetProperty("contacts", out var contacts) &&
+                    contacts.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var c in contacts.EnumerateArray())
+                    {
+                        if (!c.TryGetProperty("id", out var idProp)) continue;
+                        bool isMain = c.TryGetProperty("is_main", out var im) && im.ValueKind == JsonValueKind.True;
+                        if (isMain || contactId is null)
+                            contactId = idProp.GetInt64().ToString();
+                        if (isMain) break;
+                    }
+                }
+
+                return (createdAt, firstContactUnix, contactId);
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                foreach (var c in contacts.EnumerateArray())
-                {
-                    if (!c.TryGetProperty("id", out var idProp)) continue;
-                    bool isMain = c.TryGetProperty("is_main", out var im) && im.ValueKind == JsonValueKind.True;
-                    if (isMain || contactId is null)
-                        contactId = idProp.GetInt64().ToString();
-                    if (isMain) break;
-                }
+                Debug.WriteLine($"[Kommo] GetLeadDetails attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
             }
-
-            return (createdAt, firstContactUnix, contactId);
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"GetLeadDetails exception — лід {leadId}: {ex.Message}", ex);
+                return (null, null, null);
+            }
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
-            return (null, null, null);
-        }
+        return (null, null, null);
     }
 
     private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, object value)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            var payload = JsonSerializer.Serialize(new
+            try
             {
-                custom_fields_values = new[]
+                var payload = JsonSerializer.Serialize(new
                 {
-                    new { field_id = fieldId, values = new[] { new { value } } }
+                    custom_fields_values = new[]
+                    {
+                        new { field_id = fieldId, values = new[] { new { value } } }
+                    }
+                });
+
+                using var req = new HttpRequestMessage(HttpMethod.Patch, $"{baseUrl}/leads/{leadId}")
+                {
+                    Content = new StringContent(payload, Encoding.UTF8, "application/json")
+                };
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                Debug.WriteLine($"[Kommo] PatchLead field {fieldId} → {(int)res.StatusCode} (attempt {attempt})");
+
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"PatchLeadField HTTP {(int)res.StatusCode} — лід {leadId}, поле {fieldId}: {snippet}");
                 }
-            });
-
-            using var req = new HttpRequestMessage(HttpMethod.Patch, $"{baseUrl}/leads/{leadId}")
+                return;
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Content = new StringContent(payload, Encoding.UTF8, "application/json")
-            };
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            Debug.WriteLine($"[Kommo] PatchLead field {fieldId} → {(int)res.StatusCode}");
-
-            if (!res.IsSuccessStatusCode)
+                Debug.WriteLine($"[Kommo] PatchLeadField attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+            catch (Exception ex)
             {
-                var snippet = body.Length > 300 ? body[..300] : body;
-                ErrorReporter.Report("KOMMO", $"PatchLeadField HTTP {(int)res.StatusCode} — лід {leadId}, поле {fieldId}: {snippet}");
+                Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"PatchLeadField exception — лід {leadId}, поле {fieldId}: {ex.Message}", ex);
+                return;
             }
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}");
-            ErrorReporter.Report("KOMMO", $"PatchLeadField exception — лід {leadId}, поле {fieldId}: {ex.Message}", ex);
-        }
     }
+
+    private static bool IsTransientNetworkError(Exception ex) =>
+        ex is HttpRequestException or TaskCanceledException or System.Net.Sockets.SocketException;
 
     public void Dispose() => _http.Dispose();
 
