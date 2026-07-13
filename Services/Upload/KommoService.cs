@@ -184,29 +184,35 @@ public class KommoService : IDisposable
     {
         try
         {
-            var (createdAt, isFieldAlreadySet, contactId) =
+            var (createdAt, existingFirstContactUnix, contactId) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId);
 
-            if (isFieldAlreadySet)
-            {
-                Debug.WriteLine("[Kommo] First-contact field already has a value — skipping");
-                return;
-            }
+            long firstContactUnix;
 
-            long unix = new DateTimeOffset(callStartTime.ToUniversalTime()).ToUnixTimeSeconds();
-            await PatchLeadFieldAsync(baseUrl, token, leadId, FirstContactFieldId, unix);
+            if (existingFirstContactUnix.HasValue)
+            {
+                // Field already has a value — reuse it instead of overwriting, and still
+                // (re)compute the processing-speed fields from that existing timestamp.
+                Debug.WriteLine("[Kommo] First-contact field already has a value — using it for the speed calc");
+                firstContactUnix = existingFirstContactUnix.Value;
+            }
+            else
+            {
+                firstContactUnix = new DateTimeOffset(callStartTime.ToUniversalTime()).ToUnixTimeSeconds();
+                await PatchLeadFieldAsync(baseUrl, token, leadId, FirstContactFieldId, firstContactUnix);
+            }
 
             if (createdAt.HasValue)
             {
-                var leadCreatedUtc = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
-                var callStartUtc   = callStartTime.ToUniversalTime();
+                var leadCreatedUtc  = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
+                var firstContactUtc = DateTimeOffset.FromUnixTimeSeconds(firstContactUnix).UtcDateTime;
 
-                int minutes = (int)Math.Round(Math.Abs((leadCreatedUtc - callStartUtc).TotalMinutes));
-                Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, callStart={callStartUtc:u})");
+                int minutes = (int)Math.Round(Math.Abs((leadCreatedUtc - firstContactUtc).TotalMinutes));
+                Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, firstContact={firstContactUtc:u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
 
                 if (contactId is not null)
-                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, leadCreatedUtc, callStartUtc);
+                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, leadCreatedUtc, firstContactUtc);
                 else
                     ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту — поле 'Скорость обработки в рабочее время' не заповнено");
             }
@@ -362,7 +368,7 @@ public class KommoService : IDisposable
         }
     }
 
-    private async Task<(long? createdAt, bool isFieldSet, string? contactId)> GetLeadDetailsAsync(
+    private async Task<(long? createdAt, long? firstContactUnix, string? contactId)> GetLeadDetailsAsync(
         string baseUrl, string token, string leadId)
     {
         try
@@ -372,13 +378,13 @@ public class KommoService : IDisposable
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var res  = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode) return (null, false, null);
+            if (!res.IsSuccessStatusCode) return (null, null, null);
 
             using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
             long? createdAt = root.TryGetProperty("created_at", out var ca) ? ca.GetInt64() : null;
 
-            bool isFieldSet = false;
+            long? firstContactUnix = null;
             if (root.TryGetProperty("custom_fields_values", out var fields) &&
                 fields.ValueKind == JsonValueKind.Array)
             {
@@ -390,9 +396,9 @@ public class KommoService : IDisposable
                     if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
                         foreach (var v in vals.EnumerateArray())
                             if (v.TryGetProperty("value", out var val) &&
-                                val.ValueKind != JsonValueKind.Null &&
-                                !(val.ValueKind == JsonValueKind.Number && val.GetInt64() == 0))
-                            { isFieldSet = true; break; }
+                                val.ValueKind == JsonValueKind.Number &&
+                                val.GetInt64() != 0)
+                            { firstContactUnix = val.GetInt64(); break; }
                     break;
                 }
             }
@@ -412,12 +418,12 @@ public class KommoService : IDisposable
                 }
             }
 
-            return (createdAt, isFieldSet, contactId);
+            return (createdAt, firstContactUnix, contactId);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
-            return (null, false, null);
+            return (null, null, null);
         }
     }
 
@@ -439,10 +445,21 @@ public class KommoService : IDisposable
             };
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var res = await _http.SendAsync(req);
-            Debug.WriteLine($"[Kommo] PatchLead → {(int)res.StatusCode}");
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
+            Debug.WriteLine($"[Kommo] PatchLead field {fieldId} → {(int)res.StatusCode}");
+
+            if (!res.IsSuccessStatusCode)
+            {
+                var snippet = body.Length > 300 ? body[..300] : body;
+                ErrorReporter.Report("KOMMO", $"PatchLeadField HTTP {(int)res.StatusCode} — лід {leadId}, поле {fieldId}: {snippet}");
+            }
         }
-        catch (Exception ex) { Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}"); }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"PatchLeadField exception — лід {leadId}, поле {fieldId}: {ex.Message}", ex);
+        }
     }
 
     public void Dispose() => _http.Dispose();
