@@ -246,7 +246,7 @@ public class KommoService : IDisposable
             return;
         }
 
-        var timeZone = TryResolveTimeZoneFromPhone(phone);
+        var (timeZone, isUkrainian) = TryResolveTimeZoneFromPhone(phone);
         if (timeZone is null)
         {
             Debug.WriteLine($"[Kommo] Could not resolve timezone for phone '{phone}' — skipping local-time processing speed");
@@ -257,10 +257,20 @@ public class KommoService : IDisposable
         var leadCreatedLocal = TimeZoneInfo.ConvertTimeFromUtc(leadCreatedUtc, timeZone);
         var callStartLocal   = TimeZoneInfo.ConvertTimeFromUtc(callStartUtc, timeZone);
 
-        var workingDuration = CalculateWorkingHoursDuration(leadCreatedLocal, callStartLocal, _settings.WorkDayStart, _settings.WorkDayEnd);
+        // Для українських номерів вікно робочого часу розширюємо на +7 год в обидва боки
+        // (напр. дефолт 9:00–21:00 → 16:00–04:00) — так домовились для укр. клієнтів.
+        var workDayStart = _settings.WorkDayStart;
+        var workDayEnd   = _settings.WorkDayEnd;
+        if (isUkrainian)
+        {
+            workDayStart += TimeSpan.FromHours(7);
+            workDayEnd   += TimeSpan.FromHours(7);
+        }
+
+        var workingDuration = CalculateWorkingHoursDuration(leadCreatedLocal, callStartLocal, workDayStart, workDayEnd);
         int minutes = (int)Math.Round(workingDuration.TotalMinutes);
 
-        Debug.WriteLine($"[Kommo] Processing speed (working hours, {timeZone.Id}): {minutes} min");
+        Debug.WriteLine($"[Kommo] Processing speed (working hours, {timeZone.Id}{(isUkrainian ? ", UA +7h window" : "")}): {minutes} min");
         await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedLocalTimeFieldId, minutes);
     }
 
@@ -291,7 +301,7 @@ public class KommoService : IDisposable
         return total;
     }
 
-    private static TimeZoneInfo? TryResolveTimeZoneFromPhone(string rawPhone)
+    private static (TimeZoneInfo? Zone, bool IsUkrainian) TryResolveTimeZoneFromPhone(string rawPhone)
     {
         try
         {
@@ -316,23 +326,27 @@ public class KommoService : IDisposable
             var timeZones = timeZonesMapper.GetTimeZonesForGeographicalNumber(phoneNumber);
 
             var ianaId = timeZones.FirstOrDefault();
-            if (string.IsNullOrEmpty(ianaId) || ianaId == "Etc/Unknown") return null;
+            if (string.IsNullOrEmpty(ianaId) || ianaId == "Etc/Unknown") return (null, false);
+
+            // Визначаємо "українськість" за резолвнутою таймзоною (Europe/Kyiv), а не за
+            // кодом країни — номер може прийти і в форматі +380..., і в місцевому 0955...
+            bool isUkrainian = ianaId is "Europe/Kyiv" or "Europe/Kiev";
 
             try
             {
-                return TimeZoneInfo.FindSystemTimeZoneById(ianaId);
+                return (TimeZoneInfo.FindSystemTimeZoneById(ianaId), isUkrainian);
             }
             catch (TimeZoneNotFoundException) when (ianaId == "Europe/Kyiv")
             {
                 // Some Windows builds haven't picked up the 2022 IANA rename (Kiev -> Kyiv) in their ICU data.
-                return TimeZoneInfo.FindSystemTimeZoneById("Europe/Kiev");
+                return (TimeZoneInfo.FindSystemTimeZoneById("Europe/Kiev"), isUkrainian);
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] TryResolveTimeZoneFromPhone failed: {ex.Message}");
             ErrorReporter.Report("KOMMO", $"Помилка визначення часового поясу за номером '{rawPhone}': {ex.Message}", ex);
-            return null;
+            return (null, false);
         }
     }
 

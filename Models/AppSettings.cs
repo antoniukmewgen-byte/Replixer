@@ -175,7 +175,7 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_workDayStart == value) return; _workDayStart = value; OnPropertyChanged(); Save(); }
     }
 
-    private TimeSpan _workDayEnd = TimeSpan.FromHours(20);
+    private TimeSpan _workDayEnd = TimeSpan.FromHours(21);
     public TimeSpan WorkDayEnd
     {
         get => _workDayEnd;
