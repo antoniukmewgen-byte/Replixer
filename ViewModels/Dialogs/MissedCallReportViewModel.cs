@@ -11,9 +11,6 @@ public record MissedCallReportData(
     string CrmUrl,
     string Note)
 {
-    public bool IsNoLink { get; init; } = false;
-
-
     public string FormatCaption()
     {
         var sb = new StringBuilder();
@@ -44,7 +41,6 @@ public class MissedCallReportViewModel : ViewModelBase
     private readonly string _managerName;
     private string? _selectedCallType;
     private string? _selectedLeadSource;
-    private bool _isNoLink;
     private string _crmUrl = string.Empty;
     private string _note = string.Empty;
 
@@ -70,30 +66,21 @@ public class MissedCallReportViewModel : ViewModelBase
         }
     }
 
-    public bool IsNoLink
-    {
-        get => _isNoLink;
-        set
-        {
-            if (SetField(ref _isNoLink, value))
-            {
-                OnPropertyChanged(nameof(IsCrmUrlVisible));
-                CommandManager.InvalidateRequerySuggested();
-            }
-        }
-    }
-
-    public bool IsCrmUrlVisible => !_isNoLink;
-
     public string CrmUrl
     {
         get => _crmUrl;
         set
         {
             if (SetField(ref _crmUrl, value))
+            {
+                OnPropertyChanged(nameof(IsCrmUrlInvalid));
                 CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
+
+    // true лише коли поле не порожнє, але текст не є коректним посиланням — для підсвітки помилки в UI.
+    public bool IsCrmUrlInvalid => !string.IsNullOrWhiteSpace(_crmUrl) && !UrlValidator.IsValidHttpUrl(_crmUrl);
 
     public const int NoteMaxLength = 500;
 
@@ -126,7 +113,7 @@ public class MissedCallReportViewModel : ViewModelBase
     private bool CanSubmit() =>
         _selectedCallType   is not null &&
         _selectedLeadSource is not null &&
-        (_isNoLink || !string.IsNullOrWhiteSpace(_crmUrl)) &&
+        UrlValidator.IsValidHttpUrl(_crmUrl) &&
         !string.IsNullOrWhiteSpace(_note);
 
     private void OnSubmit() =>
@@ -134,9 +121,6 @@ public class MissedCallReportViewModel : ViewModelBase
             Manager:    _managerName,
             CallType:   _selectedCallType!,
             LeadSource: _selectedLeadSource!,
-            CrmUrl:     _isNoLink ? string.Empty : _crmUrl,
-            Note:       _note)
-        {
-            IsNoLink = _isNoLink,
-        });
+            CrmUrl:     _crmUrl,
+            Note:       _note));
 }

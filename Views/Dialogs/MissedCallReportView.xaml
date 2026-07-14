@@ -74,7 +74,16 @@
                                 Foreground="{StaticResource SubText}">
                                 Посилання на CRM
                             </TextBlock>
-                            <Border Style="{StaticResource AppInputBorder}" Visibility="{Binding IsCrmUrlVisible, Converter={StaticResource BoolToVis}}">
+                            <Border>
+                                <Border.Style>
+                                    <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCrmUrlInvalid}" Value="True">
+                                                <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Grid>
                                     <TextBox
                                         x:Name="CrmBox"
@@ -100,64 +109,13 @@
                                     </TextBlock>
                                 </Grid>
                             </Border>
-                            <!--  No-link checkbox — hides the CRM input and skips sending to Kommo  -->
-                            <CheckBox
-                                Margin="0,8,0,0"
-                                Cursor="Hand"
-                                FocusVisualStyle="{x:Null}"
-                                IsChecked="{Binding IsNoLink}">
-                                <CheckBox.Template>
-                                    <ControlTemplate TargetType="CheckBox">
-                                        <Border
-                                            x:Name="Bg"
-                                            Padding="10,7"
-                                            Background="{StaticResource BrushColor4}"
-                                            BorderBrush="{StaticResource BrushBorderColor4}"
-                                            BorderThickness="1"
-                                            CornerRadius="10">
-                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                                <Border
-                                                    x:Name="Box"
-                                                    Width="16"
-                                                    Height="16"
-                                                    Margin="0,0,8,0"
-                                                    VerticalAlignment="Center"
-                                                    Background="Transparent"
-                                                    BorderBrush="{StaticResource SubText}"
-                                                    BorderThickness="1.5"
-                                                    CornerRadius="4">
-                                                    <Path
-                                                        x:Name="Check"
-                                                        Width="9"
-                                                        Height="7"
-                                                        Data="M 0 3.5 L 3 6.5 L 9 0"
-                                                        Stroke="{StaticResource OtherBrushSubColor1}"
-                                                        StrokeEndLineCap="Round"
-                                                        StrokeLineJoin="Round"
-                                                        StrokeStartLineCap="Round"
-                                                        StrokeThickness="1.5"
-                                                        Visibility="Collapsed" />
-                                                </Border>
-                                                <TextBlock
-                                                    x:Name="Label"
-                                                    VerticalAlignment="Center"
-                                                    FontFamily="{StaticResource InterFont}"
-                                                    FontSize="13"
-                                                    Foreground="{StaticResource Text}"
-                                                    Text="Немає посилання" />
-                                            </StackPanel>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="Check" Property="Visibility" Value="Visible" />
-                                                <Setter TargetName="Box" Property="Background" Value="{StaticResource OtherBrushColor1}" />
-                                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
-                                                <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </CheckBox.Template>
-                            </CheckBox>
+                            <TextBlock
+                                Margin="2,4,0,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="11"
+                                Foreground="{StaticResource OtherBrushSubColor4}"
+                                Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/leads/detail/25448453)"
+                                Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
 
                         <!--  Примітка  -->
