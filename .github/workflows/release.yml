@@ -68,14 +68,16 @@ jobs:
           $ver = $tag.TrimStart('v')
           echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
 
-      # Генеруємо manifest.json і version.json: SHA256 для кожного Replixer.* файлу в publish/
+      # Генеруємо manifest.json і version.json: SHA256 для кожного файлу в publish/
+      # (усі DLL/EXE/JSON, не тільки Replixer.* — інакше нові NuGet-залежності
+      # ніколи не докачаються існуючим користувачам через автооновлення)
       - name: Generate update manifest
         shell: pwsh
         run: |
           $version  = "${{ steps.version.outputs.VERSION }}"
           $baseUrl  = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
           $files    = Get-ChildItem -Path publish -File |
-                        Where-Object { $_.Name -match '^Replixer\.' -and $_.Extension -ne '.pdb' } |
+                        Where-Object { $_.Extension -ne '.pdb' } |
                         ForEach-Object {
                           [ordered]@{
                             path   = $_.Name
@@ -99,7 +101,8 @@ jobs:
           git commit -m "chore: update version.json to ${{ steps.version.outputs.VERSION }}"
           git push origin main
 
-      # Створюємо GitHub Release: інсталер + manifest.json + окремі Replixer.* файли
+      # Створюємо GitHub Release: інсталер + manifest.json + усі файли з publish/
+      # (dll/exe/json — включно з усіма NuGet-залежностями, а не тільки Replixer.*)
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -110,10 +113,9 @@ jobs:
           files: |
             installer/Replixer-Setup.exe
             manifest.json
-            publish/Replixer.exe
-            publish/Replixer.dll
-            publish/Replixer.runtimeconfig.json
-            publish/Replixer.deps.json
+            publish/*.exe
+            publish/*.dll
+            publish/*.json
           body: |
             ## Що нового у версії ${{ steps.version.outputs.VERSION }}
 
