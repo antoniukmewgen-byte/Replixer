@@ -184,7 +184,7 @@ public class KommoService : IDisposable
     {
         try
         {
-            var (createdAt, existingFirstContactUnix, contactId) =
+            var (createdAt, existingFirstContactUnix, contactId, companyId) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId);
 
             long firstContactUnix;
@@ -211,10 +211,10 @@ public class KommoService : IDisposable
                 Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, firstContact={firstContactUtc:u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
 
-                if (contactId is not null)
-                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, leadCreatedUtc, firstContactUtc);
+                if (contactId is not null || companyId is not null)
+                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, companyId, leadCreatedUtc, firstContactUtc);
                 else
-                    ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту — поле 'Скорость обработки в рабочее время' не заповнено");
+                    ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту чи компанії — поле 'Скорость обработки в рабочее время' не заповнено");
             }
             else
             {
@@ -229,13 +229,20 @@ public class KommoService : IDisposable
     }
 
     private async Task TrySetLocalTimeProcessingSpeedAsync(
-        string baseUrl, string token, string leadId, string contactId, DateTime leadCreatedUtc, DateTime callStartUtc)
+        string baseUrl, string token, string leadId, string? contactId, string? companyId, DateTime leadCreatedUtc, DateTime callStartUtc)
     {
-        var phone = await GetContactPhoneAsync(baseUrl, token, contactId);
+        string? phone = contactId is not null ? await GetContactPhoneAsync(baseUrl, token, contactId) : null;
+
+        if (string.IsNullOrWhiteSpace(phone) && companyId is not null)
+        {
+            Debug.WriteLine("[Kommo] Contact has no phone — falling back to company phone");
+            phone = await GetCompanyPhoneAsync(baseUrl, token, companyId);
+        }
+
         if (string.IsNullOrWhiteSpace(phone))
         {
-            Debug.WriteLine("[Kommo] Contact has no phone — skipping local-time processing speed");
-            ErrorReporter.Report("KOMMO", $"Контакт {contactId} (лід {leadId}) без телефону — поле 'Скорость обработки в рабочее время' не заповнено");
+            Debug.WriteLine("[Kommo] Neither contact nor company has a phone — skipping local-time processing speed");
+            ErrorReporter.Report("KOMMO", $"Контакт {contactId ?? "—"} і компанія {companyId ?? "—"} (лід {leadId}) без телефону — поле 'Скорость обработки в рабочее время' не заповнено");
             return;
         }
 
@@ -352,6 +359,9 @@ public class KommoService : IDisposable
                     fields.ValueKind != JsonValueKind.Array)
                     return null;
 
+                // Поле "Телефон" (field_id = ContactPhoneFieldId) у Kommo — це multitext-поле:
+                // може містити кілька записів номера різних типів (WORK, MOB, FAX, HOME, OTHER...).
+                // Якщо перший запис порожній, а номер вказаний у наступному — беремо перший НЕпорожній.
                 foreach (var field in fields.EnumerateArray())
                 {
                     if (!field.TryGetProperty("field_id", out var fid) || fid.GetInt64() != ContactPhoneFieldId)
@@ -359,7 +369,8 @@ public class KommoService : IDisposable
 
                     if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
                         foreach (var v in vals.EnumerateArray())
-                            if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String)
+                            if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String &&
+                                !string.IsNullOrWhiteSpace(val.GetString()))
                                 return val.GetString();
 
                     break;
@@ -382,7 +393,64 @@ public class KommoService : IDisposable
         return null;
     }
 
-    private async Task<(long? createdAt, long? firstContactUnix, string? contactId)> GetLeadDetailsAsync(
+    // Той самий телефон (field_id = ContactPhoneFieldId) буває заповнений не на контакті,
+    // а на прив'язаній до ліда компанії (наприклад, коли контакт створився без номера,
+    // а форма записала телефон у компанію). Викликається як фолбек, якщо в контакта пусто.
+    private async Task<string?> GetCompanyPhoneAsync(string baseUrl, string token, string companyId)
+    {
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/companies/{companyId}");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"GetCompanyPhone HTTP {(int)res.StatusCode} — компанія {companyId}: {snippet}");
+                    return null;
+                }
+
+                using var doc = JsonDocument.Parse(body);
+                if (!doc.RootElement.TryGetProperty("custom_fields_values", out var fields) ||
+                    fields.ValueKind != JsonValueKind.Array)
+                    return null;
+
+                foreach (var field in fields.EnumerateArray())
+                {
+                    if (!field.TryGetProperty("field_id", out var fid) || fid.GetInt64() != ContactPhoneFieldId)
+                        continue;
+
+                    if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
+                        foreach (var v in vals.EnumerateArray())
+                            if (v.TryGetProperty("value", out var val) && val.ValueKind == JsonValueKind.String &&
+                                !string.IsNullOrWhiteSpace(val.GetString()))
+                                return val.GetString();
+
+                    break;
+                }
+
+                return null;
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
+            {
+                Debug.WriteLine($"[Kommo] GetCompanyPhone attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] GetCompanyPhone failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"GetCompanyPhone exception — компанія {companyId}: {ex.Message}", ex);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private async Task<(long? createdAt, long? firstContactUnix, string? contactId, string? companyId)> GetLeadDetailsAsync(
         string baseUrl, string token, string leadId)
     {
         const int maxAttempts = 3;
@@ -400,7 +468,7 @@ public class KommoService : IDisposable
                 {
                     var snippet = body.Length > 300 ? body[..300] : body;
                     ErrorReporter.Report("KOMMO", $"GetLeadDetails HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
-                    return (null, null, null);
+                    return (null, null, null, null);
                 }
 
                 using var doc = JsonDocument.Parse(body);
@@ -427,21 +495,30 @@ public class KommoService : IDisposable
                 }
 
                 string? contactId = null;
-                if (root.TryGetProperty("_embedded", out var emb) &&
-                    emb.TryGetProperty("contacts", out var contacts) &&
-                    contacts.ValueKind == JsonValueKind.Array)
+                string? companyId = null;
+                if (root.TryGetProperty("_embedded", out var emb))
                 {
-                    foreach (var c in contacts.EnumerateArray())
+                    if (emb.TryGetProperty("contacts", out var contacts) &&
+                        contacts.ValueKind == JsonValueKind.Array)
                     {
-                        if (!c.TryGetProperty("id", out var idProp)) continue;
-                        bool isMain = c.TryGetProperty("is_main", out var im) && im.ValueKind == JsonValueKind.True;
-                        if (isMain || contactId is null)
-                            contactId = idProp.GetInt64().ToString();
-                        if (isMain) break;
+                        foreach (var c in contacts.EnumerateArray())
+                        {
+                            if (!c.TryGetProperty("id", out var idProp)) continue;
+                            bool isMain = c.TryGetProperty("is_main", out var im) && im.ValueKind == JsonValueKind.True;
+                            if (isMain || contactId is null)
+                                contactId = idProp.GetInt64().ToString();
+                            if (isMain) break;
+                        }
                     }
+
+                    if (emb.TryGetProperty("companies", out var companies) &&
+                        companies.ValueKind == JsonValueKind.Array &&
+                        companies.GetArrayLength() > 0 &&
+                        companies[0].TryGetProperty("id", out var companyIdProp))
+                        companyId = companyIdProp.GetInt64().ToString();
                 }
 
-                return (createdAt, firstContactUnix, contactId);
+                return (createdAt, firstContactUnix, contactId, companyId);
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
@@ -452,10 +529,10 @@ public class KommoService : IDisposable
             {
                 Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
                 ErrorReporter.Report("KOMMO", $"GetLeadDetails exception — лід {leadId}: {ex.Message}", ex);
-                return (null, null, null);
+                return (null, null, null, null);
             }
         }
-        return (null, null, null);
+        return (null, null, null, null);
     }
 
     private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, object value)
