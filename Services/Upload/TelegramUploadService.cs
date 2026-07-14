@@ -174,6 +174,20 @@ public class TelegramUploadService : IDisposable
             await Task.Delay(2000);
             return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
         }
+        catch (TaskCanceledException ex) when (!isRetry)
+        {
+            // WTelegram's internal RPC got canceled mid-request — we never pass a CancellationToken
+            // into SendMediaAsync ourselves, so this is caused by the underlying connection dropping
+            // (Wi-Fi switch, sleep/wake, DC reconnect), not by any code-level cancellation.
+            // Reset the client so the retry reconnects cleanly, then retry once.
+            Debug.WriteLine($"[TG] ✗ Send RPC canceled (network drop?) — resetting and retrying: {ex.Message}");
+            _isReady = false;
+            InvalidatePeerCache();
+            _client?.Dispose();
+            _client = null;
+            await Task.Delay(2000);
+            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
+        }
         catch (Exception ex)
         {
             Debug.WriteLine($"[TG] ✗ Send failed: {ex.Message}");
