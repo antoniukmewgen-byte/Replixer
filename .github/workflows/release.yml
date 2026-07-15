@@ -68,26 +68,70 @@ jobs:
           $ver = $tag.TrimStart('v')
           echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
 
+      # Тягнемо version.json, який минулий реліз закомітив у main — щоб порівняти
+      # SHA256 і не заливати повторно файли рантайму/NuGet, які не змінились.
+      # Якщо це перший реліз (файла ще нема в main) — просто працюємо з порожнім списком.
+      - name: Fetch previous manifest
+        shell: pwsh
+        run: |
+          git fetch origin main
+          $prev = git show origin/main:version.json 2>$null
+          if ($LASTEXITCODE -eq 0 -and $prev) {
+            $prev | Out-File -FilePath previous-version.json -Encoding utf8
+            Write-Host "Previous manifest знайдено."
+          } else {
+            New-Item -ItemType File -Path previous-version.json -Force | Out-Null
+            Write-Host "Попереднього manifest'а нема (перший реліз?) — усі файли вважаються новими."
+          }
+
       # Генеруємо manifest.json і version.json: SHA256 для кожного файлу в publish/
       # (усі DLL/EXE/JSON, не тільки Replixer.* — інакше нові NuGet-залежності
-      # ніколи не докачаються існуючим користувачам через автооновлення)
+      # ніколи не докачаються існуючим користувачам через автооновлення).
+      # Але в GitHub Release заливаємо (files: у наступному кроці) лише ті файли,
+      # чий SHA256 відрізняється від минулого релізу — решта посилань у manifest.json
+      # просто вказує на той старий реліз, де файл з'явився. Це різко скорочує кількість
+      # asset-ів на реліз (self-contained публікація — це 200+ файлів рантайму, які
+      # майже завжди однакові від релізу до релізу) і уникає secondary rate limit GitHub.
       - name: Generate update manifest
+        id: manifest
         shell: pwsh
         run: |
           $version  = "${{ steps.version.outputs.VERSION }}"
           $baseUrl  = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
-          $files    = Get-ChildItem -Path publish -File |
-                        Where-Object { $_.Extension -ne '.pdb' } |
-                        ForEach-Object {
-                          [ordered]@{
-                            path   = $_.Name
-                            sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
-                            url    = "$baseUrl/$($_.Name)"
-                          }
-                        }
+
+          $prevByName = @{}
+          if ((Get-Item previous-version.json).Length -gt 0) {
+            $prevJson = Get-Content previous-version.json -Raw | ConvertFrom-Json
+            foreach ($f in $prevJson.files) { $prevByName[$f.path] = $f }
+          }
+
+          $changedFiles = New-Object System.Collections.Generic.List[string]
+          $files = Get-ChildItem -Path publish -File |
+                     Where-Object { $_.Extension -ne '.pdb' } |
+                     ForEach-Object {
+                       $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+                       $prev = $prevByName[$_.Name]
+                       if ($prev -and $prev.sha256 -eq $hash) {
+                         # Не змінився — не заливаємо повторно, посилання лишається на старий реліз.
+                         [ordered]@{ path = $_.Name; sha256 = $hash; url = $prev.url }
+                       } else {
+                         $changedFiles.Add("publish/$($_.Name)")
+                         [ordered]@{ path = $_.Name; sha256 = $hash; url = "$baseUrl/$($_.Name)" }
+                       }
+                     }
+
           $manifest = [ordered]@{ version = $version; files = @($files) }
           $manifest | ConvertTo-Json -Depth 3 | Out-File -FilePath manifest.json  -Encoding utf8NoBOM
           $manifest | ConvertTo-Json -Depth 3 | Out-File -FilePath version.json   -Encoding utf8NoBOM
+
+          Write-Host "Змінених файлів для заливки: $($changedFiles.Count) / $($files.Count)"
+
+          $delimiter = "EOF_$([guid]::NewGuid().ToString('N'))"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "changed_files<<$delimiter"
+          if ($changedFiles.Count -gt 0) {
+            Add-Content -Path $env:GITHUB_OUTPUT -Value ($changedFiles -join "`n")
+          }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value $delimiter
 
       # Комітимо version.json у main щоб застосунок міг читати його без API
       - name: Commit version.json to main
@@ -95,14 +139,27 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Робоча директорія зараз у detached HEAD (checkout тегу), і version.json
+          # у ній вже перезаписаний кроком "Generate update manifest" — це незакомічена
+          # зміна. Якщо просто зробити checkout main, git відмовиться перемикати гілку,
+          # щоб не затерти цю зміну. Тому зберігаємо новий version.json окремо,
+          # форсовано перемикаємось на main (відкидаючи "брудний" detached HEAD,
+          # він нам більше не потрібен), і повертаємо новий вміст назад.
+          Copy-Item version.json "$env:RUNNER_TEMP\version.json" -Force
+
           git fetch origin main
-          git checkout main
+          git checkout -f main
+
+          Copy-Item "$env:RUNNER_TEMP\version.json" version.json -Force
+
           git add version.json
           git commit -m "chore: update version.json to ${{ steps.version.outputs.VERSION }}"
           git push origin main
 
-      # Створюємо GitHub Release: інсталер + manifest.json + усі файли з publish/
-      # (dll/exe/json — включно з усіма NuGet-залежностями, а не тільки Replixer.*)
+      # Створюємо GitHub Release: інсталер + manifest.json + лише ЗМІНЕНІ файли з publish/
+      # (список — вихід кроку "Generate update manifest"; незмінені файли рантайму/NuGet
+      # не заливаються повторно, щоб не впертись у secondary rate limit GitHub)
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -113,9 +170,7 @@ jobs:
           files: |
             installer/Replixer-Setup.exe
             manifest.json
-            publish/*.exe
-            publish/*.dll
-            publish/*.json
+            ${{ steps.manifest.outputs.changed_files }}
           body: |
             ## Що нового у версії ${{ steps.version.outputs.VERSION }}
 
