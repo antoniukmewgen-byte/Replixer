@@ -39,4 +39,19 @@ public interface IUploadOrchestrator
     Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null);
 
     Task<string?> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null);
+
+    Task<UploadResult> RetryMissingStepsAsync(
+        string filePath,
+        string? existingDriveUrl,
+        int? existingTelegramMessageId,
+        long? existingKommoNoteId,
+        bool needDrive,
+        bool needTelegram,
+        bool needKommo,
+        string? telegramCaption,
+        string? kommoLeadUrl,
+        DateTime? callStartTime,
+        string? leadSource,
+        string? callType,
+        CancellationToken ct = default);
 }

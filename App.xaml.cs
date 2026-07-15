@@ -4,6 +4,7 @@ using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Manager;
+using Replixer.Services.Upload;
 using Replixer.ViewModels;
 using Replixer.Views;
 using System.IO;
@@ -153,11 +154,15 @@ public partial class App : Application
         _notifyIcon.DataContext = trayVm;
         trayVm.BalloonRequested += (title, msg) =>
             _notifyIcon.ShowBalloonTip(title, msg, BalloonIcon.Info);
+
+        // Тихий фоновий добір записів, які раніше не вдалося відправити (мережева помилка тощо).
+        _services!.GetRequiredService<PendingUploadRetryService>().Start();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         _services?.GetService<AppSettings>()?.Flush();
+        _services?.GetService<PendingUploadRetryService>()?.Dispose();
         if (_mainWindowStarted)
             _services?.GetService<MainViewModel>()?.Dispose();
 

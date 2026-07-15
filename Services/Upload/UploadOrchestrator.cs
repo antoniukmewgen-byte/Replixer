@@ -47,12 +47,20 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             var (kommoNoteId, kommoWarning) = await PostKommoAsync(
                 kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
 
-            if (driveUrl is not null)
+            // Файл видаляємо ЛИШЕ якщо геть усі кроки, які мали відбутись, реально
+            // завершились успішно. Раніше видалення залежало тільки від driveUrl —
+            // якщо Диск проходив, а Telegram чи Kommo впадали по мережі, файл
+            // видалявся назавжди, і фоновому retry вже не було чим користуватись.
+            bool driveOk    = driveUrl is not null;
+            bool telegramOk = tgWarning is null;
+            bool kommoOk    = kommoWarning is null;
+
+            if (driveOk && telegramOk && kommoOk)
             {
                 SafeDelete(filePath);
                 return new UploadResult
                 {
-                    DriveUrl          = driveUrl.Length > 0 ? driveUrl : null,
+                    DriveUrl          = driveUrl!.Length > 0 ? driveUrl : null,
                     TelegramMessageId = tgMessageId,
                     TelegramChatId    = _settings.TelegramChatId,
                     TelegramTopicId   = _settings.TelegramTopicId,
@@ -64,10 +72,11 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
                 };
             }
 
-            Debug.WriteLine("[Upload] Drive upload failed — file remains in temp for retry");
+            Debug.WriteLine("[Upload] Не всі кроки вдалися — файл лишається на диску для фонового retry");
             return new UploadResult
             {
-                DriveWarning      = "Google Drive: не вдалося завантажити файл",
+                DriveUrl          = driveUrl is { Length: > 0 } ? driveUrl : null,
+                DriveWarning      = driveOk ? null : "Google Drive: не вдалося завантажити файл",
                 TelegramMessageId = tgMessageId,
                 TelegramChatId    = _settings.TelegramChatId,
                 TelegramTopicId   = _settings.TelegramTopicId,
@@ -99,6 +108,57 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             KommoNoteId       = kommoId,
             KommoAttempted    = !string.IsNullOrWhiteSpace(kommoLeadUrl) && _kommo.IsEnabled,
             KommoWarning      = kommoWarn,
+        };
+    }
+
+    // Тихий фоновий "добір" лише тих кроків, які раніше не вдалися (мережева помилка тощо).
+    // Кроки, що вже мають значення (existingDriveUrl/existingTelegramMessageId/existingKommoNoteId),
+    // НЕ повторюються — інакше в Kommo задублювалась би нотатка, а в Telegram — повідомлення.
+    // needX прапорці кажуть, які кроки взагалі мали відбутись (беруться з RecordingEntry.*Failed).
+    public async Task<UploadResult> RetryMissingStepsAsync(
+        string filePath,
+        string? existingDriveUrl,
+        int? existingTelegramMessageId,
+        long? existingKommoNoteId,
+        bool needDrive,
+        bool needTelegram,
+        bool needKommo,
+        string? telegramCaption,
+        string? kommoLeadUrl,
+        DateTime? callStartTime,
+        string? leadSource,
+        string? callType,
+        CancellationToken ct = default)
+    {
+        string? driveUrl = existingDriveUrl;
+        if (needDrive && driveUrl is null)
+        {
+            string? folderId = await ResolveTargetFolderAsync(ct);
+            driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
+        }
+
+        int?    tgMessageId = existingTelegramMessageId;
+        string? tgWarning   = null;
+        if (needTelegram && tgMessageId is null)
+            (tgMessageId, tgWarning) = await SendTelegramAsync(true, filePath, telegramCaption, driveUrl);
+
+        long?   kommoNoteId  = existingKommoNoteId;
+        string? kommoWarning = null;
+        if (needKommo && kommoNoteId is null)
+            (kommoNoteId, kommoWarning) = await PostKommoAsync(kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
+
+        return new UploadResult
+        {
+            DriveUrl          = driveUrl,
+            DriveWarning      = needDrive && driveUrl is null ? "Google Drive: не вдалося завантажити файл" : null,
+            TelegramMessageId = tgMessageId,
+            TelegramChatId    = _settings.TelegramChatId,
+            TelegramTopicId   = _settings.TelegramTopicId,
+            TelegramAttempted = needTelegram,
+            TelegramWarning   = tgWarning,
+            KommoNoteId       = kommoNoteId,
+            KommoAttempted    = needKommo,
+            KommoWarning      = kommoWarning,
         };
     }
 

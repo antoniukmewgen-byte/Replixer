@@ -26,6 +26,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<TelegramUploadService>();
         services.AddSingleton<KommoService>();
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
+        services.AddSingleton<PendingUploadRetryService>();
         return services;
     }
 

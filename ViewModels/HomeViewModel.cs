@@ -237,6 +237,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramTopicId   = upload.TelegramTopicId;
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
+            entry.DriveFailed       = upload.DriveWarning is not null;
+            entry.TelegramFailed    = upload.TelegramAttempted && upload.TelegramWarning is not null;
+            entry.KommoFailed       = upload.KommoAttempted    && upload.KommoWarning    is not null;
 
             if (upload.DriveWarning is not null)
             {
@@ -340,14 +343,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         entry.EditReportCommand = new RelayCommand(
             execute:    () => _ = EditEntryReportAsync(entry),
-            canExecute: () => entry.HasTelegramMessage);
+            canExecute: () => entry.HasTelegramMessage && !entry.IsBackgroundRetrying);
     }
 
     private void WireEntryRetryCommand(RecordingEntry entry)
     {
         entry.RetryCommand = new RelayCommand(
             execute:    () => _ = RetryEntryAsync(entry),
-            canExecute: () => entry.Status == RecordingStatus.Error && entry.HasRetryableFile);
+            // !IsBackgroundRetrying — щоб не зіткнутися з фоновим PendingUploadRetryService,
+            // який саме зараз тихо доробляє цей самий запис (інакше можлива подвійна відправка).
+            canExecute: () => entry.Status == RecordingStatus.Error && entry.HasRetryableFile && !entry.IsBackgroundRetrying);
     }
 
     private void WireEntryResumeDraftCommand(RecordingEntry entry)
@@ -401,6 +406,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramTopicId   = upload.TelegramTopicId;
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
+            entry.DriveFailed       = upload.DriveWarning is not null;
+            entry.TelegramFailed    = upload.TelegramAttempted && upload.TelegramWarning is not null;
+            entry.KommoFailed       = upload.KommoAttempted    && upload.KommoWarning    is not null;
 
             if (upload.DriveWarning is not null)
             {
@@ -465,6 +473,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             entry.TelegramTopicId   = upload.TelegramTopicId;
             entry.KommoNoteId       = upload.KommoNoteId;
             entry.ReportData        = reportData;
+            entry.DriveFailed       = upload.DriveWarning is not null;
+            entry.TelegramFailed    = upload.TelegramAttempted && upload.TelegramWarning is not null;
+            entry.KommoFailed       = upload.KommoAttempted    && upload.KommoWarning    is not null;
 
             if (upload.DriveWarning is not null)
             {

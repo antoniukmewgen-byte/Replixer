@@ -84,6 +84,9 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
                     KommoNoteId       = dto.KommoNoteId,
                     ReportData        = dto.ReportData,
                     CallDuration      = dto.CallDuration,
+                    DriveFailed       = dto.DriveFailed,
+                    TelegramFailed    = dto.TelegramFailed,
+                    KommoFailed       = dto.KommoFailed,
                 };
                 SubscribeEntry(entry);
                 Recordings.Add(entry);
@@ -107,7 +110,7 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
             .Select(e => new RecordingDto(
                 e.Platform, e.StartedAt, e.Status, e.DriveUrl, e.FilePath, e.SourcePath,
                 e.TelegramMessageId, e.TelegramChatId, e.TelegramTopicId, e.KommoNoteId, e.ReportData,
-                e.CallDuration))
+                e.CallDuration, e.DriveFailed, e.TelegramFailed, e.KommoFailed))
             .ToList();
 
         _ = SaveAsync();
@@ -160,5 +163,8 @@ public class RecordingsViewModel : ViewModelBase, IDisposable
         int?            TelegramTopicId,
         long?           KommoNoteId,
         CallReportData? ReportData,
-        TimeSpan        CallDuration = default);
+        TimeSpan        CallDuration = default,
+        bool            DriveFailed = false,
+        bool            TelegramFailed = false,
+        bool            KommoFailed = false);
 }
