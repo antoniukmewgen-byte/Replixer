@@ -114,7 +114,7 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="11"
                                 Foreground="{StaticResource OtherBrushSubColor4}"
-                                Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/leads/detail/25448453)"
+                                Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/)"
                                 Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
 

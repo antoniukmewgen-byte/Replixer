@@ -301,7 +301,7 @@
                                 FontFamily="{StaticResource InterFont}"
                                 FontSize="11"
                                 Foreground="{StaticResource OtherBrushSubColor4}"
-                                Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/leads/detail/25448453)"
+                                Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/)"
                                 Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
 
@@ -338,9 +338,9 @@
                                         x:Name="NotesBox"
                                         MinHeight="60"
                                         MaxHeight="100"
-                                        MaxLength="500"
                                         VerticalAlignment="Top"
                                         AcceptsReturn="True"
+                                        MaxLength="500"
                                         Style="{StaticResource AppTextBox}"
                                         Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         TextWrapping="Wrap"

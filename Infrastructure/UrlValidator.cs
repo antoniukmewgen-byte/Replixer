@@ -6,7 +6,9 @@ namespace Replixer.Infrastructure;
 // (напр. https://movenation.kommo.com/leads/detail/25448453), а не будь-яким текстом чи посиланням.
 public static partial class UrlValidator
 {
-    [GeneratedRegex(@"^https://[a-zA-Z0-9\-]+\.kommo\.com/leads/detail/\d+/?$", RegexOptions.IgnoreCase)]
+    // Достатньо, щоб посилання ПОЧИНАЛОСЯ з https://<піддомен>.kommo.com/leads/detail/<id> —
+    // далі може йти будь-що (query-параметри на кшталт "?tab_id=...", trailing slash тощо).
+    [GeneratedRegex(@"^https://[a-zA-Z0-9\-]+\.kommo\.com/leads/detail/\d+", RegexOptions.IgnoreCase)]
     private static partial Regex KommoLeadUrlRegex();
 
     public static bool IsValidHttpUrl(string? url) =>
