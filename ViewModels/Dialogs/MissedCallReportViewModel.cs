@@ -2,6 +2,7 @@ using Replixer.Infrastructure;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -12,7 +13,10 @@ public record MissedCallReportData(
     string Manager,
     string CallType,
     string CrmUrl,
-    IReadOnlyList<string> ScreenshotUrls)
+    IReadOnlyList<string> ScreenshotUrls,
+    // Час "первого касання" для Kommo — за замовчуванням момент кліку на "Не додзвонився",
+    // але для типу "ще не було спілкування" менеджер міг скоригувати його вручну у формі.
+    DateTime FirstContactTime)
 {
     public string FormatCaption()
     {
@@ -38,9 +42,16 @@ public class MissedCallReportViewModel : ViewModelBase
         "Недодзвон (ще не було спілкування)", "Недодзвон (вже було спілкування)"
     };
 
+    private const string NoCommunicationCallType = "Недодзвон (ще не було спілкування)";
+    private const string FirstContactTimeFormat  = "dd.MM.yyyy HH:mm";
+
     private readonly string _managerName;
+    // Момент кліку на "Не додзвонився" — стартове значення поля часу і запасний варіант,
+    // якщо блок редагування прихований (тип не "ще не було спілкування") чи текст невалідний.
+    private readonly DateTime _defaultFirstContactTime;
     private string? _selectedCallType;
     private string _crmUrl = string.Empty;
+    private string _firstContactTimeText;
 
     private readonly Action<MissedCallReportData?> _onComplete;
 
@@ -53,6 +64,7 @@ public class MissedCallReportViewModel : ViewModelBase
             {
                 EnsureRequiredScreenshotFields();
                 OnPropertyChanged(nameof(HasCallType));
+                OnPropertyChanged(nameof(IsFirstContactTimeEditable));
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -61,6 +73,40 @@ public class MissedCallReportViewModel : ViewModelBase
     // Керує видимістю блоку скрінів і кнопки "+ Додати ще поле" — обидва з'являються
     // лише після вибору типу дзвінка.
     public bool HasCallType => _selectedCallType is not null;
+
+    // Ручне редагування часу "первого касання" доступне лише для "ще не було спілкування" —
+    // саме цей тип надалі переводить лід у статус "Недозвон" у Kommo, тож там важливо мати
+    // точний час першої спроби, а не лише момент, коли менеджер натиснув кнопку в застосунку.
+    public bool IsFirstContactTimeEditable => _selectedCallType == NoCommunicationCallType;
+
+    public string FirstContactTimeText
+    {
+        get => _firstContactTimeText;
+        set
+        {
+            if (SetField(ref _firstContactTimeText, value))
+            {
+                OnPropertyChanged(nameof(IsFirstContactTimeInvalid));
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+    }
+
+    // true лише коли блок видимий, але текст не парситься як дд.мм.рррр гг:хх — для підсвітки помилки.
+    public bool IsFirstContactTimeInvalid => IsFirstContactTimeEditable && !TryParseFirstContactTime(out _);
+
+    private bool TryParseFirstContactTime(out DateTime value) =>
+        DateTime.TryParseExact(
+            _firstContactTimeText?.Trim(), FirstContactTimeFormat,
+            CultureInfo.InvariantCulture, DateTimeStyles.None, out value);
+
+    // Кнопки +/- біля поля: якщо поточний текст валідний — крутимо від нього, інакше
+    // (менеджер щось зіпсував руками) відштовхуємось від часу кліку на "Не додзвонився".
+    private void AdjustFirstContactTime(int minutesDelta)
+    {
+        var baseTime = TryParseFirstContactTime(out var parsed) ? parsed : _defaultFirstContactTime;
+        FirstContactTimeText = baseTime.AddMinutes(minutesDelta).ToString(FirstContactTimeFormat, CultureInfo.InvariantCulture);
+    }
 
     // "Ще не було спілкування" — довший тип недодзвону, менеджер має докласти 2 скріни
     // (напр. дзвінок і повідомлення); "вже було спілкування" — досить одного.
@@ -91,17 +137,26 @@ public class MissedCallReportViewModel : ViewModelBase
 
     public ICommand AddScreenshotFieldCommand { get; }
     public ICommand RemoveScreenshotFieldCommand { get; }
+    public ICommand IncrementFirstContactTimeCommand { get; }
+    public ICommand DecrementFirstContactTimeCommand { get; }
     public ICommand SubmitCommand { get; }
 
-    public MissedCallReportViewModel(Action<MissedCallReportData?> onComplete, string? managerName = null)
+    public MissedCallReportViewModel(Action<MissedCallReportData?> onComplete, DateTime missedAt, string? managerName = null)
     {
-        _onComplete   = onComplete;
-        _managerName  = managerName ?? string.Empty;
+        _onComplete              = onComplete;
+        _managerName             = managerName ?? string.Empty;
+        _defaultFirstContactTime = missedAt;
+        _firstContactTimeText    = missedAt.ToString(FirstContactTimeFormat, CultureInfo.InvariantCulture);
         SubmitCommand = new RelayCommand(OnSubmit, CanSubmit);
 
         AddScreenshotFieldCommand = new RelayCommand(
             () => Screenshots.Add(new ScreenshotAttachment(Screenshots.Count + 1, isRemovable: true)));
         RemoveScreenshotFieldCommand = new RelayCommand<ScreenshotAttachment>(RemoveScreenshotField);
+
+        // Кнопки +/- поруч із полем часу — крок 1 хв за клік (RepeatButton у XAML сам
+        // повторює команду, доки кнопку тримають натиснутою).
+        IncrementFirstContactTimeCommand = new RelayCommand(() => AdjustFirstContactTime(1));
+        DecrementFirstContactTimeCommand = new RelayCommand(() => AdjustFirstContactTime(-1));
 
         Screenshots.CollectionChanged += OnScreenshotsCollectionChanged;
         // Поля скрінів з'являються лише після вибору типу дзвінка (див. EnsureRequiredScreenshotFields) —
@@ -162,15 +217,25 @@ public class MissedCallReportViewModel : ViewModelBase
         _selectedCallType is not null &&
         UrlValidator.IsValidHttpUrl(_crmUrl) &&
         Screenshots.Count >= RequiredScreenshotCount &&
-        Screenshots.All(s => UrlValidator.IsValidScreenshotUrl(s.Url));
+        Screenshots.All(s => UrlValidator.IsValidScreenshotUrl(s.Url)) &&
+        !IsFirstContactTimeInvalid;
 
-    private void OnSubmit() =>
+    private void OnSubmit()
+    {
+        // Якщо блок редагування прихований (тип не "ще не було спілкування") або текст
+        // з якоїсь причини не спарсився — використовуємо момент кліку на "Не додзвонився".
+        var firstContactTime = IsFirstContactTimeEditable && TryParseFirstContactTime(out var edited)
+            ? edited
+            : _defaultFirstContactTime;
+
         _onComplete(new MissedCallReportData(
-            Manager:        _managerName,
-            CallType:       _selectedCallType!,
-            CrmUrl:         _crmUrl,
-            ScreenshotUrls: Screenshots
+            Manager:          _managerName,
+            CallType:         _selectedCallType!,
+            CrmUrl:           _crmUrl,
+            ScreenshotUrls:   Screenshots
                 .Where(s => !string.IsNullOrWhiteSpace(s.Url))
                 .Select(s => s.Url.Trim())
-                .ToList()));
+                .ToList(),
+            FirstContactTime: firstContactTime));
+    }
 }

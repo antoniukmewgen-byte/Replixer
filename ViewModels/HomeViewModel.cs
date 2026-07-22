@@ -325,8 +325,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             onComplete: data =>
             {
                 MissedCallReportRequested?.Invoke(null);
-                if (data is not null) _ = SubmitMissedCallAsync(data, missedAt);
+                if (data is not null) _ = SubmitMissedCallAsync(data);
             },
+            missedAt: missedAt,
             managerName: _settings.ManagerName);
         MissedCallReportRequested?.Invoke(vm);
     }
@@ -335,9 +336,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     // текстом у нотатку ("Скрін 1 - ...", "Скрін 2 - ..."), окремого завантаження файлів
     // не потрібно. Саму доставку в Kommo (разом з чергою на випадок мережевої помилки —
     // див. MissedCallDeliveryService) робить окремий сервіс, щоб недодзвін не губився,
-    // якщо перша спроба не вдалась.
-    private Task SubmitMissedCallAsync(MissedCallReportData data, DateTime missedAt) =>
-        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType, missedAt);
+    // якщо перша спроба не вдалась. data.FirstContactTime — момент кліку на "Не додзвонився",
+    // або, для типу "ще не було спілкування", час, який менеджер вручну скоригував у формі.
+    private Task SubmitMissedCallAsync(MissedCallReportData data) =>
+        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType, data.FirstContactTime);
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {
