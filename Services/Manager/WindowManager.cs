@@ -6,6 +6,7 @@ namespace Replixer.Services.Manager
     public class WindowManager : IWindowManager
     {
         private CallCheatSheetWindow? _cheatSheet;
+        private MissedCallReminderWindow? _missedCallReminder;
 
         public void ShowCheatSheet()
         {
@@ -33,6 +34,22 @@ namespace Replixer.Services.Manager
             if (win.WindowState == WindowState.Minimized)
                 win.WindowState = WindowState.Normal;
             win.Activate();
+        }
+
+        // Викликається один раз при старті застосунку (див. App.xaml.cs). На відміну від
+        // ShowCheatSheet/CloseCheatSheet тут немає парного Close-методу: банер навмисно
+        // лишається на екрані (Topmost) до самого виходу із застосунку, а не ховається
+        // програмно десь у логіці дзвінків.
+        public void ShowMissedCallReminder()
+        {
+            if (_missedCallReminder != null) return;
+
+            _missedCallReminder = new MissedCallReminderWindow();
+
+            _missedCallReminder.Left = (SystemParameters.PrimaryScreenWidth - _missedCallReminder.Width) / 2;
+            _missedCallReminder.Top  = 16;
+
+            _missedCallReminder.Show();
         }
     }
 }

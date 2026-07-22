@@ -5,5 +5,6 @@
         void ShowCheatSheet();
         void CloseCheatSheet();
         void ShowMainWindow();
+        void ShowMissedCallReminder();
     }
 }

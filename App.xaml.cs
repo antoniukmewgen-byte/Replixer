@@ -158,6 +158,10 @@ public partial class App : Application
         // Тихий фоновий добір записів, які раніше не вдалося відправити (мережева помилка тощо).
         _services!.GetRequiredService<PendingUploadRetryService>().Start();
         _services!.GetRequiredService<MissedCallDeliveryService>().Start();
+
+        // Не залежить від --tray: банер-нагадування має бути видимим одразу зі стартом
+        // застосунку, навіть якщо головне вікно ще згорнуте в трей, і не закривається сам.
+        _services!.GetRequiredService<IWindowManager>().ShowMissedCallReminder();
     }
 
     protected override void OnExit(ExitEventArgs e)
