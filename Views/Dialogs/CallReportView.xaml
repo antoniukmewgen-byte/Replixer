@@ -6,13 +6,13 @@
 
     <Border
         Width="500"
-        Padding="16"
+        Margin="16"
         Background="{StaticResource BrushColor2}"
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="12">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-            <StackPanel>
+            <StackPanel Margin="16">
                 <TextBlock
                     Margin="0,0,0,12"
                     FontFamily="{StaticResource InterFont}"
@@ -337,7 +337,6 @@
                                     <TextBox
                                         x:Name="NotesBox"
                                         MinHeight="60"
-                                        MaxHeight="100"
                                         VerticalAlignment="Top"
                                         AcceptsReturn="True"
                                         MaxLength="500"

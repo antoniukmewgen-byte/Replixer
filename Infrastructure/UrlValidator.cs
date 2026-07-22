@@ -13,4 +13,12 @@ public static partial class UrlValidator
 
     public static bool IsValidHttpUrl(string? url) =>
         !string.IsNullOrWhiteSpace(url) && KommoLeadUrlRegex().IsMatch(url.Trim());
+
+    // Скріншоти менеджери надсилають посиланнями на Lightshot (напр. https://prnt.sc/eRDSnZFKNIqV) —
+    // приймаємо лише такий формат, щоб не пропустити випадковий текст чи чужий сайт у нотатку.
+    [GeneratedRegex(@"^https://prnt\.sc/[a-zA-Z0-9]+/?$", RegexOptions.IgnoreCase)]
+    private static partial Regex PrntScUrlRegex();
+
+    public static bool IsValidScreenshotUrl(string? url) =>
+        !string.IsNullOrWhiteSpace(url) && PrntScUrlRegex().IsMatch(url.Trim());
 }

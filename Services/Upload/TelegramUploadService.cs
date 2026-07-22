@@ -120,10 +120,10 @@ public class TelegramUploadService : IDisposable
         }
     }
 
-    public Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null)
-        => SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: false);
+    public Task<int?> SendFileAsync(string filePath, long chatId, int? topicId = null, string? caption = null, string? driveUrl = null, string? mimeType = null)
+        => SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, mimeType, isRetry: false);
 
-    private async Task<int?> SendFileCoreAsync(string filePath, long chatId, int? topicId, string? caption, string? driveUrl, bool isRetry)
+    private async Task<int?> SendFileCoreAsync(string filePath, long chatId, int? topicId, string? caption, string? driveUrl, string? mimeType, bool isRetry)
     {
         Debug.WriteLine($"[TG] ── SendFileAsync{(isRetry ? " (retry)" : "")} ──────────────────────────────");
         Debug.WriteLine($"[TG] File   : {filePath}");
@@ -151,7 +151,7 @@ public class TelegramUploadService : IDisposable
             var fileName  = Path.GetFileName(filePath);
 
             var (msgText, entities) = BuildCaption(caption ?? $"Запис дзвінку: {fileName}", driveUrl);
-            var msg = await _client.SendMediaAsync(peer, msgText, inputFile, "audio/mpeg", entities: entities, reply_to_msg_id: topicId ?? 0);
+            var msg = await _client.SendMediaAsync(peer, msgText, inputFile, mimeType ?? "audio/mpeg", entities: entities, reply_to_msg_id: topicId ?? 0);
 
             Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msg?.id}");
             return msg?.id;
@@ -172,7 +172,7 @@ public class TelegramUploadService : IDisposable
             _client?.Dispose();
             _client = null;
             await Task.Delay(2000);
-            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
+            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, mimeType, isRetry: true);
         }
         catch (TaskCanceledException ex) when (!isRetry)
         {
@@ -186,7 +186,7 @@ public class TelegramUploadService : IDisposable
             _client?.Dispose();
             _client = null;
             await Task.Delay(2000);
-            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, isRetry: true);
+            return await SendFileCoreAsync(filePath, chatId, topicId, caption, driveUrl, mimeType, isRetry: true);
         }
         catch (Exception ex)
         {

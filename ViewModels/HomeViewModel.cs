@@ -327,11 +327,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         try
         {
-            string? warning = await _orchestrator.PostKommoNoteAsync(data.CrmUrl, data.FormatCaption(), DateTime.Now, data.CallType);
-            if (warning is null)
+            // Скріншоти — це просто вставлені посилання на prnt.sc, FormatCaption() уже
+            // вписує їх текстом у нотатку ("Скрін 1 - ...", "Скрін 2 - ..."), окремого
+            // завантаження файлів більше не потрібно.
+            string note = data.FormatCaption();
+
+            string? kommoWarning = await _orchestrator.PostKommoNoteAsync(data.CrmUrl, note, DateTime.Now, data.CallType);
+            if (kommoWarning is null)
                 NotificationService.ShowSuccess("Недодзвон зафіксовано.");
             else
-                ErrorReporter.Report("MISSED_CALL", $"Не вдалося зафіксувати недодзвон у Kommo.\n{warning}");
+                ErrorReporter.Report("MISSED_CALL", $"Не вдалося зафіксувати недодзвон у Kommo.\n{kommoWarning}");
         }
         catch (Exception ex)
         {

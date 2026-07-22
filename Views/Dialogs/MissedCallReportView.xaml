@@ -6,13 +6,13 @@
 
     <Border
         Width="500"
-        Padding="16"
+        Margin="16"
         Background="{StaticResource BrushColor2}"
         BorderBrush="{StaticResource BrushBorderColor2}"
         BorderThickness="1"
         CornerRadius="12">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-            <StackPanel>
+            <StackPanel Margin="16">
                 <TextBlock
                     Margin="0,0,0,12"
                     FontFamily="{StaticResource InterFont}"
@@ -43,23 +43,6 @@
                             <ComboBox
                                 ItemsSource="{x:Static vm:MissedCallReportViewModel.CallTypes}"
                                 SelectedItem="{Binding SelectedCallType}"
-                                Style="{StaticResource AppComboBox}"
-                                Tag="Оберіть..." />
-                        </StackPanel>
-
-                        <!--  Джерело ліда  -->
-                        <StackPanel Margin="0,12,0,0">
-                            <TextBlock
-                                Margin="0,0,0,4"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource SubText}">
-                                Джерело ліда
-                            </TextBlock>
-                            <ComboBox
-                                ItemsSource="{x:Static vm:MissedCallReportViewModel.LeadSources}"
-                                SelectedItem="{Binding SelectedLeadSource}"
                                 Style="{StaticResource AppComboBox}"
                                 Tag="Оберіть..." />
                         </StackPanel>
@@ -118,66 +101,144 @@
                                 Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
 
-                        <!--  Примітка  -->
+                        <!--  Скріншоти  -->
                         <StackPanel Margin="0,12,0,0">
-                            <Grid Margin="0,0,0,4">
-                                <TextBlock
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource SubText}">
-                                    Примітки
-                                </TextBlock>
-                                <TextBlock
-                                    HorizontalAlignment="Right"
-                                    FontFamily="{StaticResource InterFont}"
-                                    FontSize="12">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource SubText}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsNoteNearLimit}" Value="True">
-                                                    <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                    <Run Text="{Binding NoteLength, Mode=OneWay}" /><Run Text=" / 500" />
-                                </TextBlock>
-                            </Grid>
-                            <Border Style="{StaticResource AppInputBorder}">
-                                <Grid>
-                                    <TextBox
-                                        x:Name="NotesBox"
-                                        MinHeight="60"
-                                        MaxHeight="100"
-                                        MaxLength="500"
-                                        VerticalAlignment="Top"
-                                        AcceptsReturn="True"
-                                        Style="{StaticResource AppTextBox}"
-                                        Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        TextWrapping="Wrap"
-                                        VerticalScrollBarVisibility="Hidden" />
-                                    <TextBlock
-                                        VerticalAlignment="Top"
-                                        FontFamily="{StaticResource InterFont}"
-                                        FontSize="14"
-                                        Foreground="{StaticResource SubText}"
-                                        IsHitTestVisible="False"
-                                        Text="Введіть примітку...">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Text, ElementName=NotesBox}" Value="">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Grid>
-                            </Border>
+                            <ItemsControl ItemsSource="{Binding Screenshots}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ScreenshotAttachment}">
+                                        <StackPanel Margin="0,0,0,8">
+                                            <TextBlock
+                                                Margin="0,0,0,4"
+                                                FontFamily="{StaticResource InterFont}"
+                                                FontSize="11"
+                                                Foreground="{StaticResource SubText}"
+                                                Text="{Binding Label}" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Grid.Column="0">
+                                                    <Border.Style>
+                                                        <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsInvalid}" Value="True">
+                                                                    <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <Grid>
+                                                        <TextBox
+                                                            x:Name="ScreenshotBox"
+                                                            Style="{StaticResource AppTextBox}"
+                                                            Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontFamily="{StaticResource InterFont}"
+                                                            FontSize="14"
+                                                            Foreground="{StaticResource SubText}"
+                                                            IsHitTestVisible="False"
+                                                            Text="Вставте посилання (prnt.sc)...">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=ScreenshotBox}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </Border>
+
+                                                <Button
+                                                    Grid.Column="1"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Margin="8,0,0,0"
+                                                    Command="{Binding DataContext.RemoveScreenshotFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Cursor="Hand"
+                                                    ToolTip="Видалити поле"
+                                                    Visibility="{Binding IsRemovable, Converter={StaticResource BoolToVis}}">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border
+                                                                x:Name="Bg"
+                                                                Background="{StaticResource BrushColor4}"
+                                                                BorderBrush="{StaticResource BrushBorderColor4}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="8">
+                                                                <Path
+                                                                    Width="14"
+                                                                    Height="14"
+                                                                    Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12Z"
+                                                                    Fill="{StaticResource SubText}"
+                                                                    Stretch="Uniform" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </Grid>
+                                            <TextBlock
+                                                Margin="2,4,0,0"
+                                                FontFamily="{StaticResource InterFont}"
+                                                FontSize="11"
+                                                Foreground="{StaticResource OtherBrushSubColor4}"
+                                                Text="Посилання має бути на prnt.sc (напр. https://prnt.sc/eRDSnZFKNIqV)"
+                                                Visibility="{Binding IsInvalid, Converter={StaticResource BoolToVis}}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button
+                                Margin="0,4,0,0"
+                                Padding="10,7"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding AddScreenshotFieldCommand}"
+                                Cursor="Hand"
+                                Visibility="{Binding HasCallType, Converter={StaticResource BoolToVis}}">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                            x:Name="Bg"
+                                            Padding="{TemplateBinding Padding}"
+                                            Background="{StaticResource BrushColor3}"
+                                            BorderBrush="{StaticResource BrushBorderColor3}"
+                                            BorderThickness="1"
+                                            CornerRadius="8">
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontFamily="{StaticResource InterFont}"
+                                                FontSize="12"
+                                                FontWeight="Medium"
+                                                Foreground="{StaticResource SubText}"
+                                                Text="+ Додати ще поле" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
                         </StackPanel>
 
                         <!--  Submit button  -->
