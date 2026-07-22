@@ -26,6 +26,14 @@ public class KommoService : IDisposable
     private const long ProcessingSpeedLocalTimeFieldId = 1227531;
     private const long ContactPhoneFieldId             = 458590;
 
+    // Коли обрано тип дзвінка "Недодзвон (ще не було спілкування)", переводимо лід у стадію
+    // "Недозвон" воронки "Відділ продажу ЕК" (значення підтверджені живим GET /leads/pipelines
+    // саме для акаунту користувача — не змінювати без повторної перевірки). Стосується лише
+    // цього конкретного типу — "вже було спілкування" статус не чіпає.
+    private const long   NedozvonPipelineId              = 12703972;
+    private const long   NedozvonStatusId                = 98056416;
+    private const string NedozvonNoCommunicationCallType = "Недодзвон (ще не було спілкування)";
+
     public KommoService(AppSettings settings) => _settings = settings;
 
     public bool IsEnabled =>
@@ -74,8 +82,11 @@ public class KommoService : IDisposable
         var callTypeTask = !string.IsNullOrWhiteSpace(callType)
             ? PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType)
             : Task.CompletedTask;
+        var statusTask   = callType == NedozvonNoCommunicationCallType
+            ? PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId)
+            : Task.CompletedTask;
 
-        await Task.WhenAll(noteTask, dateTask, callTypeTask);
+        await Task.WhenAll(noteTask, dateTask, callTypeTask, statusTask);
         return await noteTask;
     }
 
@@ -123,6 +134,9 @@ public class KommoService : IDisposable
 
         if (!string.IsNullOrWhiteSpace(callType))
             await PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType);
+
+        if (callType == NedozvonNoCommunicationCallType)
+            await PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId);
 
         return null;
     }
@@ -590,6 +604,48 @@ public class KommoService : IDisposable
             {
                 Debug.WriteLine($"[Kommo] PatchLeadField failed: {ex.Message}");
                 ErrorReporter.Report("KOMMO", $"PatchLeadField exception — лід {leadId}, поле {fieldId}: {ex.Message}", ex);
+                return;
+            }
+        }
+    }
+
+    // Переводить лід у вказану стадію конкретної воронки. На відміну від PatchLeadFieldAsync
+    // (custom_fields_values), тут status_id/pipeline_id — поля верхнього рівня самого ліда.
+    private async Task PatchLeadStatusAsync(string baseUrl, string token, string leadId, long statusId, long pipelineId)
+    {
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                var payload = JsonSerializer.Serialize(new { status_id = statusId, pipeline_id = pipelineId });
+
+                using var req = new HttpRequestMessage(HttpMethod.Patch, $"{baseUrl}/leads/{leadId}")
+                {
+                    Content = new StringContent(payload, Encoding.UTF8, "application/json")
+                };
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+                Debug.WriteLine($"[Kommo] PatchLeadStatus {statusId}/{pipelineId} → {(int)res.StatusCode} (attempt {attempt})");
+
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"PatchLeadStatus HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
+                }
+                return;
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
+            {
+                Debug.WriteLine($"[Kommo] PatchLeadStatus attempt {attempt} failed: {ex.Message} — retrying in 2s");
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] PatchLeadStatus failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"PatchLeadStatus exception — лід {leadId}: {ex.Message}", ex);
                 return;
             }
         }
