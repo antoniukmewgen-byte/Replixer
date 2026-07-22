@@ -157,12 +157,14 @@ public partial class App : Application
 
         // Тихий фоновий добір записів, які раніше не вдалося відправити (мережева помилка тощо).
         _services!.GetRequiredService<PendingUploadRetryService>().Start();
+        _services!.GetRequiredService<MissedCallDeliveryService>().Start();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         _services?.GetService<AppSettings>()?.Flush();
         _services?.GetService<PendingUploadRetryService>()?.Dispose();
+        _services?.GetService<MissedCallDeliveryService>()?.Dispose();
         if (_mainWindowStarted)
             _services?.GetService<MainViewModel>()?.Dispose();
 

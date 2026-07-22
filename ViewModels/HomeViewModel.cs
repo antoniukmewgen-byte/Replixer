@@ -26,6 +26,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
     private readonly IWindowManager _windowManager;
+    private readonly MissedCallDeliveryService _missedCallDelivery;
 
     private bool  _isRecording;
     private bool  _isStopping;
@@ -60,13 +61,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         IUploadOrchestrator orchestrator,
         RecordingsViewModel recordingsVm,
         IWindowManager windowManager,
-        AudioRecordingService recorder)
+        AudioRecordingService recorder,
+        MissedCallDeliveryService missedCallDelivery)
     {
-        _settings      = settings;
-        _orchestrator  = orchestrator;
-        _recordingsVm  = recordingsVm;
-        _windowManager = windowManager;
-        _recorder      = recorder;
+        _settings           = settings;
+        _orchestrator       = orchestrator;
+        _recordingsVm       = recordingsVm;
+        _windowManager      = windowManager;
+        _recorder           = recorder;
+        _missedCallDelivery = missedCallDelivery;
 
         _callContent = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
 
@@ -323,26 +326,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         MissedCallReportRequested?.Invoke(vm);
     }
 
-    private async Task SubmitMissedCallAsync(MissedCallReportData data)
-    {
-        try
-        {
-            // Скріншоти — це просто вставлені посилання на prnt.sc, FormatCaption() уже
-            // вписує їх текстом у нотатку ("Скрін 1 - ...", "Скрін 2 - ..."), окремого
-            // завантаження файлів більше не потрібно.
-            string note = data.FormatCaption();
-
-            string? kommoWarning = await _orchestrator.PostKommoNoteAsync(data.CrmUrl, note, DateTime.Now, data.CallType);
-            if (kommoWarning is null)
-                NotificationService.ShowSuccess("Недодзвон зафіксовано.");
-            else
-                ErrorReporter.Report("MISSED_CALL", $"Не вдалося зафіксувати недодзвон у Kommo.\n{kommoWarning}");
-        }
-        catch (Exception ex)
-        {
-            ErrorReporter.Report("MISSED_CALL", "Помилка при фіксації недодзвону.", ex);
-        }
-    }
+    // Скріншоти — це просто вставлені посилання на prnt.sc, FormatCaption() уже вписує їх
+    // текстом у нотатку ("Скрін 1 - ...", "Скрін 2 - ..."), окремого завантаження файлів
+    // не потрібно. Саму доставку в Kommo (разом з чергою на випадок мережевої помилки —
+    // див. MissedCallDeliveryService) робить окремий сервіс, щоб недодзвін не губився,
+    // якщо перша спроба не вдалась.
+    private Task SubmitMissedCallAsync(MissedCallReportData data) =>
+        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType);
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {

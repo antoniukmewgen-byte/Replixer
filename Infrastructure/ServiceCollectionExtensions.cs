@@ -27,6 +27,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<KommoService>();
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
         services.AddSingleton<PendingUploadRetryService>();
+        services.AddSingleton<MissedCallDeliveryService>();
         return services;
     }
 
