@@ -314,13 +314,18 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     {
         if (_isRecording || _isStopping || _hasActiveDialog) return;
 
+        // "Дата и время первого касания" в Kommo має відповідати моменту натискання
+        // кнопки "Не додзвонився", а не моменту, коли менеджер закінчить заповнювати
+        // форму (яка може лежати відкритою хвилинами) — тож фіксуємо час тут, до відкриття діалогу.
+        var missedAt = DateTime.Now;
+
         _windowManager.ShowMainWindow();
 
         var vm = new MissedCallReportViewModel(
             onComplete: data =>
             {
                 MissedCallReportRequested?.Invoke(null);
-                if (data is not null) _ = SubmitMissedCallAsync(data);
+                if (data is not null) _ = SubmitMissedCallAsync(data, missedAt);
             },
             managerName: _settings.ManagerName);
         MissedCallReportRequested?.Invoke(vm);
@@ -331,8 +336,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     // не потрібно. Саму доставку в Kommo (разом з чергою на випадок мережевої помилки —
     // див. MissedCallDeliveryService) робить окремий сервіс, щоб недодзвін не губився,
     // якщо перша спроба не вдалась.
-    private Task SubmitMissedCallAsync(MissedCallReportData data) =>
-        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType);
+    private Task SubmitMissedCallAsync(MissedCallReportData data, DateTime missedAt) =>
+        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType, missedAt);
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {

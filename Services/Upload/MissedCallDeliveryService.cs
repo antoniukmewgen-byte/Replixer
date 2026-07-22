@@ -50,9 +50,11 @@ public sealed class MissedCallDeliveryService : IDisposable
 
     // Викликається одразу після сабміту форми недодзвону: ставить запис у чергу (щоб він
     // пережив навіть падіння застосунку до завершення першої спроби) і одразу пробує надіслати.
-    public async Task SubmitAsync(string crmUrl, string note, string? callType)
+    // missedAt — момент натискання кнопки "Не додзвонився" (фіксується ще ДО відкриття форми,
+    // див. HomeViewModel.ReportMissedCall), а не момент сабміту цієї форми.
+    public async Task SubmitAsync(string crmUrl, string note, string? callType, DateTime missedAt)
     {
-        var entry = new PendingMissedCall(Guid.NewGuid(), crmUrl, note, callType, DateTime.Now);
+        var entry = new PendingMissedCall(Guid.NewGuid(), crmUrl, note, callType, missedAt);
 
         lock (_pending) _pending.Add(entry);
         await SaveAsync();
@@ -75,7 +77,7 @@ public sealed class MissedCallDeliveryService : IDisposable
     {
         try
         {
-            string? warning = await _orchestrator.PostKommoNoteAsync(entry.CrmUrl, entry.Note, entry.CreatedAt, entry.CallType);
+            string? warning = await _orchestrator.PostKommoNoteAsync(entry.CrmUrl, entry.Note, entry.MissedAt, entry.CallType);
 
             if (warning is null)
             {

@@ -8,4 +8,6 @@ public record PendingMissedCall(
     string    CrmUrl,
     string    Note,
     string?   CallType,
-    DateTime  CreatedAt);
+    // Момент натискання кнопки "Не додзвонився" (а не момент сабміту форми чи фонового
+    // ретраю) — саме цей час іде в поле "Дата и время первого касания" в Kommo.
+    DateTime  MissedAt);
