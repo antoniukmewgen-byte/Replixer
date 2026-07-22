@@ -163,7 +163,6 @@
                                                     Command="{Binding DataContext.RemoveScreenshotFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
                                                     Cursor="Hand"
-                                                    ToolTip="Видалити поле"
                                                     Visibility="{Binding IsRemovable, Converter={StaticResource BoolToVis}}">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="Button">
@@ -226,7 +225,7 @@
                                                 FontSize="12"
                                                 FontWeight="Medium"
                                                 Foreground="{StaticResource SubText}"
-                                                Text="+ Додати ще поле" />
+                                                Text="+ Додати ще скріншот" />
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
