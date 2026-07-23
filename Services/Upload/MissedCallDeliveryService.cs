@@ -175,6 +175,14 @@ public sealed class MissedCallDeliveryService : IDisposable
         }
     }
 
+    // Місяці в називному відмінку (а не родовому, який дає стандартне форматування .NET
+    // культури "uk-UA", напр. "липня") — саме так, як має виглядати назва в колонці таблиці.
+    private static readonly string[] UkrainianMonths =
+    {
+        "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
+        "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень",
+    };
+
     // Стандарт — 2 колонки під скріни; якщо їх більше — додаємо ще по одній колонці на кожен
     // наступний (Скрін 3, Скрін 4, ...), а не обрізаємо список.
     private static List<object?> BuildSheetRow(PendingMissedCall entry)
@@ -183,7 +191,8 @@ public sealed class MissedCallDeliveryService : IDisposable
         var row = new List<object?>
         {
             now.Year,
-            now.ToString("dd.MM"),
+            now.Day,
+            UkrainianMonths[now.Month - 1],
             now.ToString("HH:mm:ss"),
             entry.Manager,
             entry.CallType ?? "",
