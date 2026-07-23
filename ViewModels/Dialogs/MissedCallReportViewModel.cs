@@ -39,11 +39,20 @@ public class MissedCallReportViewModel : ViewModelBase
 {
     public static IReadOnlyList<string> CallTypes { get; } = new[]
     {
-        "Недодзвон (ще не було спілкування)", "Недодзвон (вже було спілкування)"
+        "Недозвон 1 (ще не було спілкування)",
+        "Недозвон 2 (ще не було спілкування)",
+        "Недозвон 3 (ще не було спілкування)",
+        "Недозвон 4 (ще не було спілкування)",
+        "Недодзвон (вже було спілкування)",
     };
 
-    private const string NoCommunicationCallType = "Недодзвон (ще не було спілкування)";
-    private const string FirstContactTimeFormat  = "dd.MM.yyyy HH:mm";
+    private const string NoCommunicationMarker  = "ще не було спілкування";
+    private const string FirstContactTimeFormat = "dd.MM.yyyy HH:mm";
+
+    // "Недозвон 1..4 (ще не було спілкування)" усі поводяться однаково — перевіряємо підрядком,
+    // а не точним значенням зі списку CallTypes.
+    private static bool IsNoCommunicationType(string? callType) =>
+        callType is not null && callType.Contains(NoCommunicationMarker);
 
     private readonly string _managerName;
     // Момент кліку на "Не додзвонився" — стартове значення поля часу і запасний варіант,
@@ -77,7 +86,7 @@ public class MissedCallReportViewModel : ViewModelBase
     // Ручне редагування часу "первого касання" доступне лише для "ще не було спілкування" —
     // саме цей тип надалі переводить лід у статус "Недозвон" у Kommo, тож там важливо мати
     // точний час першої спроби, а не лише момент, коли менеджер натиснув кнопку в застосунку.
-    public bool IsFirstContactTimeEditable => _selectedCallType == NoCommunicationCallType;
+    public bool IsFirstContactTimeEditable => IsNoCommunicationType(_selectedCallType);
 
     public string FirstContactTimeText
     {
@@ -112,9 +121,10 @@ public class MissedCallReportViewModel : ViewModelBase
     // (напр. дзвінок і повідомлення); "вже було спілкування" — досить одного.
     private int RequiredScreenshotCount => _selectedCallType switch
     {
-        "Недодзвон (ще не було спілкування)" => 2,
-        "Недодзвон (вже було спілкування)"   => 1,
-        _                                     => 0,
+        null                                          => 0,
+        _ when IsNoCommunicationType(_selectedCallType) => 2,
+        "Недодзвон (вже було спілкування)"              => 1,
+        _                                                => 0,
     };
 
     public string CrmUrl

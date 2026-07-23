@@ -26,13 +26,18 @@ public class KommoService : IDisposable
     private const long ProcessingSpeedLocalTimeFieldId = 1227531;
     private const long ContactPhoneFieldId             = 458590;
 
-    // Коли обрано тип дзвінка "Недодзвон (ще не було спілкування)", переводимо лід у стадію
-    // "Недозвон" воронки "Відділ продажу ЕК" (значення підтверджені живим GET /leads/pipelines
-    // саме для акаунту користувача — не змінювати без повторної перевірки). Стосується лише
-    // цього конкретного типу — "вже було спілкування" статус не чіпає.
+    // Коли обрано тип дзвінка "... (ще не було спілкування)" — і "Недодзвон (ще не було
+    // спілкування)" з CallReportView, і "Недозвон 1..4 (ще не було спілкування)" з
+    // MissedCallReportView — переводимо лід у стадію "Недозвон" воронки "Відділ продажу ЕК"
+    // (значення підтверджені живим GET /leads/pipelines саме для акаунту користувача —
+    // не змінювати без повторної перевірки). Перевіряємо підрядком, а не точним рядком, тому
+    // всі варіанти "ще не було спілкування" підпадають однаково; "вже було спілкування" статус не чіпає.
     private const long   NedozvonPipelineId              = 12703972;
     private const long   NedozvonStatusId                = 98056416;
-    private const string NedozvonNoCommunicationCallType = "Недодзвон (ще не було спілкування)";
+    private const string NoCommunicationCallTypeMarker   = "ще не було спілкування";
+
+    private static bool IsNoCommunicationCallType(string? callType) =>
+        callType is not null && callType.Contains(NoCommunicationCallTypeMarker);
 
     public KommoService(AppSettings settings) => _settings = settings;
 
@@ -87,7 +92,7 @@ public class KommoService : IDisposable
         var callTypeTask = !string.IsNullOrWhiteSpace(callType)
             ? PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType)
             : Task.CompletedTask;
-        var statusTask   = callType == NedozvonNoCommunicationCallType
+        var statusTask   = IsNoCommunicationCallType(callType)
             ? PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId)
             : Task.CompletedTask;
 
@@ -141,7 +146,7 @@ public class KommoService : IDisposable
         if (!string.IsNullOrWhiteSpace(callType))
             await PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType);
 
-        if (callType == NedozvonNoCommunicationCallType)
+        if (IsNoCommunicationCallType(callType))
             await PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId);
 
         return null;
