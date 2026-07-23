@@ -113,12 +113,8 @@
                                         </Style>
                                     </Border.Style>
                                     <TextBox
-                                        Cursor="Arrow"
-                                        Focusable="False"
-                                        IsReadOnly="True"
-                                        IsReadOnlyCaretVisible="False"
                                         Style="{StaticResource AppTextBox}"
-                                        Text="{Binding FirstContactTimeText, Mode=OneWay}"
+                                        Text="{Binding FirstContactTimeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         TextAlignment="Center" />
                                 </Border>
 
