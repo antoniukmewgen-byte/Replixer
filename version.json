@@ -1,5 +1,5 @@
 {
-  "version": "1.5.4",
+  "version": "1.5.5",
   "files": [
     {
       "path": "Accessibility.dll",
@@ -65,6 +65,11 @@
       "path": "Google.Apis.Drive.v3.dll",
       "sha256": "6dbe449e982bbde2a5848debe03b749b213285786caaf36796dd4d04b0ef4aa5",
       "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.2/Google.Apis.Drive.v3.dll"
+    },
+    {
+      "path": "Google.Apis.Sheets.v4.dll",
+      "sha256": "c4cc07bb0365a4d4542b692403db95f5f9f2e77e86fd3fd0f8c2aa80ba197ec4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.5/Google.Apis.Sheets.v4.dll"
     },
     {
       "path": "Hardcodet.NotifyIcon.Wpf.dll",
@@ -323,18 +328,18 @@
     },
     {
       "path": "Replixer.deps.json",
-      "sha256": "3cda9fac36c7a90281d1796a632bc7afba1478056ae80a105c5a6a1195de461e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.4/Replixer.deps.json"
+      "sha256": "688fca5e78294168b533cad3fead2839346a1069bb0f2b63df6ad472f4d402e5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.5/Replixer.deps.json"
     },
     {
       "path": "Replixer.dll",
-      "sha256": "c87a4309295bc9cd73832dec755341f587fdc6660d2234cda203657a794356a7",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.4/Replixer.dll"
+      "sha256": "f07fab4d741ed8e64210ef24dc668c8ec1ddd09f1e1e83ec7c65db991a528bda",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.5/Replixer.dll"
     },
     {
       "path": "Replixer.exe",
-      "sha256": "f5d501678bcd7558d0675215d0fd61a28e150b3172fdea0299c6229ac38bbec0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.4/Replixer.exe"
+      "sha256": "5cdfef74cea61c64f8bea4ccee356918749fad251e8d76373a4be0a07602db6c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.5/Replixer.exe"
     },
     {
       "path": "Replixer.runtimeconfig.json",
