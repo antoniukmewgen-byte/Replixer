@@ -93,7 +93,7 @@ public class KommoService : IDisposable
             ? PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType)
             : Task.CompletedTask;
         var statusTask   = IsNoCommunicationCallType(callType)
-            ? PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId)
+            ? TryAdvanceToNedozvonStatusAsync(baseUrl, token, leadId)
             : Task.CompletedTask;
 
         await Task.WhenAll(noteTask, dateTask, callTypeTask, statusTask);
@@ -147,7 +147,7 @@ public class KommoService : IDisposable
             await PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType);
 
         if (IsNoCommunicationCallType(callType))
-            await PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId);
+            await TryAdvanceToNedozvonStatusAsync(baseUrl, token, leadId);
 
         return null;
     }
@@ -691,6 +691,111 @@ public class KommoService : IDisposable
                 ErrorReporter.Report("KOMMO", $"PatchLeadField exception — лід {leadId}, поле {fieldId}: {ex.Message}", ex);
                 return;
             }
+        }
+    }
+
+    // Угода не повинна рухатись назад по воронці: якщо вона вже в тій самій воронці
+    // "Відділ продажу ЕК", але на стадії, що йде ПІСЛЯ "Недозвону" (менеджер вже просунув
+    // угоду далі — наприклад, додзвонився і провів переговори), пропускаємо зміну статусу.
+    // Якщо угода в іншій воронці (ще не потрапляла в цю) або на попередній/тій самій стадії —
+    // переводимо в "Недозвон" як і раніше. При будь-якій помилці визначення поточної позиції —
+    // не блокуємо: застосовуємо статус як і до цієї зміни (безпечніший дефолт, ніж мовчки нічого не зробити).
+    private async Task TryAdvanceToNedozvonStatusAsync(string baseUrl, string token, string leadId)
+    {
+        try
+        {
+            var (currentPipelineId, currentStatusId) = await GetLeadPipelineStatusAsync(baseUrl, token, leadId);
+
+            if (currentPipelineId == NedozvonPipelineId &&
+                currentStatusId.HasValue &&
+                currentStatusId.Value != NedozvonStatusId)
+            {
+                var sortById = await GetPipelineStatusSortOrderAsync(baseUrl, token, NedozvonPipelineId);
+
+                if (sortById is not null &&
+                    sortById.TryGetValue(currentStatusId.Value, out var currentSort) &&
+                    sortById.TryGetValue(NedozvonStatusId, out var nedozvonSort) &&
+                    currentSort > nedozvonSort)
+                {
+                    Debug.WriteLine($"[Kommo] Лід {leadId} вже на стадії {currentStatusId} (sort {currentSort}), що йде після 'Недозвону' (sort {nedozvonSort}) — статус не змінюємо");
+                    return;
+                }
+            }
+
+            await PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] TryAdvanceToNedozvonStatus failed: {ex.Message} — застосовуємо статус як є");
+            await PatchLeadStatusAsync(baseUrl, token, leadId, NedozvonStatusId, NedozvonPipelineId);
+        }
+    }
+
+    private async Task<(long? pipelineId, long? statusId)> GetLeadPipelineStatusAsync(string baseUrl, string token, string leadId)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/{leadId}");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
+
+            if (!res.IsSuccessStatusCode)
+            {
+                var snippet = body.Length > 300 ? body[..300] : body;
+                ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
+                return (null, null);
+            }
+
+            using var doc = JsonDocument.Parse(body);
+            var root = doc.RootElement;
+            long? pipelineId = root.TryGetProperty("pipeline_id", out var pid) ? pid.GetInt64() : null;
+            long? statusId   = root.TryGetProperty("status_id", out var sid) ? sid.GetInt64() : null;
+            return (pipelineId, statusId);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] GetLeadPipelineStatus failed: {ex.Message}");
+            return (null, null);
+        }
+    }
+
+    // sort — офіційне поле Kommo, що визначає порядок стадій у воронці (менше значення = раніше).
+    private async Task<Dictionary<long, int>?> GetPipelineStatusSortOrderAsync(string baseUrl, string token, long pipelineId)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/pipelines/{pipelineId}");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var res  = await _http.SendAsync(req);
+            var body = await res.Content.ReadAsStringAsync();
+
+            if (!res.IsSuccessStatusCode)
+            {
+                var snippet = body.Length > 300 ? body[..300] : body;
+                ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder HTTP {(int)res.StatusCode} — воронка {pipelineId}: {snippet}");
+                return null;
+            }
+
+            using var doc = JsonDocument.Parse(body);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("_embedded", out var emb) ||
+                !emb.TryGetProperty("statuses", out var statuses) ||
+                statuses.ValueKind != JsonValueKind.Array)
+                return null;
+
+            var result = new Dictionary<long, int>();
+            foreach (var s in statuses.EnumerateArray())
+                if (s.TryGetProperty("id", out var idProp) && s.TryGetProperty("sort", out var sortProp))
+                    result[idProp.GetInt64()] = sortProp.GetInt32();
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Kommo] GetPipelineStatusSortOrder failed: {ex.Message}");
+            return null;
         }
     }
 
