@@ -204,44 +204,66 @@ public class KommoService : IDisposable
     {
         try
         {
-            var (createdAt, existingFirstContactUnix, contactId, companyId) =
+            var (createdAt, existingFirstContactUnix, firstContactOccupied, contactId, companyId,
+                existingSpeedMinutes, speedMinutesOccupied, existingSpeedWorkMinutes, speedWorkMinutesOccupied) =
                 await GetLeadDetailsAsync(baseUrl, token, leadId);
 
-            long firstContactUnix;
+            // "Дата и время первого касания" — байдуже, яким саме значенням воно заповнене
+            // (дата, число чи навіть текст): якщо там вже щось є, нічого не пишемо. Порожнє —
+            // проставляємо. firstContactUnix потрібен лише для розрахунку швидкості нижче,
+            // тож якщо поле зайняте нечисловим значенням — просто пропускаємо той розрахунок.
+            long? firstContactUnix;
 
-            if (existingFirstContactUnix.HasValue)
+            if (firstContactOccupied)
             {
-                // Field already has a value — reuse it instead of overwriting, and still
-                // (re)compute the processing-speed fields from that existing timestamp.
-                Debug.WriteLine("[Kommo] First-contact field already has a value — using it for the speed calc");
-                firstContactUnix = existingFirstContactUnix.Value;
+                Debug.WriteLine("[Kommo] First-contact field already has a value — keeping it as is");
+                firstContactUnix = existingFirstContactUnix;
             }
             else
             {
                 firstContactUnix = new DateTimeOffset(callStartTime.ToUniversalTime()).ToUnixTimeSeconds();
-                await PatchLeadFieldAsync(baseUrl, token, leadId, FirstContactFieldId, firstContactUnix);
+                await PatchLeadFieldAsync(baseUrl, token, leadId, FirstContactFieldId, firstContactUnix.Value);
             }
 
-            if (createdAt.HasValue)
+            // "Скорость обработки в мин" — та сама логіка: зайняте (будь-яким типом значення) —
+            // не чіпаємо і повертаємо як є (щоб MissedCallDeliveryService міг продублювати те
+            // саме в Google Таблицю); порожнє і є з чого порахувати — проставляємо.
+            int? minutes = existingSpeedMinutes;
+            if (!speedMinutesOccupied && createdAt.HasValue && firstContactUnix.HasValue)
             {
                 var leadCreatedUtc  = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
-                var firstContactUtc = DateTimeOffset.FromUnixTimeSeconds(firstContactUnix).UtcDateTime;
+                var firstContactUtc = DateTimeOffset.FromUnixTimeSeconds(firstContactUnix.Value).UtcDateTime;
 
-                int minutes = (int)Math.Round(Math.Abs((leadCreatedUtc - firstContactUtc).TotalMinutes));
+                minutes = (int)Math.Round(Math.Abs((leadCreatedUtc - firstContactUtc).TotalMinutes));
                 Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, firstContact={firstContactUtc:u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
+            }
+            else if (speedMinutesOccupied)
+            {
+                Debug.WriteLine("[Kommo] Processing-speed field already has a value — keeping it as is");
+            }
 
-                int? workMinutes = null;
+            // "Скорость обработки в рабочее время" — те саме: не чіпаємо, якщо вже зайняте.
+            int? workMinutes = existingSpeedWorkMinutes;
+            if (speedWorkMinutesOccupied)
+            {
+                Debug.WriteLine("[Kommo] Working-hours processing-speed field already has a value — keeping it as is");
+            }
+            else if (createdAt.HasValue && firstContactUnix.HasValue)
+            {
+                var leadCreatedUtc  = DateTimeOffset.FromUnixTimeSeconds(createdAt.Value).UtcDateTime;
+                var firstContactUtc = DateTimeOffset.FromUnixTimeSeconds(firstContactUnix.Value).UtcDateTime;
+
                 if (contactId is not null || companyId is not null)
                     workMinutes = await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, companyId, leadCreatedUtc, firstContactUtc);
                 else
                     ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту чи компанії — поле 'Скорость обработки в рабочее время' не заповнено");
-
-                return (minutes, workMinutes);
             }
 
-            Debug.WriteLine("[Kommo] created_at not available — skipping processing speed");
-            return (null, null);
+            if (!createdAt.HasValue || !firstContactUnix.HasValue)
+                Debug.WriteLine("[Kommo] created_at / first-contact unavailable as numbers — skipping processing speed calc");
+
+            return (minutes, workMinutes);
         }
         catch (Exception ex)
         {
@@ -488,7 +510,32 @@ public class KommoService : IDisposable
         return null;
     }
 
-    private async Task<(long? createdAt, long? firstContactUnix, string? contactId, string? companyId)> GetLeadDetailsAsync(
+    // Поле вважається "вже заповненим", якщо в ньому лежить БУДЬ-яке непорожнє значення —
+    // байдуже, дата (число-таймстамп), число (хвилини) чи текст (хтось міг вручну ввести
+    // значення в полі іншого типу). У такому разі просто нічого не пишемо в нього.
+    private static bool TryGetOccupiedValue(JsonElement valuesArray, out JsonElement value)
+    {
+        foreach (var v in valuesArray.EnumerateArray())
+        {
+            if (!v.TryGetProperty("value", out var val)) continue;
+
+            bool occupied = val.ValueKind switch
+            {
+                JsonValueKind.Number             => val.GetInt64() != 0,
+                JsonValueKind.String              => !string.IsNullOrWhiteSpace(val.GetString()),
+                JsonValueKind.True or JsonValueKind.False => true,
+                _                                  => false,
+            };
+
+            if (occupied) { value = val; return true; }
+        }
+
+        value = default;
+        return false;
+    }
+
+    private async Task<(long? createdAt, long? firstContactUnix, bool firstContactOccupied, string? contactId, string? companyId,
+        int? speedMinutes, bool speedMinutesOccupied, int? speedWorkMinutes, bool speedWorkMinutesOccupied)> GetLeadDetailsAsync(
         string baseUrl, string token, string leadId)
     {
         const int maxAttempts = 3;
@@ -506,29 +553,51 @@ public class KommoService : IDisposable
                 {
                     var snippet = body.Length > 300 ? body[..300] : body;
                     ErrorReporter.Report("KOMMO", $"GetLeadDetails HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
-                    return (null, null, null, null);
+                    return (null, null, false, null, null, null, false, null, false);
                 }
 
                 using var doc = JsonDocument.Parse(body);
                 var root = doc.RootElement;
                 long? createdAt = root.TryGetProperty("created_at", out var ca) ? ca.GetInt64() : null;
 
-                long? firstContactUnix = null;
+                long? firstContactUnix          = null;
+                bool  firstContactOccupied      = false;
+                int?  speedMinutes              = null;
+                bool  speedMinutesOccupied      = false;
+                int?  speedWorkMinutes          = null;
+                bool  speedWorkMinutesOccupied  = false;
                 if (root.TryGetProperty("custom_fields_values", out var fields) &&
                     fields.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var field in fields.EnumerateArray())
                     {
-                        if (!field.TryGetProperty("field_id", out var fid) ||
-                            fid.GetInt64() != FirstContactFieldId) continue;
+                        if (!field.TryGetProperty("field_id", out var fid)) continue;
+                        long id = fid.GetInt64();
+                        if (id != FirstContactFieldId && id != ProcessingSpeedFieldId && id != ProcessingSpeedLocalTimeFieldId)
+                            continue;
 
-                        if (field.TryGetProperty("values", out var vals) && vals.ValueKind == JsonValueKind.Array)
-                            foreach (var v in vals.EnumerateArray())
-                                if (v.TryGetProperty("value", out var val) &&
-                                    val.ValueKind == JsonValueKind.Number &&
-                                    val.GetInt64() != 0)
-                                { firstContactUnix = val.GetInt64(); break; }
-                        break;
+                        if (!field.TryGetProperty("values", out var vals) || vals.ValueKind != JsonValueKind.Array)
+                            continue;
+
+                        if (!TryGetOccupiedValue(vals, out var val)) continue;
+
+                        long? numericValue = val.ValueKind == JsonValueKind.Number ? val.GetInt64() : null;
+
+                        if (id == FirstContactFieldId)
+                        {
+                            firstContactOccupied = true;
+                            firstContactUnix     = numericValue;
+                        }
+                        else if (id == ProcessingSpeedFieldId)
+                        {
+                            speedMinutesOccupied = true;
+                            speedMinutes         = (int?)numericValue;
+                        }
+                        else if (id == ProcessingSpeedLocalTimeFieldId)
+                        {
+                            speedWorkMinutesOccupied = true;
+                            speedWorkMinutes         = (int?)numericValue;
+                        }
                     }
                 }
 
@@ -556,7 +625,8 @@ public class KommoService : IDisposable
                         companyId = companyIdProp.GetInt64().ToString();
                 }
 
-                return (createdAt, firstContactUnix, contactId, companyId);
+                return (createdAt, firstContactUnix, firstContactOccupied, contactId, companyId,
+                    speedMinutes, speedMinutesOccupied, speedWorkMinutes, speedWorkMinutesOccupied);
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
@@ -567,10 +637,10 @@ public class KommoService : IDisposable
             {
                 Debug.WriteLine($"[Kommo] GetLeadDetails failed: {ex.Message}");
                 ErrorReporter.Report("KOMMO", $"GetLeadDetails exception — лід {leadId}: {ex.Message}", ex);
-                return (null, null, null, null);
+                return (null, null, false, null, null, null, false, null, false);
             }
         }
-        return (null, null, null, null);
+        return (null, null, false, null, null, null, false, null, false);
     }
 
     private async Task PatchLeadFieldAsync(string baseUrl, string token, string leadId, long fieldId, object value)
