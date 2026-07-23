@@ -56,9 +56,11 @@
                 <dialogViews:UpdateDialogView />
             </DataTemplate>
 
-            <!--  Model → View: неявні шаблони для ItemsControl без явного ItemTemplate,
-                  щоб один список міг рендерити впереміш RecordingEntry і MissedCallEntry
-                  (див. HomeViewModel.RecentActivity + HomePage.xaml)  -->
+            <!--
+                Model → View: неявні шаблони для ItemsControl без явного ItemTemplate,
+                щоб один список міг рендерити впереміш RecordingEntry і MissedCallEntry
+                (див. HomeViewModel.RecentActivity + HomePage.xaml)
+            -->
             <DataTemplate DataType="{x:Type models:RecordingEntry}">
                 <views:RecordingItemView />
             </DataTemplate>

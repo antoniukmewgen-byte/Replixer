@@ -48,9 +48,7 @@
                         </StackPanel>
 
                         <!--  Час першого дзвінка — редагується лише для "ще не було спілкування"  -->
-                        <StackPanel
-                            Margin="0,12,0,0"
-                            Visibility="{Binding IsFirstContactTimeEditable, Converter={StaticResource BoolToVis}}">
+                        <StackPanel Margin="0,12,0,0" Visibility="{Binding IsFirstContactTimeEditable, Converter={StaticResource BoolToVis}}">
                             <TextBlock
                                 Margin="0,0,0,4"
                                 FontFamily="{StaticResource InterFont}"
@@ -115,12 +113,12 @@
                                         </Style>
                                     </Border.Style>
                                     <TextBox
-                                        Style="{StaticResource AppTextBox}"
-                                        Text="{Binding FirstContactTimeText, Mode=OneWay}"
+                                        Cursor="Arrow"
+                                        Focusable="False"
                                         IsReadOnly="True"
                                         IsReadOnlyCaretVisible="False"
-                                        Focusable="False"
-                                        Cursor="Arrow"
+                                        Style="{StaticResource AppTextBox}"
+                                        Text="{Binding FirstContactTimeText, Mode=OneWay}"
                                         TextAlignment="Center" />
                                 </Border>
 
