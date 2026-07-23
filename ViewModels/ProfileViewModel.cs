@@ -6,6 +6,7 @@ using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Replixer.ViewModels;
@@ -16,6 +17,7 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     private readonly GoogleDriveUploadService _uploader;
     private readonly TelegramUploadService _telegram;
     private readonly KommoService _kommo;
+    private readonly GoogleSheetsUploadService _sheetsUploader;
     private readonly RecordingsViewModel _recordings;
 
     public static IReadOnlyList<string> Positions => Dialogs.CallReportViewModel.Positions;
@@ -168,6 +170,52 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     public AsyncRelayCommand TestKommoConnectionCommand { get; }
 
+    public bool IsGoogleSheetsEnabled
+    {
+        get => _settings.IsGoogleSheetsEnabled;
+        set => _settings.IsGoogleSheetsEnabled = value;
+    }
+
+    public string GoogleSheetsId
+    {
+        get => _settings.GoogleSheetsId;
+        // Приймаємо або голий ID, або повне посилання на таблицю — одразу вирізаємо ID,
+        // щоб у _settings (і, відповідно, у виклику AppendRowAsync) завжди лежав чистий ID,
+        // а не URL. Раніше вирізання відбувалось лише перед тестовим підключенням
+        // (TestSheetsConnectionAsync), тому кнопка "Перевірити" показувала успіх, а реальна
+        // доставка недодзвону в Таблицю падала з 404 — Sheets API не приймає URL як spreadsheetId.
+        set => _settings.GoogleSheetsId = ExtractSpreadsheetId(value);
+    }
+
+    public string GoogleSheetsTabName
+    {
+        get => _settings.GoogleSheetsTabName;
+        set => _settings.GoogleSheetsTabName = value;
+    }
+
+    private bool? _isSheetsConnected;
+    public bool? IsSheetsConnected
+    {
+        get => _isSheetsConnected;
+        private set { SetField(ref _isSheetsConnected, value); _settings.IsGoogleSheetsConnected = value; }
+    }
+
+    private bool _isCheckingSheets;
+    public bool IsCheckingSheets
+    {
+        get => _isCheckingSheets;
+        private set => SetField(ref _isCheckingSheets, value);
+    }
+
+    private string? _sheetsConnectionError;
+    public string? SheetsConnectionError
+    {
+        get => _sheetsConnectionError;
+        private set => SetField(ref _sheetsConnectionError, value);
+    }
+
+    public AsyncRelayCommand TestSheetsConnectionCommand { get; }
+
     public RelayCommand ClearAllDataCommand { get; }
 
     public ProfileViewModel(
@@ -175,26 +223,30 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         GoogleDriveUploadService uploader,
         TelegramUploadService telegram,
         KommoService kommo,
+        GoogleSheetsUploadService sheetsUploader,
         RecordingsViewModel recordings)
     {
-        _settings   = settings;
-        _uploader   = uploader;
-        _telegram   = telegram;
-        _kommo      = kommo;
-        _recordings = recordings;
+        _settings       = settings;
+        _uploader       = uploader;
+        _telegram       = telegram;
+        _kommo          = kommo;
+        _sheetsUploader = sheetsUploader;
+        _recordings     = recordings;
 
         _isDriveConnected    = settings.IsGoogleDriveConnected;
         _isTelegramConnected = telegram.IsAuthorized ? true : settings.IsTelegramConnected;
         _isKommoConnected    = settings.IsKommoConnected;
+        _isSheetsConnected   = settings.IsGoogleSheetsConnected;
         _selectedTelegramChat = settings.Position == "Кваліфікатор"
             ? TelegramChats.FirstOrDefault(c => c.Name == "Чат Kvalifikatory Team")
             : TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
 
-        TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
-        TelegramActionCommand      = new RelayCommand(TelegramAction);
-        LogoutTelegramCommand      = new RelayCommand(LogoutTelegram);
-        TestKommoConnectionCommand = new AsyncRelayCommand(TestKommoConnectionAsync);
-        ClearAllDataCommand        = new RelayCommand(ClearAllData);
+        TestDriveConnectionCommand  = new AsyncRelayCommand(TestDriveConnectionAsync);
+        TelegramActionCommand       = new RelayCommand(TelegramAction);
+        LogoutTelegramCommand       = new RelayCommand(LogoutTelegram);
+        TestKommoConnectionCommand  = new AsyncRelayCommand(TestKommoConnectionAsync);
+        TestSheetsConnectionCommand = new AsyncRelayCommand(TestSheetsConnectionAsync);
+        ClearAllDataCommand         = new RelayCommand(ClearAllData);
 
         _settings.PropertyChanged    += OnSettingsChanged;
         _telegram.SessionInvalidated += OnSessionInvalidated;
@@ -230,6 +282,32 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             if (error is not null)
                 ErrorReporter.Report("KOMMO CRM", error);
         });
+    }
+
+    private async Task TestSheetsConnectionAsync()
+    {
+        IsSheetsConnected     = null;
+        SheetsConnectionError = null;
+        IsCheckingSheets       = true;
+        string id     = ExtractSpreadsheetId(_settings.GoogleSheetsId);
+        string? error = await _sheetsUploader.TestAccessAsync(id, _settings.GoogleSheetsTabName);
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            IsCheckingSheets      = false;
+            IsSheetsConnected     = error is null;
+            SheetsConnectionError = error;
+            if (error is not null)
+                ErrorReporter.Report("GOOGLE SHEETS", error);
+        });
+    }
+
+    // Дозволяємо вставити або "голий" ID, або повне посилання на таблицю —
+    // https://docs.google.com/spreadsheets/d/{ID}/edit#gid=0.
+    private static string ExtractSpreadsheetId(string input)
+    {
+        input = input.Trim();
+        var match = Regex.Match(input, @"/spreadsheets/d/([a-zA-Z0-9_-]+)");
+        return match.Success ? match.Groups[1].Value : input;
     }
 
     private void TelegramAction() => _ = AuthorizeTelegramAsync();
@@ -309,6 +387,10 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
         _settings.KommoSubdomain   = string.Empty;
         _settings.KommoApiToken    = string.Empty;
         _settings.IsKommoConnected = null;
+        _settings.IsGoogleSheetsEnabled   = false;
+        _settings.GoogleSheetsId          = string.Empty;
+        _settings.GoogleSheetsTabName     = string.Empty;
+        _settings.IsGoogleSheetsConnected = null;
         _settings.IsSetupComplete = false;
         _settings.Flush();
 
@@ -389,6 +471,21 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
                 IsKommoConnected     = null;
                 KommoConnectionError = null;
                 IsCheckingKommo      = false;
+                break;
+            case nameof(AppSettings.IsGoogleSheetsEnabled):
+                OnPropertyChanged(nameof(IsGoogleSheetsEnabled));
+                break;
+            case nameof(AppSettings.GoogleSheetsId):
+                OnPropertyChanged(nameof(GoogleSheetsId));
+                IsSheetsConnected     = null;
+                SheetsConnectionError = null;
+                IsCheckingSheets      = false;
+                break;
+            case nameof(AppSettings.GoogleSheetsTabName):
+                OnPropertyChanged(nameof(GoogleSheetsTabName));
+                IsSheetsConnected     = null;
+                SheetsConnectionError = null;
+                IsCheckingSheets      = false;
                 break;
         }
     }

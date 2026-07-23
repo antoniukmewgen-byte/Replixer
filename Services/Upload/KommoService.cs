@@ -58,9 +58,14 @@ public class KommoService : IDisposable
         catch (Exception ex) { return ex.Message; }
     }
 
-    public async Task<long?> ProcessLeadAsync(string leadUrl, string noteText, DateTime? callStartTime = null, string? callType = null)
+    // ProcessingSpeedMinutes/ProcessingSpeedWorkMinutes — ті самі числа, що патчаться в кастомні
+    // поля Kommo (ProcessingSpeedFieldId/ProcessingSpeedLocalTimeFieldId) всередині
+    // TrySetFirstContactDateAsync; повертаємо їх нагору, щоб викликач (MissedCallDeliveryService)
+    // міг продублювати ті самі значення в Google Таблицю без повторного походу в Kommo API.
+    public async Task<(long? NoteId, int? ProcessingSpeedMinutes, int? ProcessingSpeedWorkMinutes)> ProcessLeadAsync(
+        string leadUrl, string noteText, DateTime? callStartTime = null, string? callType = null)
     {
-        if (!IsEnabled) return null;
+        if (!IsEnabled) return (null, null, null);
 
         var (subdomain, leadId) = ParseLeadUrl(leadUrl);
         subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
@@ -69,7 +74,7 @@ public class KommoService : IDisposable
         {
             Debug.WriteLine($"[Kommo] Cannot parse lead URL: {leadUrl}");
             ErrorReporter.Report("KOMMO", $"Не вдалося розпарсити URL ліда: {leadUrl}");
-            return null;
+            return (null, null, null);
         }
 
         string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
@@ -78,7 +83,7 @@ public class KommoService : IDisposable
         var noteTask     = PostNoteAsync(baseUrl, token, leadId, noteText);
         var dateTask     = callStartTime.HasValue
             ? TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime.Value)
-            : Task.CompletedTask;
+            : Task.FromResult<(int? Minutes, int? WorkMinutes)>((null, null));
         var callTypeTask = !string.IsNullOrWhiteSpace(callType)
             ? PatchLeadFieldAsync(baseUrl, token, leadId, CallTypeFieldId, (object)callType)
             : Task.CompletedTask;
@@ -87,7 +92,8 @@ public class KommoService : IDisposable
             : Task.CompletedTask;
 
         await Task.WhenAll(noteTask, dateTask, callTypeTask, statusTask);
-        return await noteTask;
+        var (speedMinutes, speedWorkMinutes) = await dateTask;
+        return (await noteTask, speedMinutes, speedWorkMinutes);
     }
 
     public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
@@ -194,7 +200,7 @@ public class KommoService : IDisposable
         return null;
     }
 
-    private async Task TrySetFirstContactDateAsync(string baseUrl, string token, string leadId, DateTime callStartTime)
+    private async Task<(int? Minutes, int? WorkMinutes)> TrySetFirstContactDateAsync(string baseUrl, string token, string leadId, DateTime callStartTime)
     {
         try
         {
@@ -225,24 +231,27 @@ public class KommoService : IDisposable
                 Debug.WriteLine($"[Kommo] Processing speed: {minutes} min (created={leadCreatedUtc:u}, firstContact={firstContactUtc:u})");
                 await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedFieldId, minutes);
 
+                int? workMinutes = null;
                 if (contactId is not null || companyId is not null)
-                    await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, companyId, leadCreatedUtc, firstContactUtc);
+                    workMinutes = await TrySetLocalTimeProcessingSpeedAsync(baseUrl, token, leadId, contactId, companyId, leadCreatedUtc, firstContactUtc);
                 else
                     ErrorReporter.Report("KOMMO", $"Лід {leadId} без прив'язаного контакту чи компанії — поле 'Скорость обработки в рабочее время' не заповнено");
+
+                return (minutes, workMinutes);
             }
-            else
-            {
-                Debug.WriteLine("[Kommo] created_at not available — skipping processing speed");
-            }
+
+            Debug.WriteLine("[Kommo] created_at not available — skipping processing speed");
+            return (null, null);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] TrySetFirstContact failed: {ex.Message}");
             ErrorReporter.Report("KOMMO", $"TrySetFirstContact exception — лід {leadId}: {ex.Message}", ex);
+            return (null, null);
         }
     }
 
-    private async Task TrySetLocalTimeProcessingSpeedAsync(
+    private async Task<int?> TrySetLocalTimeProcessingSpeedAsync(
         string baseUrl, string token, string leadId, string? contactId, string? companyId, DateTime leadCreatedUtc, DateTime callStartUtc)
     {
         string? phone = contactId is not null ? await GetContactPhoneAsync(baseUrl, token, contactId) : null;
@@ -257,7 +266,7 @@ public class KommoService : IDisposable
         {
             Debug.WriteLine("[Kommo] Neither contact nor company has a phone — skipping local-time processing speed");
             ErrorReporter.Report("KOMMO", $"Контакт {contactId ?? "—"} і компанія {companyId ?? "—"} (лід {leadId}) без телефону — поле 'Скорость обработки в рабочее время' не заповнено");
-            return;
+            return null;
         }
 
         var (timeZone, isUkrainian) = TryResolveTimeZoneFromPhone(phone);
@@ -265,7 +274,7 @@ public class KommoService : IDisposable
         {
             Debug.WriteLine($"[Kommo] Could not resolve timezone for phone '{phone}' — skipping local-time processing speed");
             ErrorReporter.Report("KOMMO", $"Не вдалося визначити часовий пояс за номером '{phone}' (контакт {contactId}, лід {leadId}) — поле 'Скорость обработки в рабочее время' не заповнено");
-            return;
+            return null;
         }
 
         var leadCreatedLocal = TimeZoneInfo.ConvertTimeFromUtc(leadCreatedUtc, timeZone);
@@ -286,6 +295,7 @@ public class KommoService : IDisposable
 
         Debug.WriteLine($"[Kommo] Processing speed (working hours, {timeZone.Id}{(isUkrainian ? ", UA +7h window" : "")}): {minutes} min");
         await PatchLeadFieldAsync(baseUrl, token, leadId, ProcessingSpeedLocalTimeFieldId, minutes);
+        return minutes;
     }
 
     // Sums only the portion of [startLocal, endLocal] that falls within the daily

@@ -3,6 +3,7 @@ using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Upload;
 using Replixer.ViewModels.Dialogs;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -12,6 +13,7 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 {
     private readonly AppSettings _settings;
     private readonly GoogleDriveUploadService _driveUploader;
+    private readonly GoogleSheetsUploadService _sheetsUploader;
     private readonly TelegramUploadService _telegram;
     private readonly KommoService _kommo;
 
@@ -188,6 +190,55 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public AsyncRelayCommand TestKommoConnectionCommand { get; }
 
+    // Приймає або "голий" ID таблиці, або повне посилання виду
+    // https://docs.google.com/spreadsheets/d/{ID}/edit#gid=0 — ID вирізається автоматично.
+    private string _googleSheetsId = string.Empty;
+    public string GoogleSheetsId
+    {
+        get => _googleSheetsId;
+        set
+        {
+            SetField(ref _googleSheetsId, value);
+            IsSheetsConnected     = null;
+            SheetsConnectionError = null;
+        }
+    }
+
+    private string _googleSheetsTabName = string.Empty;
+    public string GoogleSheetsTabName
+    {
+        get => _googleSheetsTabName;
+        set
+        {
+            SetField(ref _googleSheetsTabName, value);
+            IsSheetsConnected     = null;
+            SheetsConnectionError = null;
+        }
+    }
+
+    private bool? _isSheetsConnected;
+    public bool? IsSheetsConnected
+    {
+        get => _isSheetsConnected;
+        private set => SetField(ref _isSheetsConnected, value);
+    }
+
+    private bool _isCheckingSheets;
+    public bool IsCheckingSheets
+    {
+        get => _isCheckingSheets;
+        private set => SetField(ref _isCheckingSheets, value);
+    }
+
+    private string? _sheetsConnectionError;
+    public string? SheetsConnectionError
+    {
+        get => _sheetsConnectionError;
+        private set => SetField(ref _sheetsConnectionError, value);
+    }
+
+    public AsyncRelayCommand TestSheetsConnectionCommand { get; }
+
     private ViewModelBase? _dialog;
     public ViewModelBase? Dialog
     {
@@ -200,12 +251,13 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
 
     public RelayCommand FinishCommand { get; }
 
-    public SetupViewModel(AppSettings settings, GoogleDriveUploadService driveUploader, TelegramUploadService telegram, KommoService kommo)
+    public SetupViewModel(AppSettings settings, GoogleDriveUploadService driveUploader, GoogleSheetsUploadService sheetsUploader, TelegramUploadService telegram, KommoService kommo)
     {
-        _settings      = settings;
-        _driveUploader = driveUploader;
-        _telegram      = telegram;
-        _kommo         = kommo;
+        _settings       = settings;
+        _driveUploader  = driveUploader;
+        _sheetsUploader = sheetsUploader;
+        _telegram       = telegram;
+        _kommo          = kommo;
 
         if (settings.IsSetupComplete)
         {
@@ -221,11 +273,14 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             : TelegramChats.FirstOrDefault(c => c.Id == settings.TelegramChatId && c.TopicId == settings.TelegramTopicId);
         _kommoSubdomain       = settings.KommoSubdomain;
         _kommoApiToken        = settings.KommoApiToken;
+        _googleSheetsId       = settings.GoogleSheetsId;
+        _googleSheetsTabName  = settings.GoogleSheetsTabName;
 
-        TestDriveConnectionCommand = new AsyncRelayCommand(TestDriveConnectionAsync);
-        TelegramActionCommand      = new RelayCommand(() => _ = AuthorizeTelegramAsync());
-        TestKommoConnectionCommand = new AsyncRelayCommand(TestKommoConnectionAsync);
-        FinishCommand              = new RelayCommand(Finish, () => CanFinish);
+        TestDriveConnectionCommand  = new AsyncRelayCommand(TestDriveConnectionAsync);
+        TelegramActionCommand       = new RelayCommand(() => _ = AuthorizeTelegramAsync());
+        TestKommoConnectionCommand  = new AsyncRelayCommand(TestKommoConnectionAsync);
+        TestSheetsConnectionCommand = new AsyncRelayCommand(TestSheetsConnectionAsync);
+        FinishCommand               = new RelayCommand(Finish, () => CanFinish);
     }
 
     private async Task TestDriveConnectionAsync()
@@ -295,6 +350,32 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
         });
     }
 
+    private async Task TestSheetsConnectionAsync()
+    {
+        IsSheetsConnected     = null;
+        SheetsConnectionError = null;
+        IsCheckingSheets       = true;
+        string id    = ExtractSpreadsheetId(_googleSheetsId);
+        string? error = await _sheetsUploader.TestAccessAsync(id, _googleSheetsTabName);
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            IsCheckingSheets      = false;
+            IsSheetsConnected     = error is null;
+            SheetsConnectionError = error;
+            if (error is not null)
+                ErrorReporter.Report("GOOGLE SHEETS", error);
+        });
+    }
+
+    // Дозволяємо вставити або "голий" ID, або повне посилання на таблицю —
+    // https://docs.google.com/spreadsheets/d/{ID}/edit#gid=0.
+    private static string ExtractSpreadsheetId(string input)
+    {
+        input = input.Trim();
+        var match = Regex.Match(input, @"/spreadsheets/d/([a-zA-Z0-9_-]+)");
+        return match.Success ? match.Groups[1].Value : input;
+    }
+
     private void Finish()
     {
         _settings.ManagerName    = _managerName.Trim();
@@ -326,6 +407,14 @@ public sealed class SetupViewModel : ViewModelBase, IDialogHost
             _settings.KommoApiToken    = _kommoApiToken;
             _settings.IsKommoEnabled   = _isKommoConnected == true;
             _settings.IsKommoConnected = _isKommoConnected;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_googleSheetsId))
+        {
+            _settings.GoogleSheetsId        = ExtractSpreadsheetId(_googleSheetsId);
+            _settings.GoogleSheetsTabName    = _googleSheetsTabName.Trim();
+            _settings.IsGoogleSheetsEnabled  = _isSheetsConnected == true;
+            _settings.IsGoogleSheetsConnected = _isSheetsConnected;
         }
 
         _settings.IsSetupComplete = true;

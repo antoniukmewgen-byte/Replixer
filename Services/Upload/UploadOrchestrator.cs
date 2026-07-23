@@ -44,7 +44,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             var (tgMessageId, tgWarning) = await SendTelegramAsync(
                 sendTelegram, filePath, telegramCaption, driveUrl);
 
-            var (kommoNoteId, kommoWarning) = await PostKommoAsync(
+            var (kommoNoteId, kommoWarning, _, _) = await PostKommoAsync(
                 kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
 
             // Файл видаляємо ЛИШЕ якщо геть усі кроки, які мали відбутись, реально
@@ -91,7 +91,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         var (tgMsgId, tgWarn) = await SendTelegramAsync(
             sendTelegram, filePath, telegramCaption, driveUrl: null);
 
-        var (kommoId, kommoWarn) = await PostKommoAsync(
+        var (kommoId, kommoWarn, _, _) = await PostKommoAsync(
             kommoLeadUrl, telegramCaption, driveUrl: null, callStartTime, leadSource, callType);
 
         var localPath = MoveToRecordingsFolder(filePath);
@@ -145,7 +145,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         long?   kommoNoteId  = existingKommoNoteId;
         string? kommoWarning = null;
         if (needKommo && kommoNoteId is null)
-            (kommoNoteId, kommoWarning) = await PostKommoAsync(kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
+            (kommoNoteId, kommoWarning, _, _) = await PostKommoAsync(kommoLeadUrl, telegramCaption, driveUrl, callStartTime, leadSource, callType);
 
         return new UploadResult
         {
@@ -168,10 +168,10 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
     public Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
         => _kommo.EditNoteAsync(leadUrl, noteId, noteText, callType);
 
-    public async Task<string?> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null)
+    public async Task<KommoNoteDeliveryResult> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null)
     {
-        var (_, warning) = await PostKommoAsync(kommoLeadUrl, note, driveUrl: null, callStartTime, leadSource: null, callType);
-        return warning;
+        var (_, warning, speedMinutes, speedWorkMinutes) = await PostKommoAsync(kommoLeadUrl, note, driveUrl: null, callStartTime, leadSource: null, callType);
+        return new KommoNoteDeliveryResult(warning, speedMinutes, speedWorkMinutes);
     }
 
     private async Task<(int? MessageId, string? Warning)> SendTelegramAsync(
@@ -186,11 +186,11 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         return (msgId, warning);
     }
 
-    private async Task<(long? NoteId, string? Warning)> PostKommoAsync(
+    private async Task<(long? NoteId, string? Warning, int? SpeedMinutes, int? SpeedWorkMinutes)> PostKommoAsync(
         string? kommoLeadUrl, string? telegramCaption, string? driveUrl,
         DateTime? callStartTime, string? leadSource, string? callType = null)
     {
-        if (string.IsNullOrWhiteSpace(kommoLeadUrl)) return (null, null);
+        if (string.IsNullOrWhiteSpace(kommoLeadUrl)) return (null, null, null, null);
 
         var kommoBase = CaptionHelper.StripHashtags(telegramCaption ?? string.Empty);
         var kommoNote = string.IsNullOrWhiteSpace(driveUrl)
@@ -198,13 +198,13 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
             : kommoBase + $"\n💾 Google Drive: {driveUrl}";
         kommoNote += $"\n🔖 v{ErrorReporter.AppVersion}";
 
-        long? noteId  = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, callType);
+        var (noteId, speedMinutes, speedWorkMinutes) = await _kommo.ProcessLeadAsync(kommoLeadUrl, kommoNote, callStartTime, callType);
 
         string? warning = noteId is null && _kommo.IsEnabled
             ? "Kommo: не вдалося створити нотатку"
             : null;
 
-        return (noteId, warning);
+        return (noteId, warning, speedMinutes, speedWorkMinutes);
     }
 
     private async Task<string?> ResolveTargetFolderAsync(CancellationToken ct)

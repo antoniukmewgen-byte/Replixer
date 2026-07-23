@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:callViews="clr-namespace:Replixer.Views.Call"
     xmlns:callVm="clr-namespace:Replixer.ViewModels.Call"
-    xmlns:models="clr-namespace:Replixer.Models"
     xmlns:views="clr-namespace:Replixer.Views">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type callVm:IdleCallViewModel}">
@@ -58,21 +57,16 @@
                     ОСТАННІ ЗАПИСИ
                 </TextBlock>
 
-                <!--  List  -->
+                <!--  List — впереміш RecordingEntry і MissedCallEntry, DataTemplate резолвиться
+                      неявно за типом елемента (див. App.xaml)  -->
                 <ItemsControl
                     Grid.Row="1"
                     Margin="16,0,16,16"
-                    ItemsSource="{Binding RecordingsVm.RecentRecordings}"
-                    Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource InverseBoolToVis}}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:RecordingEntry}">
-                            <views:RecordingItemView />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    ItemsSource="{Binding RecentActivity}"
+                    Visibility="{Binding IsRecentActivityEmpty, Converter={StaticResource InverseBoolToVis}}" />
 
                 <!--  Empty state  -->
-                <views:EmptyRecordingsView Grid.Row="1" Visibility="{Binding RecordingsVm.IsEmpty, Converter={StaticResource BoolToVis}}" />
+                <views:EmptyRecordingsView Grid.Row="1" Visibility="{Binding IsRecentActivityEmpty, Converter={StaticResource BoolToVis}}" />
 
             </Grid>
         </Border>

@@ -23,6 +23,7 @@ internal static class ServiceCollectionExtensions
     internal static IServiceCollection AddUploadServices(this IServiceCollection services)
     {
         services.AddSingleton<GoogleDriveUploadService>();
+        services.AddSingleton<GoogleSheetsUploadService>();
         services.AddSingleton<TelegramUploadService>();
         services.AddSingleton<KommoService>();
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
@@ -41,6 +42,7 @@ internal static class ServiceCollectionExtensions
     {
         services.AddSingleton<SetupViewModel>();
         services.AddSingleton<RecordingsViewModel>();
+        services.AddSingleton<MissedCallsViewModel>();
         services.AddSingleton<ProfileViewModel>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<SettingsViewModel>();

@@ -161,6 +161,36 @@ public class AppSettings : INotifyPropertyChanged
         set { if (_isKommoConnected == value) return; _isKommoConnected = value; OnPropertyChanged(); Save(); }
     }
 
+    private bool _isGoogleSheetsEnabled = false;
+    public bool IsGoogleSheetsEnabled
+    {
+        get => _isGoogleSheetsEnabled;
+        set { if (_isGoogleSheetsEnabled == value) return; _isGoogleSheetsEnabled = value; OnPropertyChanged(); Save(); }
+    }
+
+    // ID таблиці (не назва і не повне посилання) — вирізається з URL виду
+    // https://docs.google.com/spreadsheets/d/{ID}/edit#gid=0 при збереженні налаштувань.
+    private string _googleSheetsId = string.Empty;
+    public string GoogleSheetsId
+    {
+        get => _googleSheetsId;
+        set { if (_googleSheetsId == value) return; _googleSheetsId = value; OnPropertyChanged(); Save(); }
+    }
+
+    private string _googleSheetsTabName = string.Empty;
+    public string GoogleSheetsTabName
+    {
+        get => _googleSheetsTabName;
+        set { if (_googleSheetsTabName == value) return; _googleSheetsTabName = value; OnPropertyChanged(); Save(); }
+    }
+
+    private bool? _isGoogleSheetsConnected;
+    public bool? IsGoogleSheetsConnected
+    {
+        get => _isGoogleSheetsConnected;
+        set { if (_isGoogleSheetsConnected == value) return; _isGoogleSheetsConnected = value; OnPropertyChanged(); Save(); }
+    }
+
     private bool _isNotificationsEnabled = true;
     public bool IsNotificationsEnabled
     {

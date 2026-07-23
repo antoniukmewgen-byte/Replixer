@@ -265,6 +265,19 @@
                             Stretch="Uniform" />
                     </Button>
                     <Button
+                        x:Name="MissedCallsButton"
+                        Margin="0,0,0,12"
+                        Padding="0"
+                        Command="{Binding NavigateMissedCallsCommand}"
+                        Style="{StaticResource SidebarButton}">
+                        <Path
+                            Width="18"
+                            Height="18"
+                            Data="M1.172,19.119A4,4,0,0,0,0,21.947V24H2.053a4,4,0,0,0,2.828-1.172L18.224,9.485,14.515,5.776Z M23.145.855a2.622,2.622,0,0,0-3.71,0L15.929,4.362l3.709,3.709,3.507-3.506A2.622,2.622,0,0,0,23.145.855Z"
+                            Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Stretch="Uniform" />
+                    </Button>
+                    <Button
                         x:Name="SettingsButton"
                         Padding="0"
                         Command="{Binding NavigateSettingsCommand}"

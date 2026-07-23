@@ -64,11 +64,12 @@ public partial class MainWindow : Window
 
         var button = ((MainViewModel)DataContext).CurrentViewModel switch
         {
-            HomeViewModel       => HomeButton,
-            RecordingsViewModel => RecordingsButton,
-            SettingsViewModel   => SettingsButton,
-            ProfileViewModel    => ProfileButton,
-            _                   => null
+            HomeViewModel        => HomeButton,
+            RecordingsViewModel  => RecordingsButton,
+            MissedCallsViewModel => MissedCallsButton,
+            SettingsViewModel    => SettingsButton,
+            ProfileViewModel     => ProfileButton,
+            _                    => null
         };
 
         if (button is null) return;

@@ -32,11 +32,12 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         private set => SetField(ref _updateAvailable, value);
     }
 
-    public ICommand NavigateHomeCommand       { get; }
-    public ICommand NavigateRecordingsCommand { get; }
-    public ICommand NavigateSettingsCommand   { get; }
-    public ICommand NavigateProfileCommand    { get; }
-    public ICommand CheckForUpdatesCommand    { get; }
+    public ICommand NavigateHomeCommand        { get; }
+    public ICommand NavigateRecordingsCommand  { get; }
+    public ICommand NavigateMissedCallsCommand { get; }
+    public ICommand NavigateSettingsCommand    { get; }
+    public ICommand NavigateProfileCommand     { get; }
+    public ICommand CheckForUpdatesCommand     { get; }
 
     private readonly HomeViewModel        _homeVm;
     private readonly SettingsViewModel    _settingsVm;
@@ -52,6 +53,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     public MainViewModel(
         HomeViewModel          homeVm,
         RecordingsViewModel    recordingsVm,
+        MissedCallsViewModel   missedCallsVm,
         SettingsViewModel      settingsVm,
         ProfileViewModel       profileVm,
         TelegramUploadService  telegram,
@@ -74,11 +76,12 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         _homeVm.MissedCallReportRequested  += OnMissedCallReportRequested;
         _currentViewModel = _homeVm;
 
-        NavigateHomeCommand       = new RelayCommand(() => CurrentViewModel = _homeVm);
-        NavigateRecordingsCommand = new RelayCommand(() => CurrentViewModel = recordingsVm);
-        NavigateSettingsCommand   = new RelayCommand(() => CurrentViewModel = _settingsVm);
-        NavigateProfileCommand    = new RelayCommand(() => CurrentViewModel = _profileVm);
-        CheckForUpdatesCommand    = new AsyncRelayCommand(CheckAndShowUpdateAsync);
+        NavigateHomeCommand        = new RelayCommand(() => CurrentViewModel = _homeVm);
+        NavigateRecordingsCommand  = new RelayCommand(() => CurrentViewModel = recordingsVm);
+        NavigateMissedCallsCommand = new RelayCommand(() => CurrentViewModel = missedCallsVm);
+        NavigateSettingsCommand    = new RelayCommand(() => CurrentViewModel = _settingsVm);
+        NavigateProfileCommand     = new RelayCommand(() => CurrentViewModel = _profileVm);
+        CheckForUpdatesCommand     = new AsyncRelayCommand(CheckAndShowUpdateAsync);
     }
 
     public async Task StartupUpdateCheckAsync()

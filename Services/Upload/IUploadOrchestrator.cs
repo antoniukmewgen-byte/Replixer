@@ -19,6 +19,14 @@ public readonly record struct UploadResult
     public string? LocalPathWarning   { get; init; }
 }
 
+// Результат відправки нотатки про недодзвон у Kommo. ProcessingSpeed* — ті самі хвилини, що
+// патчаться в кастомні поля Kommo (див. KommoService.TrySetFirstContactDateAsync) — повертаються
+// тут, щоб MissedCallDeliveryService міг продублювати ті самі значення в Google Таблицю.
+public readonly record struct KommoNoteDeliveryResult(
+    string? Warning,
+    int?    ProcessingSpeedMinutes,
+    int?    ProcessingSpeedWorkMinutes);
+
 public interface IUploadOrchestrator
 {
     bool IsTelegramReady { get; }
@@ -38,7 +46,7 @@ public interface IUploadOrchestrator
 
     Task<string?> EditKommoNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null);
 
-    Task<string?> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null);
+    Task<KommoNoteDeliveryResult> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null);
 
     Task<UploadResult> RetryMissingStepsAsync(
         string filePath,

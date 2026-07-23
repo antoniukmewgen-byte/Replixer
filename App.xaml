@@ -6,6 +6,7 @@
     xmlns:dialogViews="clr-namespace:Replixer.Views.Dialogs"
     xmlns:dialogs="clr-namespace:Replixer.ViewModels.Dialogs"
     xmlns:local="clr-namespace:Replixer"
+    xmlns:models="clr-namespace:Replixer.Models"
     xmlns:views="clr-namespace:Replixer.Views"
     xmlns:vm="clr-namespace:Replixer.ViewModels"
     ShutdownMode="OnExplicitShutdown">
@@ -30,6 +31,9 @@
             <DataTemplate DataType="{x:Type vm:RecordingsViewModel}">
                 <views:RecordingsPage />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:MissedCallsViewModel}">
+                <views:MissedCallsPage />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                 <views:SettingsPage />
             </DataTemplate>
@@ -50,6 +54,16 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type dialogs:UpdateDialogViewModel}">
                 <dialogViews:UpdateDialogView />
+            </DataTemplate>
+
+            <!--  Model → View: неявні шаблони для ItemsControl без явного ItemTemplate,
+                  щоб один список міг рендерити впереміш RecordingEntry і MissedCallEntry
+                  (див. HomeViewModel.RecentActivity + HomePage.xaml)  -->
+            <DataTemplate DataType="{x:Type models:RecordingEntry}">
+                <views:RecordingItemView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type models:MissedCallEntry}">
+                <views:MissedCallItemView />
             </DataTemplate>
 
         </ResourceDictionary>

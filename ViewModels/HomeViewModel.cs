@@ -23,6 +23,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly AppSettings _settings;
     private readonly IUploadOrchestrator _orchestrator;
     private readonly RecordingsViewModel _recordingsVm;
+    private readonly MissedCallsViewModel _missedCallsVm;
     private readonly IMonitorService _micMonitor;
     private readonly AudioRecordingService _recorder;
     private readonly IWindowManager _windowManager;
@@ -44,7 +45,32 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private CallReportData?  _interruptedDraft;
 
     private ViewModelBase _callContent;
-    public RecordingsViewModel RecordingsVm => _recordingsVm;
+    public RecordingsViewModel   RecordingsVm   => _recordingsVm;
+    public MissedCallsViewModel  MissedCallsVm  => _missedCallsVm;
+
+    // Об'єднаний перелік для "ОСТАННІ ЗАПИСИ" — впереміш RecordingEntry і MissedCallEntry
+    // (див. відповідь користувача "2)Впереміш"), відсортовано за часом спадання, топ-4.
+    // Кешується так само, як RecordingsViewModel.RecentRecordings, і скидається при зміні
+    // будь-якої з двох вихідних колекцій (див. підписки в конструкторі).
+    private IReadOnlyList<object>? _recentActivity;
+    public  IReadOnlyList<object>  RecentActivity => _recentActivity ??= BuildRecentActivity();
+
+    public bool IsRecentActivityEmpty => _recordingsVm.IsEmpty && _missedCallsVm.IsEmpty;
+
+    private IReadOnlyList<object> BuildRecentActivity()
+    {
+        IEnumerable<object> recordings = _recordingsVm.Recordings;
+        IEnumerable<object> missed     = _missedCallsVm.MissedCalls;
+        return recordings.Concat(missed)
+            .OrderByDescending(o => o switch
+            {
+                RecordingEntry r  => r.StartedAt,
+                MissedCallEntry m => m.MissedAt,
+                _                 => DateTime.MinValue,
+            })
+            .Take(4)
+            .ToList();
+    }
 
     public ViewModelBase CallContent
     {
@@ -60,6 +86,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         AppSettings settings,
         IUploadOrchestrator orchestrator,
         RecordingsViewModel recordingsVm,
+        MissedCallsViewModel missedCallsVm,
         IWindowManager windowManager,
         AudioRecordingService recorder,
         MissedCallDeliveryService missedCallDelivery)
@@ -67,6 +94,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _settings           = settings;
         _orchestrator       = orchestrator;
         _recordingsVm       = recordingsVm;
+        _missedCallsVm      = missedCallsVm;
         _windowManager      = windowManager;
         _recorder           = recorder;
         _missedCallDelivery = missedCallDelivery;
@@ -85,7 +113,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             WireEntryResumeDraftCommand(entry);
         }
 
-        _recordingsVm.Recordings.CollectionChanged += OnRecordingsChanged;
+        _recordingsVm.Recordings.CollectionChanged  += OnRecordingsChanged;
+        _recordingsVm.Recordings.CollectionChanged  += OnRecentActivitySourceChanged;
+        _missedCallsVm.MissedCalls.CollectionChanged += OnRecentActivitySourceChanged;
+    }
+
+    private void OnRecentActivitySourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        _recentActivity = null;
+        OnPropertyChanged(nameof(RecentActivity));
+        OnPropertyChanged(nameof(IsRecentActivityEmpty));
     }
 
     private void OnCallDetected(string app)
@@ -338,8 +375,18 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     // див. MissedCallDeliveryService) робить окремий сервіс, щоб недодзвін не губився,
     // якщо перша спроба не вдалась. data.FirstContactTime — момент кліку на "Не додзвонився",
     // або, для типу "ще не було спілкування", час, який менеджер вручну скоригував у формі.
-    private Task SubmitMissedCallAsync(MissedCallReportData data) =>
-        _missedCallDelivery.SubmitAsync(data.CrmUrl, data.FormatCaption(), data.CallType, data.FirstContactTime);
+    //
+    // Guid генерується тут один раз і передається і в постійний історичний запис
+    // (MissedCallsViewModel.AddEntry — щоб рядок одразу з'явився в "НЕДОЗВОНИ"/"ОСТАННІ
+    // ЗАПИСИ"), і в чергу доставки (MissedCallDeliveryService.SubmitAsync) — щоб фонові
+    // оновлення статусу (можливо, значно пізніше) знайшли й "дозеленили" саме цей рядок.
+    private Task SubmitMissedCallAsync(MissedCallReportData data)
+    {
+        var id = Guid.NewGuid();
+        _missedCallsVm.AddEntry(id, data.Manager, data.CallType, data.FirstContactTime, data.CrmUrl, data.ScreenshotUrls);
+        return _missedCallDelivery.SubmitAsync(id, data.CrmUrl, data.FormatCaption(), data.CallType, data.FirstContactTime,
+            data.Manager, data.ScreenshotUrls);
+    }
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {
@@ -612,7 +659,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
         _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
         _currentDialog?.Dispose();
-        _recordingsVm.Recordings.CollectionChanged -= OnRecordingsChanged;
+        _recordingsVm.Recordings.CollectionChanged   -= OnRecordingsChanged;
+        _recordingsVm.Recordings.CollectionChanged   -= OnRecentActivitySourceChanged;
+        _missedCallsVm.MissedCalls.CollectionChanged -= OnRecentActivitySourceChanged;
         _micMonitor.CallDetected -= OnCallDetected;
         _micMonitor.CallEnded    -= OnCallEnded;
         _micMonitor.Stop();

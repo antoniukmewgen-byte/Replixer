@@ -1,0 +1,145 @@
+<UserControl
+    x:Class="Replixer.Views.MissedCallItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border
+        Margin="0,12,0,0"
+        Padding="16"
+        Background="{StaticResource BrushColor3}"
+        BorderBrush="{StaticResource BrushBorderColor3}"
+        BorderThickness="1"
+        CornerRadius="8">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Missed-call icon  -->
+            <Border
+                Grid.Column="0"
+                Width="38"
+                Height="38"
+                Background="{StaticResource OtherBrushColor4}"
+                CornerRadius="8">
+                <Path
+                    Width="17"
+                    Height="17"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="M1.172,19.119A4,4,0,0,0,0,21.947V24H2.053a4,4,0,0,0,2.828-1.172L18.224,9.485,14.515,5.776Z M23.145.855a2.622,2.622,0,0,0-3.71,0L15.929,4.362l3.709,3.709,3.507-3.506A2.622,2.622,0,0,0,23.145.855Z"
+                    Fill="{StaticResource OtherBrushSubColor4}"
+                    Stretch="Uniform" />
+            </Border>
+
+            <!--  Text  -->
+            <StackPanel
+                Grid.Column="1"
+                Margin="12,0,12,0"
+                VerticalAlignment="Center">
+                <TextBlock
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource Text}"
+                    Text="{Binding CallType}"
+                    TextTrimming="CharacterEllipsis" />
+                <StackPanel
+                    Margin="0,4,0,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Path
+                            Width="12"
+                            Height="12"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Data="M0,19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V10H0Zm17-4.5A1.5,1.5,0,1,1,15.5,16,1.5,1.5,0,0,1,17,14.5Zm-5,0A1.5,1.5,0,1,1,10.5,16,1.5,1.5,0,0,1,12,14.5Zm-5,0A1.5,1.5,0,1,1,5.5,16,1.5,1.5,0,0,1,7,14.5ZM19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V8H24V7A5.006,5.006,0,0,0,19,2Z"
+                            Fill="{StaticResource SubText}"
+                            Stretch="Uniform" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}"
+                            Text="{Binding DateDisplay}" />
+                    </StackPanel>
+                    <StackPanel
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Path
+                            Width="12"
+                            Height="12"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Data="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm1,11.879a1,1,0,0,1-.469.848l-3.84,2.4a1,1,0,1,1-1.062-1.7L11,11.325V7a1,1,0,0,1,2,0Z"
+                            Fill="{StaticResource SubText}"
+                            Stretch="Uniform" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}"
+                            Text="{Binding TimeOfDayDisplay}" />
+                    </StackPanel>
+                    <StackPanel
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Visibility="{Binding HasManager, Converter={StaticResource BoolToVis}}">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}"
+                            Text="{Binding Manager}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Status badge  -->
+            <Border
+                Grid.Column="2"
+                Padding="12,8"
+                VerticalAlignment="Center"
+                BorderThickness="1"
+                CornerRadius="16">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{StaticResource OtherBrushColor3}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor3}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding KommoDelivered}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource InterFont}"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    Text="{Binding StatusText}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor3}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding KommoDelivered}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

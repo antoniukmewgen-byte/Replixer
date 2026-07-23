@@ -637,6 +637,228 @@
                                         </Grid>
                                     </Border>
 
+                                    <!--  Card: Google Sheets  -->
+                                    <Border
+                                        Margin="0,12,0,0"
+                                        Padding="16"
+                                        Background="{StaticResource BrushColor3}"
+                                        BorderBrush="{StaticResource BrushBorderColor3}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Width="38"
+                                                    Height="38"
+                                                    Background="#1A3A2A"
+                                                    CornerRadius="8">
+                                                    <TextBlock
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="13"
+                                                        FontWeight="Bold"
+                                                        Foreground="#34A853">
+                                                        S
+                                                    </TextBlock>
+                                                </Border>
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Margin="12,0,0,0"
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="14"
+                                                        FontWeight="Bold"
+                                                        Foreground="{StaticResource Text}">
+                                                        Google Sheets
+                                                    </TextBlock>
+                                                    <TextBlock
+                                                        Margin="0,4,0,0"
+                                                        FontFamily="{StaticResource InterFont}"
+                                                        FontSize="12"
+                                                        FontWeight="Medium"
+                                                        Foreground="{StaticResource SubText}"
+                                                        TextWrapping="Wrap">
+                                                        Необов'язково · дублювання недодзвонів у таблицю. Не забудьте дати доступ редактора сервіс-акаунту застосунку.
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <Rectangle
+                                                Grid.Row="1"
+                                                Height="1"
+                                                Margin="0,12"
+                                                Fill="{StaticResource BrushBorderColor3}" />
+
+                                            <StackPanel Grid.Row="2">
+                                                <!--  Spreadsheet ID / link  -->
+                                                <Border Margin="0,0,0,12" Style="{StaticResource AppInputBorder}">
+                                                    <Grid>
+                                                        <TextBox
+                                                            x:Name="SheetsIdBox"
+                                                            Style="{StaticResource AppTextBox}"
+                                                            Text="{Binding GoogleSheetsId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontFamily="{StaticResource InterFont}"
+                                                            FontSize="14"
+                                                            Foreground="{StaticResource SubText}"
+                                                            IsHitTestVisible="False"
+                                                            Text="ID або посилання на таблицю">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, ElementName=SheetsIdBox}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </Border>
+                                                <!--  Tab name + Test button  -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0" Style="{StaticResource AppInputBorder}">
+                                                        <Grid>
+                                                            <TextBox
+                                                                x:Name="SheetsTabBox"
+                                                                Style="{StaticResource AppTextBox}"
+                                                                Text="{Binding GoogleSheetsTabName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                FontFamily="{StaticResource InterFont}"
+                                                                FontSize="14"
+                                                                Foreground="{StaticResource SubText}"
+                                                                IsHitTestVisible="False"
+                                                                Text="Назва аркушу (напр. Аркуш1)">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Text, ElementName=SheetsTabBox}" Value="">
+                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Grid>
+                                                    </Border>
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Margin="12,0,0,0"
+                                                        Padding="12,8"
+                                                        HorizontalAlignment="Right"
+                                                        Command="{Binding TestSheetsConnectionCommand}"
+                                                        Cursor="Hand"
+                                                        ToolTip="{Binding SheetsConnectionError}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCheckingSheets}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSheetsConnected}" Value="True">
+                                                                        <Setter Property="IsEnabled" Value="False" />
+                                                                        <Setter Property="Cursor" Value="Arrow" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <Button.Template>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border
+                                                                    x:Name="Bg"
+                                                                    Padding="{TemplateBinding Padding}"
+                                                                    Background="{StaticResource BrushColor4}"
+                                                                    BorderBrush="{StaticResource BrushBorderColor4}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="16">
+                                                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                                        <Path
+                                                                            x:Name="CheckIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M20.285,2l-11.285,11.567l-5.286,-5.011l-3.714,3.716l9,8.728l15,-15.285z"
+                                                                            Fill="{StaticResource OtherBrushSubColor1}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <Path
+                                                                            x:Name="ErrorIcon"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Margin="0,0,6,0"
+                                                                            Data="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"
+                                                                            Fill="{StaticResource OtherBrushSubColor4}"
+                                                                            Stretch="Uniform"
+                                                                            Visibility="Collapsed" />
+                                                                        <TextBlock
+                                                                            x:Name="Label"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            FontFamily="{StaticResource InterFont}"
+                                                                            FontSize="14"
+                                                                            FontWeight="Medium"
+                                                                            Foreground="{StaticResource SubText}"
+                                                                            Text="Перевірити" />
+                                                                    </StackPanel>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCheckingSheets}" Value="True">
+                                                                        <Setter TargetName="Label" Property="Text" Value="Перевірка..." />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSheetsConnected}" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor1}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Підключено" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor1}" />
+                                                                        <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSheetsConnected}" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource OtherBrushColor4}" />
+                                                                        <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="Label" Property="Text" Value="Немає доступу" />
+                                                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource OtherBrushSubColor4}" />
+                                                                        <Setter TargetName="ErrorIcon" Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsPressed" Value="True">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsEnabled" Value="False">
+                                                                        <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Button.Template>
+                                                    </Button>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
                                     <!--  Card: Telegram  -->
                                     <Border
                                         Margin="0,12,0,0"
