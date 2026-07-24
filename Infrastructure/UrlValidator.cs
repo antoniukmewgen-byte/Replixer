@@ -15,8 +15,9 @@ public static partial class UrlValidator
         !string.IsNullOrWhiteSpace(url) && KommoLeadUrlRegex().IsMatch(url.Trim());
 
     // Скріншоти менеджери надсилають посиланнями на Lightshot (напр. https://prnt.sc/eRDSnZFKNIqV) —
-    // приймаємо лише такий формат, щоб не пропустити випадковий текст чи чужий сайт у нотатку.
-    [GeneratedRegex(@"^https://prnt\.sc/[a-zA-Z0-9]+/?$", RegexOptions.IgnoreCase)]
+    // достатньо, щоб посилання ПОЧИНАЛОСЯ з https://prnt.sc/ — далі може йти будь-який ID
+    // (Lightshot інколи додає символи на кшталт "_" чи "-", тож не обмежуємо формат хвоста).
+    [GeneratedRegex(@"^https://prnt\.sc/.+", RegexOptions.IgnoreCase)]
     private static partial Regex PrntScUrlRegex();
 
     public static bool IsValidScreenshotUrl(string? url) =>
