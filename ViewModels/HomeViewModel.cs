@@ -28,6 +28,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly AudioRecordingService _recorder;
     private readonly IWindowManager _windowManager;
     private readonly MissedCallDeliveryService _missedCallDelivery;
+    private readonly KommoService _kommo;
+    private readonly ScreenCaptureService _screenCapture;
 
     private bool  _isRecording;
     private bool  _isStopping;
@@ -89,7 +91,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         MissedCallsViewModel missedCallsVm,
         IWindowManager windowManager,
         AudioRecordingService recorder,
-        MissedCallDeliveryService missedCallDelivery)
+        MissedCallDeliveryService missedCallDelivery,
+        KommoService kommo,
+        ScreenCaptureService screenCapture)
     {
         _settings           = settings;
         _orchestrator       = orchestrator;
@@ -98,6 +102,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _windowManager      = windowManager;
         _recorder           = recorder;
         _missedCallDelivery = missedCallDelivery;
+        _kommo              = kommo;
+        _screenCapture      = screenCapture;
 
         _callContent = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
 
@@ -365,6 +371,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
                 if (data is not null) _ = SubmitMissedCallAsync(data);
             },
             missedAt: missedAt,
+            kommo: _kommo,
+            screenCapture: _screenCapture,
             managerName: _settings.ManagerName);
         MissedCallReportRequested?.Invoke(vm);
     }

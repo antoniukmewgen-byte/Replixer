@@ -101,6 +101,29 @@ public class KommoService : IDisposable
         return (await noteTask, speedMinutes, speedWorkMinutes);
     }
 
+    // Дістає номер телефону клієнта за посиланням на лід — для плаваючої плашки-скріншотера,
+    // яка сама формує deep-link на месенджер за цим номером (перевикористовує ту саму логіку
+    // пошуку контакту/компанії, що й TrySetLocalTimeProcessingSpeedAsync).
+    public async Task<string?> GetClientPhoneAsync(string leadUrl)
+    {
+        if (!IsEnabled) return null;
+
+        var (subdomain, leadId) = ParseLeadUrl(leadUrl);
+        subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
+        if (leadId is null || string.IsNullOrEmpty(subdomain)) return null;
+
+        string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
+        string token   = _settings.KommoApiToken;
+
+        var (_, _, _, contactId, companyId, _, _, _, _) = await GetLeadDetailsAsync(baseUrl, token, leadId);
+
+        string? phone = contactId is not null ? await GetContactPhoneAsync(baseUrl, token, contactId) : null;
+        if (string.IsNullOrWhiteSpace(phone) && companyId is not null)
+            phone = await GetCompanyPhoneAsync(baseUrl, token, companyId);
+
+        return string.IsNullOrWhiteSpace(phone) ? null : phone;
+    }
+
     public async Task<string?> EditNoteAsync(string leadUrl, long noteId, string noteText, string? callType = null)
     {
         if (!IsEnabled) return "Kommo: інтеграція вимкнена";

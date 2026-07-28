@@ -1,7 +1,10 @@
 using Replixer.Infrastructure;
+using Replixer.Services;
+using Replixer.Services.Upload;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -54,10 +57,19 @@ public class MissedCallReportViewModel : ViewModelBase
     private static bool IsNoCommunicationType(string? callType) =>
         callType is not null && callType.Contains(NoCommunicationMarker);
 
+    // Скільки чекати, поки вікно месенджера стане foreground, перш ніж здатися.
+    private static readonly TimeSpan ForegroundWaitTimeout  = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan ForegroundPollInterval = TimeSpan.FromMilliseconds(150);
+    // Невелика пауза після появи вікна месенджера, щоб воно встигло промалюватись
+    // (інакше PrintWindow може захопити ще порожній/недомальований кадр).
+    private static readonly TimeSpan RenderSettleDelay = TimeSpan.FromMilliseconds(400);
+
     private readonly string _managerName;
     // Момент кліку на "Не додзвонився" — стартове значення поля часу і запасний варіант,
     // якщо блок редагування прихований (тип не "ще не було спілкування") чи текст невалідний.
     private readonly DateTime _defaultFirstContactTime;
+    private readonly KommoService _kommo;
+    private readonly ScreenCaptureService _capture;
     private string? _selectedCallType;
     private string _crmUrl = string.Empty;
     private string _firstContactTimeText;
@@ -151,11 +163,30 @@ public class MissedCallReportViewModel : ViewModelBase
     public ICommand DecrementFirstContactTimeCommand { get; }
     public ICommand SubmitCommand { get; }
 
-    public MissedCallReportViewModel(Action<MissedCallReportData?> onComplete, DateTime missedAt, string? managerName = null)
+    // "Швидкі дії" — відкрити чат з клієнтом у месенджері за номером з CRM і автоматично
+    // зняти скрін, щойно вікно месенджера стане активним (без окремого плаваючого віджета).
+    public IReadOnlyList<string> Messengers => MessengerDeepLinkProvider.SupportedMessengers;
+    public ICommand OpenMessengerCommand { get; }
+
+    private string? _quickActionsStatus;
+    public string? QuickActionsStatus
+    {
+        get => _quickActionsStatus;
+        private set => SetField(ref _quickActionsStatus, value);
+    }
+
+    public MissedCallReportViewModel(
+        Action<MissedCallReportData?> onComplete,
+        DateTime missedAt,
+        KommoService kommo,
+        ScreenCaptureService screenCapture,
+        string? managerName = null)
     {
         _onComplete              = onComplete;
         _managerName             = managerName ?? string.Empty;
         _defaultFirstContactTime = missedAt;
+        _kommo                   = kommo;
+        _capture                 = screenCapture;
         _firstContactTimeText    = missedAt.ToString(FirstContactTimeFormat, CultureInfo.InvariantCulture);
         SubmitCommand = new RelayCommand(OnSubmit, CanSubmit);
 
@@ -168,9 +199,122 @@ public class MissedCallReportViewModel : ViewModelBase
         IncrementFirstContactTimeCommand = new RelayCommand(() => AdjustFirstContactTime(1));
         DecrementFirstContactTimeCommand = new RelayCommand(() => AdjustFirstContactTime(-1));
 
+        OpenMessengerCommand = new AsyncRelayCommand<string>(OpenMessengerAsync);
+
         Screenshots.CollectionChanged += OnScreenshotsCollectionChanged;
         // Поля скрінів з'являються лише після вибору типу дзвінка (див. EnsureRequiredScreenshotFields) —
         // доки тип не обрано, полів не повинно бути взагалі.
+    }
+
+    private async Task OpenMessengerAsync(string? messenger)
+    {
+        if (string.IsNullOrWhiteSpace(messenger)) return;
+
+        if (string.IsNullOrWhiteSpace(_crmUrl) || !UrlValidator.IsValidHttpUrl(_crmUrl))
+        {
+            QuickActionsStatus = "Спочатку вкажіть коректне посилання на CRM";
+            return;
+        }
+
+        QuickActionsStatus = "Шукаю номер клієнта в CRM…";
+        string? phone;
+        try
+        {
+            phone = await _kommo.GetClientPhoneAsync(_crmUrl);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MissedCallReport] GetClientPhoneAsync failed: {ex}");
+            QuickActionsStatus = "Помилка звернення до CRM";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            QuickActionsStatus = "Не вдалося знайти номер телефону клієнта в CRM";
+            return;
+        }
+
+        var link = MessengerDeepLinkProvider.BuildDeepLink(messenger, phone);
+        if (link is null)
+        {
+            QuickActionsStatus = $"Немає посилання для {messenger}";
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MissedCallReport] Process.Start failed: {ex}");
+            QuickActionsStatus = $"Не вдалося відкрити {messenger}";
+            return;
+        }
+
+        QuickActionsStatus = $"Відкриваю {messenger}, очікую вікно…";
+
+        var appeared = await WaitForMessengerForegroundAsync(messenger);
+        if (!appeared)
+        {
+            QuickActionsStatus = $"Вікно {messenger} не з'явилось — скрін не зроблено";
+            return;
+        }
+
+        await Task.Delay(RenderSettleDelay);
+        CaptureScreenshot();
+    }
+
+    // Опитує GetForegroundWindow(), поки активним вікном не стане процес потрібного
+    // месенджера, або поки не вийде час очікування. Для Store/UWP-застосунків (типово —
+    // WhatsApp) процес foreground-вікна може виявитись не самим месенджером, а хостом
+    // (ApplicationFrameHost) — у цьому випадку MessengerProcessNames.Matches додатково
+    // звіряє заголовок вікна. ПРИМІТКА: якщо посилання відкриється спочатку в браузері,
+    // а не напряму в десктопному застосунку, це очікування може не спрацювати — потребує
+    // перевірки на реальній машині замовника.
+    private static async Task<bool> WaitForMessengerForegroundAsync(string messenger)
+    {
+        var deadline = DateTime.UtcNow + ForegroundWaitTimeout;
+
+        while (DateTime.UtcNow < deadline)
+        {
+            var hWnd = ScreenCaptureInterop.GetForegroundWindow();
+            if (hWnd != IntPtr.Zero && ScreenCaptureInterop.GetWindowThreadProcessId(hWnd, out var pid) != 0)
+            {
+                try
+                {
+                    using var proc = Process.GetProcessById((int)pid);
+                    if (MessengerProcessNames.Matches(messenger, proc.ProcessName, GetWindowTitle(hWnd)))
+                        return true;
+                }
+                catch (ArgumentException)
+                {
+                    // Процес встиг завершитись між викликами — просто пробуємо далі.
+                }
+            }
+
+            await Task.Delay(ForegroundPollInterval);
+        }
+
+        return false;
+    }
+
+    private static string? GetWindowTitle(IntPtr hWnd)
+    {
+        var length = ScreenCaptureInterop.GetWindowTextLength(hWnd);
+        if (length <= 0) return null;
+
+        var sb = new StringBuilder(length + 1);
+        return ScreenCaptureInterop.GetWindowText(hWnd, sb, sb.Capacity) > 0 ? sb.ToString() : null;
+    }
+
+    private void CaptureScreenshot()
+    {
+        var path = _capture.CaptureForegroundWindow();
+        QuickActionsStatus = path is null
+            ? "Не вдалося зробити скріншот"
+            : "Скріншот збережено локально";
     }
 
     private void RemoveScreenshotField(ScreenshotAttachment? item)

@@ -4,6 +4,47 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:Replixer.ViewModels.Dialogs">
 
+    <UserControl.Resources>
+        <Style x:Key="QuickActionCircleButton" TargetType="Button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource BrushBorderColor4}"
+                            BorderThickness="1"
+                            CornerRadius="21">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="QuickActionCaption" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,5,0,0" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Foreground" Value="{StaticResource SubText}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+
     <Border
         Width="500"
         Margin="16"
@@ -217,6 +258,65 @@
                                 Foreground="{StaticResource OtherBrushSubColor4}"
                                 Text="Введіть посилання на лід у Kommo (напр. https://movenation.kommo.com/)"
                                 Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
+                        </StackPanel>
+
+                        <!--  Швидкі дії — відкрити чат з клієнтом і автоматично зняти скрін  -->
+                        <StackPanel Margin="0,12,0,0">
+                            <TextBlock
+                                Margin="0,0,0,4"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource SubText}">
+                                Швидкі дії
+                            </TextBlock>
+
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                                    <Button
+                                        Background="{StaticResource BrushViber}"
+                                        Command="{Binding OpenMessengerCommand}"
+                                        CommandParameter="Viber"
+                                        Style="{StaticResource QuickActionCircleButton}"
+                                        ToolTip="Написати у Viber">
+                                        <Image Width="20" Height="20" Source="/Assets/Icons/viber.png" />
+                                    </Button>
+                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="Viber" />
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                                    <Button
+                                        Background="{StaticResource BrushTelegram}"
+                                        Command="{Binding OpenMessengerCommand}"
+                                        CommandParameter="Telegram"
+                                        Style="{StaticResource QuickActionCircleButton}"
+                                        ToolTip="Написати у Telegram">
+                                        <Image Width="20" Height="20" Source="/Assets/Icons/telegram.png" />
+                                    </Button>
+                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="Telegram" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Vertical">
+                                    <Button
+                                        Background="{StaticResource BrushWhatsApp}"
+                                        Command="{Binding OpenMessengerCommand}"
+                                        CommandParameter="WhatsApp"
+                                        Style="{StaticResource QuickActionCircleButton}"
+                                        ToolTip="Написати у WhatsApp">
+                                        <Image Width="20" Height="20" Source="/Assets/Icons/whatsapp.png" />
+                                    </Button>
+                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="WhatsApp" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <TextBlock
+                                Margin="2,8,2,0"
+                                FontFamily="{StaticResource InterFont}"
+                                FontSize="11"
+                                Foreground="{StaticResource SubText}"
+                                Text="{Binding QuickActionsStatus}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding QuickActionsStatus, Converter={StaticResource NullToVisibility}}" />
                         </StackPanel>
 
                         <!--  Скріншоти  -->

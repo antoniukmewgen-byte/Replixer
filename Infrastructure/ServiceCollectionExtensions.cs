@@ -16,6 +16,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton(AppSettings.Load());
         services.AddSingleton<IWindowManager, WindowManager>();
         services.AddSingleton<UpdateService>();
+        services.AddSingleton<ScreenCaptureService>();
 
         return services;
     }
