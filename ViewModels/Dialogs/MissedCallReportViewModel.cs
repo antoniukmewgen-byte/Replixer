@@ -1,11 +1,10 @@
 using Replixer.Infrastructure;
+using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Upload;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -19,7 +18,14 @@ public record MissedCallReportData(
     IReadOnlyList<string> ScreenshotUrls,
     // Час "первого касання" для Kommo — за замовчуванням момент кліку на "Не додзвонився",
     // але для типу "ще не було спілкування" менеджер міг скоригувати його вручну у формі.
-    DateTime FirstContactTime)
+    DateTime FirstContactTime,
+    // Ті самі посилання, що й ScreenshotUrls, але прив'язані до конкретного месенджера
+    // ("Viber"/"Telegram"/"WhatsApp" — див. MessengerDeepLinkProvider.SupportedMessengers).
+    // ScreenshotUrls — компактний список (без урахування, якого саме месенджера скрін) для
+    // Kommo-нотатки, де порядок не важливий; цей словник потрібен там, де важлива саме
+    // прив'язка до месенджера — колонки Google Таблиці (BuildSheetRow) мають назви "Viber"/
+    // "Telegram"/"WhatsApp", тож без нього скрін не того месенджера міг би потрапити не в ту колонку.
+    IReadOnlyDictionary<string, string>? ScreenshotUrlsByMessenger = null)
 {
     public string FormatCaption()
     {
@@ -70,6 +76,9 @@ public class MissedCallReportViewModel : ViewModelBase
     private readonly DateTime _defaultFirstContactTime;
     private readonly KommoService _kommo;
     private readonly ScreenCaptureService _capture;
+    private readonly GoogleDriveUploadService _drive;
+    private readonly AppSettings _settings;
+    private readonly PendingScreenshotUploadRetryService _screenshotRetry;
     private string? _selectedCallType;
     private string _crmUrl = string.Empty;
     private string _firstContactTimeText;
@@ -83,17 +92,17 @@ public class MissedCallReportViewModel : ViewModelBase
         {
             if (SetField(ref _selectedCallType, value))
             {
-                EnsureRequiredScreenshotFields();
-                OnPropertyChanged(nameof(HasCallType));
                 OnPropertyChanged(nameof(IsFirstContactTimeEditable));
+                // RequiredScreenshotCount залежить від типу дзвінка (2 для "ще не було
+                // спілкування", 1 для "вже було спілкування") — тож підказка й доступність
+                // "Відправити" мають переоцінюватись і при зміні типу, а не лише при новому скріні.
+                OnPropertyChanged(nameof(HasEnoughScreenshots));
+                OnPropertyChanged(nameof(ShowScreenshotHint));
+                OnPropertyChanged(nameof(ScreenshotHintText));
                 CommandManager.InvalidateRequerySuggested();
             }
         }
     }
-
-    // Керує видимістю блоку скрінів і кнопки "+ Додати ще поле" — обидва з'являються
-    // лише після вибору типу дзвінка.
-    public bool HasCallType => _selectedCallType is not null;
 
     // Ручне редагування часу "первого касання" доступне лише для "ще не було спілкування" —
     // саме цей тип надалі переводить лід у статус "Недозвон" у Kommo, тож там важливо мати
@@ -129,16 +138,6 @@ public class MissedCallReportViewModel : ViewModelBase
         FirstContactTimeText = baseTime.AddMinutes(minutesDelta).ToString(FirstContactTimeFormat, CultureInfo.InvariantCulture);
     }
 
-    // "Ще не було спілкування" — довший тип недодзвону, менеджер має докласти 2 скріни
-    // (напр. дзвінок і повідомлення); "вже було спілкування" — досить одного.
-    private int RequiredScreenshotCount => _selectedCallType switch
-    {
-        null                                          => 0,
-        _ when IsNoCommunicationType(_selectedCallType) => 2,
-        "Недодзвон (вже було спілкування)"              => 1,
-        _                                                => 0,
-    };
-
     public string CrmUrl
     {
         get => _crmUrl;
@@ -155,10 +154,6 @@ public class MissedCallReportViewModel : ViewModelBase
     // true лише коли поле не порожнє, але текст не є коректним посиланням — для підсвітки помилки в UI.
     public bool IsCrmUrlInvalid => !string.IsNullOrWhiteSpace(_crmUrl) && !UrlValidator.IsValidHttpUrl(_crmUrl);
 
-    public ObservableCollection<ScreenshotAttachment> Screenshots { get; } = new();
-
-    public ICommand AddScreenshotFieldCommand { get; }
-    public ICommand RemoveScreenshotFieldCommand { get; }
     public ICommand IncrementFirstContactTimeCommand { get; }
     public ICommand DecrementFirstContactTimeCommand { get; }
     public ICommand SubmitCommand { get; }
@@ -168,11 +163,127 @@ public class MissedCallReportViewModel : ViewModelBase
     public IReadOnlyList<string> Messengers => MessengerDeepLinkProvider.SupportedMessengers;
     public ICommand OpenMessengerCommand { get; }
 
-    private string? _quickActionsStatus;
-    public string? QuickActionsStatus
+    // Окремий статус/результат на кожен месенджер — відображається у відповідному
+    // (нередагованому вручну) полі поруч із його іконкою, а не в одному спільному рядку.
+    private string? _viberStatus;
+    public string? ViberStatus
     {
-        get => _quickActionsStatus;
-        private set => SetField(ref _quickActionsStatus, value);
+        get => _viberStatus;
+        private set => SetField(ref _viberStatus, value);
+    }
+
+    private string? _telegramStatus;
+    public string? TelegramStatus
+    {
+        get => _telegramStatus;
+        private set => SetField(ref _telegramStatus, value);
+    }
+
+    private string? _whatsAppStatus;
+    public string? WhatsAppStatus
+    {
+        get => _whatsAppStatus;
+        private set => SetField(ref _whatsAppStatus, value);
+    }
+
+    // Справжня валідація стану поля, а не лише текст: поле статусу месенджера показує то
+    // проміжні повідомлення ("Шукаю номер клієнта…"), то помилку, то (в успішному фіналі)
+    // саме посилання на Drive — і UI має відрізняти "помилка" від решти (щоб підсвітити поле
+    // так само, як CRM/час першого касання підсвічуються через IsCrmUrlInvalid/
+    // IsFirstContactTimeInvalid), а не покладатись на вміст рядка.
+    private bool _viberActionFailed;
+    public bool ViberActionFailed
+    {
+        get => _viberActionFailed;
+        private set => SetField(ref _viberActionFailed, value);
+    }
+
+    private bool _telegramActionFailed;
+    public bool TelegramActionFailed
+    {
+        get => _telegramActionFailed;
+        private set => SetField(ref _telegramActionFailed, value);
+    }
+
+    private bool _whatsAppActionFailed;
+    public bool WhatsAppActionFailed
+    {
+        get => _whatsAppActionFailed;
+        private set => SetField(ref _whatsAppActionFailed, value);
+    }
+
+    // isError=true — це не просто чергове проміжне повідомлення, а кінцева невдача цього
+    // кроку (немає номера, не відкрився месенджер, не зняли скрін, не залили на Drive тощо).
+    // isError=false скидає попередню помилку — використовується і на старті нової спроби,
+    // і в момент фінального успіху (посилання).
+    private void SetMessengerStatus(string messenger, string? value, bool isError = false)
+    {
+        switch (messenger)
+        {
+            case "Viber":    ViberStatus    = value; ViberActionFailed    = isError; break;
+            case "Telegram": TelegramStatus = value; TelegramActionFailed = isError; break;
+            case "WhatsApp": WhatsAppStatus = value; WhatsAppActionFailed = isError; break;
+        }
+    }
+
+    // Посилання на Google Drive окремо від тексту статусу — у ViberStatus/TelegramStatus/
+    // WhatsAppStatus разом зі станом можуть тимчасово опинитись службові повідомлення
+    // ("Завантажую на Google Drive…", помилки тощо), тому в ScreenshotUrls мають потрапити
+    // лише реально завантажені посилання, а не будь-який поточний текст поля.
+    private string? _viberScreenshotUrl;
+    private string? _telegramScreenshotUrl;
+    private string? _whatsAppScreenshotUrl;
+
+    // "Ще не було спілкування" — довший тип недодзвону, менеджер має докласти 2 скріни
+    // (напр. дзвінок і повідомлення); "вже було спілкування" — досить одного.
+    private int RequiredScreenshotCount => IsNoCommunicationType(_selectedCallType) ? 2 : 1;
+
+    // Кнопка "Відправити" вимагає щонайменше RequiredScreenshotCount реально завантажених
+    // скріншотів як доказу переписки (див. CanSubmit) — тому UI показує підказку, поки їх бракує.
+    public bool HasEnoughScreenshots => CollectScreenshotUrls().Count >= RequiredScreenshotCount;
+
+    // Підказку показуємо лише коли тип дзвінка вже обрано — доки _selectedCallType == null,
+    // RequiredScreenshotCount ще не має сенсу (невідомо, 1 чи 2 скріни знадобляться), тож
+    // показувати текст завчасно було б оманливо.
+    public bool ShowScreenshotHint => _selectedCallType is not null && !HasEnoughScreenshots;
+
+    // Текст підказки під кнопкою "Відправити" — залежить від того, скільки скрінів ще бракує
+    // для поточного типу дзвінка (2 для "ще не було спілкування", 1 — для "вже було").
+    public string ScreenshotHintText => RequiredScreenshotCount == 2
+        ? "Зробіть два скріншоти переписки, щоб відправити звіт"
+        : "Зробіть один скріншот переписки, щоб відправити звіт";
+
+    private void SetMessengerScreenshotUrl(string messenger, string? url)
+    {
+        switch (messenger)
+        {
+            case "Viber":    _viberScreenshotUrl    = url; break;
+            case "Telegram": _telegramScreenshotUrl = url; break;
+            case "WhatsApp": _whatsAppScreenshotUrl = url; break;
+        }
+        OnPropertyChanged(nameof(HasEnoughScreenshots));
+        OnPropertyChanged(nameof(ShowScreenshotHint));
+    }
+
+    private IReadOnlyList<string> CollectScreenshotUrls()
+    {
+        var urls = new List<string>();
+        if (!string.IsNullOrWhiteSpace(_viberScreenshotUrl))    urls.Add(_viberScreenshotUrl);
+        if (!string.IsNullOrWhiteSpace(_telegramScreenshotUrl)) urls.Add(_telegramScreenshotUrl);
+        if (!string.IsNullOrWhiteSpace(_whatsAppScreenshotUrl)) urls.Add(_whatsAppScreenshotUrl);
+        return urls;
+    }
+
+    // На відміну від CollectScreenshotUrls (компактний список без прив'язки до месенджера),
+    // тут кожне посилання йде під ключем свого месенджера — щоб у Google Таблиці скрін
+    // гарантовано потрапив саме в колонку "Viber"/"Telegram"/"WhatsApp", а не в довільну за порядком.
+    private IReadOnlyDictionary<string, string> CollectScreenshotUrlsByMessenger()
+    {
+        var map = new Dictionary<string, string>();
+        if (!string.IsNullOrWhiteSpace(_viberScreenshotUrl))    map["Viber"]    = _viberScreenshotUrl;
+        if (!string.IsNullOrWhiteSpace(_telegramScreenshotUrl)) map["Telegram"] = _telegramScreenshotUrl;
+        if (!string.IsNullOrWhiteSpace(_whatsAppScreenshotUrl)) map["WhatsApp"] = _whatsAppScreenshotUrl;
+        return map;
     }
 
     public MissedCallReportViewModel(
@@ -180,6 +291,9 @@ public class MissedCallReportViewModel : ViewModelBase
         DateTime missedAt,
         KommoService kommo,
         ScreenCaptureService screenCapture,
+        GoogleDriveUploadService driveUpload,
+        AppSettings settings,
+        PendingScreenshotUploadRetryService screenshotRetry,
         string? managerName = null)
     {
         _onComplete              = onComplete;
@@ -187,12 +301,11 @@ public class MissedCallReportViewModel : ViewModelBase
         _defaultFirstContactTime = missedAt;
         _kommo                   = kommo;
         _capture                 = screenCapture;
+        _drive                   = driveUpload;
+        _settings                = settings;
+        _screenshotRetry         = screenshotRetry;
         _firstContactTimeText    = missedAt.ToString(FirstContactTimeFormat, CultureInfo.InvariantCulture);
         SubmitCommand = new RelayCommand(OnSubmit, CanSubmit);
-
-        AddScreenshotFieldCommand = new RelayCommand(
-            () => Screenshots.Add(new ScreenshotAttachment(Screenshots.Count + 1, isRemovable: true)));
-        RemoveScreenshotFieldCommand = new RelayCommand<ScreenshotAttachment>(RemoveScreenshotField);
 
         // Кнопки +/- поруч із полем часу — крок 1 хв за клік (RepeatButton у XAML сам
         // повторює команду, доки кнопку тримають натиснутою).
@@ -200,10 +313,6 @@ public class MissedCallReportViewModel : ViewModelBase
         DecrementFirstContactTimeCommand = new RelayCommand(() => AdjustFirstContactTime(-1));
 
         OpenMessengerCommand = new AsyncRelayCommand<string>(OpenMessengerAsync);
-
-        Screenshots.CollectionChanged += OnScreenshotsCollectionChanged;
-        // Поля скрінів з'являються лише після вибору типу дзвінка (див. EnsureRequiredScreenshotFields) —
-        // доки тип не обрано, полів не повинно бути взагалі.
     }
 
     private async Task OpenMessengerAsync(string? messenger)
@@ -212,11 +321,11 @@ public class MissedCallReportViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(_crmUrl) || !UrlValidator.IsValidHttpUrl(_crmUrl))
         {
-            QuickActionsStatus = "Спочатку вкажіть коректне посилання на CRM";
+            SetMessengerStatus(messenger, "Спочатку вкажіть коректне посилання на CRM", isError: true);
             return;
         }
 
-        QuickActionsStatus = "Шукаю номер клієнта в CRM…";
+        SetMessengerStatus(messenger, "Шукаю номер клієнта в CRM…");
         string? phone;
         try
         {
@@ -225,20 +334,20 @@ public class MissedCallReportViewModel : ViewModelBase
         catch (Exception ex)
         {
             Debug.WriteLine($"[MissedCallReport] GetClientPhoneAsync failed: {ex}");
-            QuickActionsStatus = "Помилка звернення до CRM";
+            SetMessengerStatus(messenger, "Помилка звернення до CRM", isError: true);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(phone))
         {
-            QuickActionsStatus = "Не вдалося знайти номер телефону клієнта в CRM";
+            SetMessengerStatus(messenger, "Не вдалося знайти номер телефону клієнта в CRM", isError: true);
             return;
         }
 
         var link = MessengerDeepLinkProvider.BuildDeepLink(messenger, phone);
         if (link is null)
         {
-            QuickActionsStatus = $"Немає посилання для {messenger}";
+            SetMessengerStatus(messenger, $"Немає посилання для {messenger}", isError: true);
             return;
         }
 
@@ -249,21 +358,21 @@ public class MissedCallReportViewModel : ViewModelBase
         catch (Exception ex)
         {
             Debug.WriteLine($"[MissedCallReport] Process.Start failed: {ex}");
-            QuickActionsStatus = $"Не вдалося відкрити {messenger}";
+            SetMessengerStatus(messenger, $"Не вдалося відкрити {messenger}", isError: true);
             return;
         }
 
-        QuickActionsStatus = $"Відкриваю {messenger}, очікую вікно…";
+        SetMessengerStatus(messenger, $"Відкриваю {messenger}, очікую вікно…");
 
         var appeared = await WaitForMessengerForegroundAsync(messenger);
         if (!appeared)
         {
-            QuickActionsStatus = $"Вікно {messenger} не з'явилось — скрін не зроблено";
+            SetMessengerStatus(messenger, $"Вікно {messenger} не з'явилось — скрін не зроблено", isError: true);
             return;
         }
 
         await Task.Delay(RenderSettleDelay);
-        CaptureScreenshot();
+        await CaptureAndUploadScreenshotAsync(messenger);
     }
 
     // Опитує GetForegroundWindow(), поки активним вікном не стане процес потрібного
@@ -309,70 +418,110 @@ public class MissedCallReportViewModel : ViewModelBase
         return ScreenCaptureInterop.GetWindowText(hWnd, sb, sb.Capacity) > 0 ? sb.ToString() : null;
     }
 
-    private void CaptureScreenshot()
+    // Знімає скрін вікна месенджера локально, вантажить його на Google Drive (в окрему підпапку
+    // "Screenshots", а не впереміш із аудіозаписами дзвінків) і записує отримане посилання прямо
+    // у поле статусу відповідного месенджера (те саме readonly-поле, що раніше показувало лише
+    // "Скріншот збережено локально"). Локальний файл видаляється одразу після успішного
+    // завантаження — Drive стає єдиним місцем зберігання скріна. Якщо завантажити одразу не
+    // вдалось (мережа тощо) — файл лишається на диску і ставиться в чергу фонового ретраю
+    // (_screenshotRetry), щоб посилання не загубилось назавжди.
+    private async Task CaptureAndUploadScreenshotAsync(string messenger)
     {
-        var path = _capture.CaptureForegroundWindow();
-        QuickActionsStatus = path is null
-            ? "Не вдалося зробити скріншот"
-            : "Скріншот збережено локально";
+        var path = _capture.CaptureForegroundWindow(messenger);
+        if (path is null)
+        {
+            SetMessengerStatus(messenger, "Не вдалося зробити скріншот", isError: true);
+            return;
+        }
+
+        SetMessengerStatus(messenger, "Завантажую скріншот на Google Drive…");
+
+        string? folderId;
+        try
+        {
+            folderId = await ResolveScreenshotFolderIdAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MissedCallReport] Screenshot folder resolve failed: {ex}");
+            folderId = null;
+        }
+
+        string? url;
+        try
+        {
+            url = await _drive.UploadAsync(path, folderId, mimeType: "image/png");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MissedCallReport] Screenshot upload failed: {ex}");
+            url = null;
+        }
+
+        if (url is null)
+        {
+            SetMessengerStatus(messenger, "Не вдалося завантажити — спробуємо у фоні пізніше", isError: true);
+            // CrmUrl тут уже гарантовано валідний (перевірено на вході в OpenMessengerAsync) —
+            // передаємо його, щоб, якщо форму встигнуть відправити раніше за фонову спробу,
+            // посилання все одно потрапило в лід окремою нотаткою (див. RetryOneAsync).
+            _ = _screenshotRetry.EnqueueAsync(path, folderId, messenger, _crmUrl);
+            return;
+        }
+
+        SetMessengerScreenshotUrl(messenger, url);
+        SetMessengerStatus(messenger, url); // isError: false (за замовчуванням) — це вже справжнє посилання
+
+        try { File.Delete(path); }
+        catch (Exception ex) { Debug.WriteLine($"[MissedCallReport] Local screenshot delete failed: {ex.Message}"); }
     }
 
-    private void RemoveScreenshotField(ScreenshotAttachment? item)
+    // Кешується на весь час життя діалогу — щоб не звертатись до Drive API за кожен скрін
+    // (Viber/Telegram/WhatsApp), а резолвити підпапку "Screenshots" лише один раз.
+    private string? _screenshotFolderId;
+    private bool _screenshotFolderResolved;
+
+    // Базова папка — той самий спрощений (порівняно з UploadOrchestrator.ResolveTargetFolderAsync)
+    // вибір: без авто-створення підпапки менеджера, лише вже готові UserFolderId чи спільна
+    // GoogleDriveFolderId. Усередині неї додатково гарантується/створюється підпапка "Screenshots",
+    // щоб скріни не лежали впереміш із аудіозаписами дзвінків у тій самій папці.
+    private async Task<string?> ResolveScreenshotFolderIdAsync()
     {
-        if (item is null || !item.IsRemovable) return;
+        if (_screenshotFolderResolved) return _screenshotFolderId;
 
-        Screenshots.Remove(item);
+        var baseFolderId = ResolveBaseFolderId();
+        if (string.IsNullOrWhiteSpace(baseFolderId))
+        {
+            _screenshotFolderId = null;
+        }
+        else
+        {
+            var subfolderId = await _drive.GetOrCreateUserFolderAsync(baseFolderId, "Screenshots");
+            _screenshotFolderId = subfolderId ?? baseFolderId; // якщо підпапку створити не вдалось — вантажимо в базову
+        }
 
-        // Перенумеровуємо мітки "Скріншот N", щоб після видалення поля з середини
-        // вони лишались послідовними (1, 2, 3...).
-        for (int i = 0; i < Screenshots.Count; i++)
-            Screenshots[i].Index = i + 1;
+        _screenshotFolderResolved = true;
+        return _screenshotFolderId;
     }
 
-    // Синхронізує кількість полів скрінів РІВНО з мінімумом, потрібним для щойно обраного
-    // типу дзвінка: тип не обрано → полів немає; "вже було спілкування" → 1; "ще не було" → 2.
-    // Спрацьовує лише при зміні самого типу дзвінка, тож поля, додані вручну через
-    // "+ Додати ще поле" вже ПІСЛЯ вибору типу, цим не зачіпаються.
-    private void EnsureRequiredScreenshotFields()
+    private string? ResolveBaseFolderId()
     {
-        while (Screenshots.Count < RequiredScreenshotCount)
-            Screenshots.Add(new ScreenshotAttachment(Screenshots.Count + 1));
+        if (!string.IsNullOrWhiteSpace(_settings.UserFolderId))
+            return _settings.UserFolderId;
 
-        while (Screenshots.Count > RequiredScreenshotCount)
-            Screenshots.RemoveAt(Screenshots.Count - 1);
+        return string.IsNullOrWhiteSpace(_settings.GoogleDriveFolderId)
+            ? null
+            : _settings.GoogleDriveFolderId;
     }
 
-    // Перевалідовуємо кнопку "Відправити" при кожній зміні тексту в полі скріншота
-    // (щоб некоректне посилання на prnt.sc одразу блокувало відправку) і стежимо
-    // за появою/зникненням нових полів, додаваних через AddScreenshotFieldCommand.
-    private void OnScreenshotsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.NewItems is not null)
-            foreach (ScreenshotAttachment item in e.NewItems)
-                item.PropertyChanged += OnScreenshotItemPropertyChanged;
-
-        if (e.OldItems is not null)
-            foreach (ScreenshotAttachment item in e.OldItems)
-                item.PropertyChanged -= OnScreenshotItemPropertyChanged;
-
-        CommandManager.InvalidateRequerySuggested();
-    }
-
-    private void OnScreenshotItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ScreenshotAttachment.IsInvalid))
-            CommandManager.InvalidateRequerySuggested();
-    }
-
-    // Усі поля скрінів — і обов'язкові, і додані вручну через "+ Додати ще поле" — мають бути
-    // заповнені коректним посиланням: якщо менеджер додав зайве поле, "Відправити" лишається
-    // неактивною, доки він або заповнить його, або видалить.
+    // Ручне введення посилань на скріншоти (поля "Скріншот N" + "Додати ще скріншот") прибрано —
+    // наразі скрін знімається автоматично через "Швидкі дії" і одразу вантажиться на Google Drive
+    // (CaptureAndUploadScreenshotAsync), а MissedCallReportData.ScreenshotUrls формується
+    // з реально завантажених посилань у CollectScreenshotUrls().
     private bool CanSubmit() =>
         _selectedCallType is not null &&
         UrlValidator.IsValidHttpUrl(_crmUrl) &&
-        Screenshots.Count >= RequiredScreenshotCount &&
-        Screenshots.All(s => UrlValidator.IsValidScreenshotUrl(s.Url)) &&
-        !IsFirstContactTimeInvalid;
+        !IsFirstContactTimeInvalid &&
+        CollectScreenshotUrls().Count >= RequiredScreenshotCount;
 
     private void OnSubmit()
     {
@@ -383,13 +532,11 @@ public class MissedCallReportViewModel : ViewModelBase
             : _defaultFirstContactTime;
 
         _onComplete(new MissedCallReportData(
-            Manager:          _managerName,
-            CallType:         _selectedCallType!,
-            CrmUrl:           _crmUrl,
-            ScreenshotUrls:   Screenshots
-                .Where(s => !string.IsNullOrWhiteSpace(s.Url))
-                .Select(s => s.Url.Trim())
-                .ToList(),
-            FirstContactTime: firstContactTime));
+            Manager:                   _managerName,
+            CallType:                  _selectedCallType!,
+            CrmUrl:                    _crmUrl,
+            ScreenshotUrls:            CollectScreenshotUrls(),
+            FirstContactTime:          firstContactTime,
+            ScreenshotUrlsByMessenger: CollectScreenshotUrlsByMessenger()));
     }
 }

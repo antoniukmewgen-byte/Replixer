@@ -101,6 +101,28 @@ public class KommoService : IDisposable
         return (await noteTask, speedMinutes, speedWorkMinutes);
     }
 
+    // Легкий довідник "Швидкості" — без повторної нотатки/типу дзвінка/статусу — для ліда, чиє
+    // Kommo-доставлення (нотатка) вже відбулось раніше, але сама швидкість тоді порахувалась не
+    // повністю (напр. лід ще не мав прив'язаного контакту/компанії, чи телефон не резолвився в
+    // таймзону, чи стався тимчасовий збій мережі саме в той момент). Викликається
+    // MissedCallDeliveryService на фоновому повторі, коли треба довиконати лише цю частину, не
+    // дублюючи вже надіслану нотатку. TrySetFirstContactDateAsync сама нічого не перезаписує,
+    // якщо поле вже "зайняте" (occupied) — тож повторний виклик безпечний.
+    public async Task<(int? ProcessingSpeedMinutes, int? ProcessingSpeedWorkMinutes)> RecalculateProcessingSpeedAsync(
+        string leadUrl, DateTime callStartTime)
+    {
+        if (!IsEnabled) return (null, null);
+
+        var (subdomain, leadId) = ParseLeadUrl(leadUrl);
+        subdomain = string.IsNullOrEmpty(subdomain) ? _settings.KommoSubdomain : subdomain;
+        if (leadId is null || string.IsNullOrEmpty(subdomain)) return (null, null);
+
+        string baseUrl = $"https://{subdomain}.kommo.com/api/v4";
+        string token   = _settings.KommoApiToken;
+
+        return await TrySetFirstContactDateAsync(baseUrl, token, leadId, callStartTime);
+    }
+
     // Дістає номер телефону клієнта за посиланням на лід — для плаваючої плашки-скріншотера,
     // яка сама формує deep-link на месенджер за цим номером (перевикористовує ту саму логіку
     // пошуку контакту/компанії, що й TrySetLocalTimeProcessingSpeedAsync).
@@ -571,8 +593,11 @@ public class KommoService : IDisposable
         {
             try
             {
+                // "with=companies" необхідне окремо від "contacts" — інакше _embedded.companies
+                // не приходить у відповіді взагалі, і companyId нижче завжди лишається null для
+                // лідів, прив'язаних лише до компанії (без прямого контакту).
                 using var req = new HttpRequestMessage(HttpMethod.Get,
-                    $"{baseUrl}/leads/{leadId}?with=contacts,custom_fields");
+                    $"{baseUrl}/leads/{leadId}?with=contacts,companies,custom_fields");
                 req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var res  = await _http.SendAsync(req);
                 var body = await res.Content.ReadAsStringAsync();

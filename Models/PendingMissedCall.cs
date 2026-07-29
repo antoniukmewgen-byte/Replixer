@@ -20,6 +20,10 @@ public record PendingMissedCall(
     DateTime  MissedAt,
     string    Manager = "",
     IReadOnlyList<string>? ScreenshotUrls = null,
+    // Ті самі посилання, прив'язані до конкретного месенджера ("Viber"/"Telegram"/"WhatsApp") —
+    // потрібно, щоб BuildSheetRow клав скрін саме в свою колонку Google Таблиці, а не за
+    // порядком компактного списку ScreenshotUrls (де порядок не гарантує, який саме месенджер).
+    IReadOnlyDictionary<string, string>? ScreenshotUrlsByMessenger = null,
     bool      KommoDelivered = false,
     bool      SheetDelivered = false,
     int?      ProcessingSpeedMinutes = null,

@@ -16,15 +16,14 @@ namespace Replixer.Services.Upload;
 // "розшарити" на email сервіс-акаунта як редактора, інакше API поверне 403.
 public class GoogleSheetsUploadService
 {
-    // Фіксована частина шапки — відповідає перших 10 колонкам, які пише BuildSheetRow
-    // (MissedCallDeliveryService). Далі йдуть "Скріншот N" — їх кількість залежить від
-    // конкретного рядка (BuildSheetRow додає щонайменше 2, і більше, якщо скріншотів
-    // фактично більше) — див. BuildHeaders.
-    private static readonly string[] FixedSheetHeaders =
+    // Повна шапка — фіксована: 10 колонок даних + по одній колонці на кожен месенджер (у тому
+    // самому порядку, що й MessengerDeepLinkProvider.SupportedMessengers і
+    // MissedCallDeliveryService.BuildSheetRow), а не розрахована під конкретний рядок.
+    private static readonly string[] SheetHeaders =
     {
         "Рік", "День", "Місяць", "Час запису", "Менеджер", "Тип дзвінка",
         "Дата дзвінка", "Швидкість, хв", "Швидкість (роб. час), хв",
-        "Посилання CRM",
+        "Посилання CRM", "Viber", "Telegram", "WhatsApp",
     };
 
     private readonly SheetsService? _service;
@@ -125,7 +124,7 @@ public class GoogleSheetsUploadService
         if (string.IsNullOrWhiteSpace(spreadsheetId))
             return (false, false, "ID таблиці не вказано");
 
-        await EnsureHeaderRowAsync(spreadsheetId, sheetName, values.Count, ct);
+        await EnsureHeaderRowAsync(spreadsheetId, sheetName, ct);
 
         try
         {
@@ -170,18 +169,16 @@ public class GoogleSheetsUploadService
     }
 
     // Перевіряє перший рядок аркуша: якщо він порожній (нова/щойно створена таблиця) —
-    // дописує повну шапку з назвами колонок (враховуючи, скільки саме колонок скріншотів
-    // потрібно саме для цього рядка). Якщо шапка вже є, але коротша, ніж потрібно для
-    // поточного рядка (напр. раніше було 2 "Скріншот N", а зараз недодзвін має 4 скріни) —
-    // дописує лише бракуючий хвіст (нові "Скріншот N"), не чіпаючи вже наявні підписи.
-    // Помилки тут — не фатальні: якщо перевірка/запис шапки не вдалися (напр. немає прав
-    // саме на Update, хоча Append якимось дивом працює), просто пропускаємо крок і йдемо
-    // далі дописувати сам рядок з даними.
-    private async Task EnsureHeaderRowAsync(string spreadsheetId, string sheetName, int columnCount, CancellationToken ct)
+    // дописує повну (фіксовану) шапку з назвами колонок. Якщо шапка вже є, але коротша за
+    // повну (напр. стара таблиця зі старою версією шапки) — дописує лише бракуючий хвіст,
+    // не чіпаючи вже наявні підписи. Помилки тут — не фатальні: якщо перевірка/запис шапки
+    // не вдалися (напр. немає прав саме на Update, хоча Append якимось дивом працює), просто
+    // пропускаємо крок і йдемо далі дописувати сам рядок з даними.
+    private async Task EnsureHeaderRowAsync(string spreadsheetId, string sheetName, CancellationToken ct)
     {
         try
         {
-            var headers = BuildHeaders(columnCount);
+            var headers = SheetHeaders;
 
             var checkRange = string.IsNullOrWhiteSpace(sheetName) ? "A1:ZZ1" : $"{sheetName}!A1:ZZ1";
             var getReq      = _service!.Spreadsheets.Values.Get(spreadsheetId, checkRange);
@@ -199,7 +196,7 @@ public class GoogleSheetsUploadService
                 toWrite     = headers.Cast<object>().ToList();
                 targetRange = string.IsNullOrWhiteSpace(sheetName) ? "A1" : $"{sheetName}!A1";
             }
-            else if (existingRow!.Count < headers.Count)
+            else if (existingRow!.Count < headers.Length)
             {
                 // Шапка коротша за потрібне (з'явились нові колонки скріншотів) — дописуємо хвіст.
                 toWrite = headers.Skip(existingRow.Count).Cast<object>().ToList();
@@ -222,17 +219,6 @@ public class GoogleSheetsUploadService
         {
             Debug.WriteLine($"[GSheets] EnsureHeaderRowAsync skipped (non-fatal): {ex.GetType().Name}: {ex.Message}");
         }
-    }
-
-    // Фіксовані 9 колонок + "Скріншот N" по кількості колонок скріншотів у цьому конкретному
-    // рядку (columnCount — загальна довжина рядка з BuildSheetRow, мінімум 2 скріншоти).
-    private static List<string> BuildHeaders(int columnCount)
-    {
-        var headers = FixedSheetHeaders.ToList();
-        int screenshotColumns = Math.Max(2, columnCount - FixedSheetHeaders.Length);
-        for (int i = 1; i <= screenshotColumns; i++)
-            headers.Add($"Скріншот {i}");
-        return headers;
     }
 
     // Переводить 1-based номер колонки в літерне позначення (1→A, 26→Z, 27→AA, ...).

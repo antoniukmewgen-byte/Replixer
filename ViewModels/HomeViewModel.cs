@@ -30,6 +30,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
     private readonly MissedCallDeliveryService _missedCallDelivery;
     private readonly KommoService _kommo;
     private readonly ScreenCaptureService _screenCapture;
+    private readonly GoogleDriveUploadService _driveUpload;
+    private readonly PendingScreenshotUploadRetryService _screenshotRetry;
 
     private bool  _isRecording;
     private bool  _isStopping;
@@ -93,7 +95,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         AudioRecordingService recorder,
         MissedCallDeliveryService missedCallDelivery,
         KommoService kommo,
-        ScreenCaptureService screenCapture)
+        ScreenCaptureService screenCapture,
+        GoogleDriveUploadService driveUpload,
+        PendingScreenshotUploadRetryService screenshotRetry)
     {
         _settings           = settings;
         _orchestrator       = orchestrator;
@@ -104,6 +108,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _missedCallDelivery = missedCallDelivery;
         _kommo              = kommo;
         _screenCapture      = screenCapture;
+        _driveUpload        = driveUpload;
+        _screenshotRetry    = screenshotRetry;
 
         _callContent = new IdleCallViewModel(ManualStartRecording, ReportMissedCall);
 
@@ -373,6 +379,9 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             missedAt: missedAt,
             kommo: _kommo,
             screenCapture: _screenCapture,
+            driveUpload: _driveUpload,
+            settings: _settings,
+            screenshotRetry: _screenshotRetry,
             managerName: _settings.ManagerName);
         MissedCallReportRequested?.Invoke(vm);
     }
@@ -393,7 +402,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         var id = Guid.NewGuid();
         _missedCallsVm.AddEntry(id, data.Manager, data.CallType, data.FirstContactTime, data.CrmUrl, data.ScreenshotUrls);
         return _missedCallDelivery.SubmitAsync(id, data.CrmUrl, data.FormatCaption(), data.CallType, data.FirstContactTime,
-            data.Manager, data.ScreenshotUrls);
+            data.Manager, data.ScreenshotUrls, data.ScreenshotUrlsByMessenger);
     }
 
     private void WireEntryEditCommand(RecordingEntry entry)

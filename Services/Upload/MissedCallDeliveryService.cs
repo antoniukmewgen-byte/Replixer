@@ -1,3 +1,4 @@
+using Replixer.Infrastructure;
 using Replixer.Models;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -72,9 +73,10 @@ public sealed class MissedCallDeliveryService : IDisposable
     // див. HomeViewModel.ReportMissedCall), а не момент сабміту цієї форми.
     public async Task SubmitAsync(
         Guid id, string crmUrl, string note, string? callType, DateTime missedAt,
-        string manager = "", IReadOnlyList<string>? screenshotUrls = null)
+        string manager = "", IReadOnlyList<string>? screenshotUrls = null,
+        IReadOnlyDictionary<string, string>? screenshotUrlsByMessenger = null)
     {
-        var entry = new PendingMissedCall(id, crmUrl, note, callType, missedAt, manager, screenshotUrls);
+        var entry = new PendingMissedCall(id, crmUrl, note, callType, missedAt, manager, screenshotUrls, screenshotUrlsByMessenger);
 
         lock (_pending) _pending.Add(entry);
         await SaveAsync();
@@ -119,6 +121,19 @@ public sealed class MissedCallDeliveryService : IDisposable
             bool    needSheet    = _settings.IsGoogleSheetsEnabled && !string.IsNullOrWhiteSpace(_settings.GoogleSheetsId);
             bool    sheetOk      = entry.SheetDelivered || !needSheet;
             string? sheetWarning = null;
+
+            // Kommo вже доставлено (можливо, ще під час минулої спроби), але "Швидкість" тоді
+            // порахувалась не повністю (напр. лід ще не мав прив'язаного контакту/компанії, чи
+            // телефон не резолвився в таймзону, чи стався тимчасовий збій саме в той момент) —
+            // якщо запис ще чекає на Таблицю, довраховуємо швидкість окремим легким запитом, не
+            // чіпаючи вже надіслану нотатку. Без цього кешовані null лишались би в записі
+            // (і, відповідно, порожніми в Таблиці) назавжди — саме те, на що поскаржився користувач.
+            if (kommoOk && needSheet && !entry.SheetDelivered && (speedMinutes is null || speedWorkMinutes is null))
+            {
+                var recalculated = await _orchestrator.RecalculateProcessingSpeedAsync(entry.CrmUrl, entry.MissedAt);
+                speedMinutes     ??= recalculated.ProcessingSpeedMinutes;
+                speedWorkMinutes ??= recalculated.ProcessingSpeedWorkMinutes;
+            }
 
             if (kommoOk && needSheet && !entry.SheetDelivered)
             {
@@ -183,8 +198,6 @@ public sealed class MissedCallDeliveryService : IDisposable
         "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень",
     };
 
-    // Стандарт — 2 колонки під скріни; якщо їх більше — додаємо ще по одній колонці на кожен
-    // наступний (Скрін 3, Скрін 4, ...), а не обрізаємо список.
     private static List<object?> BuildSheetRow(PendingMissedCall entry)
     {
         var now = DateTime.Now;
@@ -202,10 +215,17 @@ public sealed class MissedCallDeliveryService : IDisposable
             entry.CrmUrl,
         };
 
-        int screenshotCount = entry.ScreenshotUrls?.Count ?? 0;
-        int columns = Math.Max(2, screenshotCount);
-        for (int i = 0; i < columns; i++)
-            row.Add(i < screenshotCount ? entry.ScreenshotUrls![i] : null);
+        // Колонки під скріни — по одній на месенджер, у фіксованому порядку Viber/Telegram/
+        // WhatsApp (той самий, що й заголовки в GoogleSheetsUploadService.SheetHeaders) —
+        // саме за назвою месенджера, а не за позицією в компактному ScreenshotUrls, бо якщо,
+        // наприклад, скрін є лише з Telegram, він мусить потрапити в колонку "Telegram",
+        // а не помилково зсунутись у колонку "Viber".
+        foreach (var messenger in MessengerDeepLinkProvider.SupportedMessengers)
+        {
+            string? url = null;
+            entry.ScreenshotUrlsByMessenger?.TryGetValue(messenger, out url);
+            row.Add(string.IsNullOrWhiteSpace(url) ? null : url);
+        }
 
         return row;
     }

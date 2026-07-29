@@ -14,6 +14,7 @@ internal static class ScreenCaptureInterop
     }
 
     public const uint PW_RENDERFULLCONTENT = 0x00000002;
+    public const uint SRCCOPY = 0x00CC0020;
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
@@ -37,6 +38,16 @@ internal static class ScreenCaptureInterop
 
     [DllImport("user32.dll")]
     public static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, uint nFlags);
+
+    // Резервний спосіб зняти скрін, коли PrintWindow повертає порожній/сірий кадр — типово
+    // трапляється з UWP/Store-застосунками (WhatsApp Desktop) чи будь-яким вікном з апаратним
+    // композитингом, чий реальний вміст малюється в окремому дочірньому CoreWindow через
+    // DirectComposition і не потрапляє в PrintWindow. BitBlt натомість копіює вже фактично
+    // відрендерений вміст екрана — те, що користувач бачить, а не окрему "картинку на запит".
+    [DllImport("gdi32.dll")]
+    public static extern bool BitBlt(
+        IntPtr hdcDest, int xDest, int yDest, int width, int height,
+        IntPtr hdcSrc, int xSrc, int ySrc, uint rop);
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetDC(IntPtr hWnd);

@@ -48,6 +48,12 @@ public interface IUploadOrchestrator
 
     Task<KommoNoteDeliveryResult> PostKommoNoteAsync(string kommoLeadUrl, string note, DateTime? callStartTime, string? callType = null);
 
+    // Легкий довідник "Швидкості" — без повторної нотатки/типу дзвінка/статусу — для ліда, чиє
+    // Kommo-доставлення (нотатка) вже відбулось раніше, але сама швидкість тоді порахувалась не
+    // повністю (напр. лід ще не мав прив'язаного контакту/компанії чи телефон не резолвився в
+    // таймзону). Викликається MissedCallDeliveryService, коли треба довиконати лише цю частину.
+    Task<(int? ProcessingSpeedMinutes, int? ProcessingSpeedWorkMinutes)> RecalculateProcessingSpeedAsync(string kommoLeadUrl, DateTime callStartTime);
+
     Task<UploadResult> RetryMissingStepsAsync(
         string filePath,
         string? existingDriveUrl,

@@ -6,8 +6,8 @@
 
     <UserControl.Resources>
         <Style x:Key="QuickActionCircleButton" TargetType="Button">
-            <Setter Property="Width" Value="42" />
-            <Setter Property="Height" Value="42" />
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
@@ -18,7 +18,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{StaticResource BrushBorderColor4}"
                             BorderThickness="1"
-                            CornerRadius="21">
+                            CornerRadius="18">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -43,6 +43,40 @@
             <Setter Property="Foreground" Value="{StaticResource SubText}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
+
+        <!--
+            Іконка месенджера — лише візуальний бейдж (не кнопка): показує, якому
+            месенджеру відповідає поле статусу й кнопка-фотоапарат в тому ж рядку.
+            Квадрат із заокругленнями (не коло) — розмір узгоджено з кнопкою поруч і з
+            природною висотою звичайних полів форми (як "Тип дзвінка"/"CRM"), а не 42px.
+        -->
+        <Style x:Key="MessengerIconBadge" TargetType="Border">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+
+        <!--  Векторна іконка фотоапарата для кнопки "зняти скрін" — без окремого файлу-ассету.  -->
+        <CombinedGeometry x:Key="CameraIconGeometry" GeometryCombineMode="Exclude">
+            <CombinedGeometry.Geometry1>
+                <GeometryGroup FillRule="Nonzero">
+                    <RectangleGeometry
+                        RadiusX="3"
+                        RadiusY="3"
+                        Rect="1,6,22,14" />
+                    <RectangleGeometry
+                        RadiusX="1.5"
+                        RadiusY="1.5"
+                        Rect="8,2,8,5" />
+                </GeometryGroup>
+            </CombinedGeometry.Geometry1>
+            <CombinedGeometry.Geometry2>
+                <EllipseGeometry
+                    Center="12,13"
+                    RadiusX="4.5"
+                    RadiusY="4.5" />
+            </CombinedGeometry.Geometry2>
+        </CombinedGeometry>
     </UserControl.Resources>
 
     <Border
@@ -260,7 +294,10 @@
                                 Visibility="{Binding IsCrmUrlInvalid, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
 
-                        <!--  Швидкі дії — відкрити чат з клієнтом і автоматично зняти скрін  -->
+                        <!--
+                            Швидкі дії — іконка месенджера, поле статусу (лише перегляд) і кнопка-фотоапарат,
+                            яка відкриває чат з клієнтом і автоматично знімає скрін.
+                        -->
                         <StackPanel Margin="0,12,0,0">
                             <TextBlock
                                 Margin="0,0,0,4"
@@ -268,195 +305,250 @@
                                 FontSize="12"
                                 FontWeight="Medium"
                                 Foreground="{StaticResource SubText}">
-                                Швидкі дії
+                                Скріншоти
                             </TextBlock>
 
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
-                                    <Button
-                                        Background="{StaticResource BrushViber}"
-                                        Command="{Binding OpenMessengerCommand}"
-                                        CommandParameter="Viber"
-                                        Style="{StaticResource QuickActionCircleButton}"
-                                        ToolTip="Написати у Viber">
-                                        <Image Width="20" Height="20" Source="/Assets/Icons/viber.png" />
-                                    </Button>
-                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="Viber" />
-                                </StackPanel>
+                            <!--  Viber  -->
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
-                                    <Button
-                                        Background="{StaticResource BrushTelegram}"
-                                        Command="{Binding OpenMessengerCommand}"
-                                        CommandParameter="Telegram"
-                                        Style="{StaticResource QuickActionCircleButton}"
-                                        ToolTip="Написати у Telegram">
-                                        <Image Width="20" Height="20" Source="/Assets/Icons/telegram.png" />
-                                    </Button>
-                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="Telegram" />
-                                </StackPanel>
+                                <Border
+                                    Grid.Column="0"
+                                    Background="{StaticResource BrushViber}"
+                                    Style="{StaticResource MessengerIconBadge}"
+                                    ToolTip="Viber">
+                                    <Image
+                                        Width="18"
+                                        Height="18"
+                                        Source="/Assets/Icons/viber.png" />
+                                </Border>
 
-                                <StackPanel Orientation="Vertical">
-                                    <Button
-                                        Background="{StaticResource BrushWhatsApp}"
-                                        Command="{Binding OpenMessengerCommand}"
-                                        CommandParameter="WhatsApp"
-                                        Style="{StaticResource QuickActionCircleButton}"
-                                        ToolTip="Написати у WhatsApp">
-                                        <Image Width="20" Height="20" Source="/Assets/Icons/whatsapp.png" />
-                                    </Button>
-                                    <TextBlock Style="{StaticResource QuickActionCaption}" Text="WhatsApp" />
-                                </StackPanel>
-                            </StackPanel>
+                                <Border Grid.Column="1" Margin="8,0">
+                                    <Border.Style>
+                                        <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ViberActionFailed}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <TextBox
+                                            x:Name="ViberStatusBox"
+                                            Focusable="False"
+                                            IsReadOnly="True"
+                                            Style="{StaticResource AppTextBox}"
+                                            Text="{Binding ViberStatus, Mode=OneWay}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="14"
+                                            Foreground="{StaticResource SubText}"
+                                            IsHitTestVisible="False"
+                                            Text="Скрін ще не знято">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=ViberStatusBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
 
-                            <TextBlock
-                                Margin="2,8,2,0"
-                                FontFamily="{StaticResource InterFont}"
-                                FontSize="11"
-                                Foreground="{StaticResource SubText}"
-                                Text="{Binding QuickActionsStatus}"
-                                TextWrapping="Wrap"
-                                Visibility="{Binding QuickActionsStatus, Converter={StaticResource NullToVisibility}}" />
+                                <Button
+                                    Grid.Column="2"
+                                    Background="{StaticResource BrushViber}"
+                                    Command="{Binding OpenMessengerCommand}"
+                                    CommandParameter="Viber"
+                                    Style="{StaticResource QuickActionCircleButton}"
+                                    ToolTip="Написати у Viber і зняти скрін">
+                                    <Path
+                                        Width="16"
+                                        Height="16"
+                                        Data="{StaticResource CameraIconGeometry}"
+                                        Fill="White"
+                                        Stretch="Uniform" />
+                                </Button>
+                            </Grid>
+
+                            <!--  Telegram  -->
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Background="{StaticResource BrushTelegram}"
+                                    Style="{StaticResource MessengerIconBadge}"
+                                    ToolTip="Telegram">
+                                    <Image
+                                        Width="18"
+                                        Height="18"
+                                        Source="/Assets/Icons/telegram.png" />
+                                </Border>
+
+                                <Border Grid.Column="1" Margin="8,0">
+                                    <Border.Style>
+                                        <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TelegramActionFailed}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <TextBox
+                                            x:Name="TelegramStatusBox"
+                                            Focusable="False"
+                                            IsReadOnly="True"
+                                            Style="{StaticResource AppTextBox}"
+                                            Text="{Binding TelegramStatus, Mode=OneWay}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="14"
+                                            Foreground="{StaticResource SubText}"
+                                            IsHitTestVisible="False"
+                                            Text="Скрін ще не знято">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=TelegramStatusBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+
+                                <Button
+                                    Grid.Column="2"
+                                    Background="{StaticResource BrushTelegram}"
+                                    Command="{Binding OpenMessengerCommand}"
+                                    CommandParameter="Telegram"
+                                    Style="{StaticResource QuickActionCircleButton}"
+                                    ToolTip="Написати у Telegram і зняти скрін">
+                                    <Path
+                                        Width="16"
+                                        Height="16"
+                                        Data="{StaticResource CameraIconGeometry}"
+                                        Fill="White"
+                                        Stretch="Uniform" />
+                                </Button>
+                            </Grid>
+
+                            <!--  WhatsApp  -->
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Background="{StaticResource BrushWhatsApp}"
+                                    Style="{StaticResource MessengerIconBadge}"
+                                    ToolTip="WhatsApp">
+                                    <Image
+                                        Width="18"
+                                        Height="18"
+                                        Source="/Assets/Icons/whatsapp.png" />
+                                </Border>
+
+                                <Border Grid.Column="1" Margin="8,0">
+                                    <Border.Style>
+                                        <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding WhatsAppActionFailed}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <TextBox
+                                            x:Name="WhatsAppStatusBox"
+                                            Focusable="False"
+                                            IsReadOnly="True"
+                                            Style="{StaticResource AppTextBox}"
+                                            Text="{Binding WhatsAppStatus, Mode=OneWay}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource InterFont}"
+                                            FontSize="14"
+                                            Foreground="{StaticResource SubText}"
+                                            IsHitTestVisible="False"
+                                            Text="Скрін ще не знято">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=WhatsAppStatusBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+
+                                <Button
+                                    Grid.Column="2"
+                                    Background="{StaticResource BrushWhatsApp}"
+                                    Command="{Binding OpenMessengerCommand}"
+                                    CommandParameter="WhatsApp"
+                                    Style="{StaticResource QuickActionCircleButton}"
+                                    ToolTip="Написати у WhatsApp і зняти скрін">
+                                    <Path
+                                        Width="16"
+                                        Height="16"
+                                        Data="{StaticResource CameraIconGeometry}"
+                                        Fill="White"
+                                        Stretch="Uniform" />
+                                </Button>
+                            </Grid>
                         </StackPanel>
 
-                        <!--  Скріншоти  -->
-                        <StackPanel Margin="0,12,0,0">
-                            <ItemsControl ItemsSource="{Binding Screenshots}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type vm:ScreenshotAttachment}">
-                                        <StackPanel Margin="0,0,0,8">
-                                            <TextBlock
-                                                Margin="0,0,0,4"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="11"
-                                                Foreground="{StaticResource SubText}"
-                                                Text="{Binding Label}" />
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <Border Grid.Column="0">
-                                                    <Border.Style>
-                                                        <Style BasedOn="{StaticResource AppInputBorder}" TargetType="Border">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsInvalid}" Value="True">
-                                                                    <Setter Property="BorderBrush" Value="{StaticResource OtherBrushSubColor4}" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <Grid>
-                                                        <TextBox
-                                                            x:Name="ScreenshotBox"
-                                                            Style="{StaticResource AppTextBox}"
-                                                            Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        <TextBlock
-                                                            VerticalAlignment="Center"
-                                                            FontFamily="{StaticResource InterFont}"
-                                                            FontSize="14"
-                                                            Foreground="{StaticResource SubText}"
-                                                            IsHitTestVisible="False"
-                                                            Text="Вставте посилання (prnt.sc)...">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Text, ElementName=ScreenshotBox}" Value="">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </Grid>
-                                                </Border>
-
-                                                <Button
-                                                    Grid.Column="1"
-                                                    Width="38"
-                                                    Height="38"
-                                                    Margin="8,0,0,0"
-                                                    Command="{Binding DataContext.RemoveScreenshotFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}"
-                                                    Cursor="Hand"
-                                                    Visibility="{Binding IsRemovable, Converter={StaticResource BoolToVis}}">
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="Button">
-                                                            <Border
-                                                                x:Name="Bg"
-                                                                Background="{StaticResource BrushColor4}"
-                                                                BorderBrush="{StaticResource BrushBorderColor4}"
-                                                                BorderThickness="1"
-                                                                CornerRadius="8">
-                                                                <Path
-                                                                    Width="14"
-                                                                    Height="14"
-                                                                    Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12Z"
-                                                                    Fill="{StaticResource SubText}"
-                                                                    Stretch="Uniform" />
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
-                                                                </Trigger>
-                                                                <Trigger Property="IsPressed" Value="True">
-                                                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
-                                            </Grid>
-                                            <TextBlock
-                                                Margin="2,4,0,0"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="11"
-                                                Foreground="{StaticResource OtherBrushSubColor4}"
-                                                Text="Посилання має бути на prnt.sc (напр. https://prnt.sc/eRDSnZFKNIqV)"
-                                                Visibility="{Binding IsInvalid, Converter={StaticResource BoolToVis}}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <Button
-                                Margin="0,4,0,0"
-                                Padding="10,7"
-                                HorizontalAlignment="Stretch"
-                                Command="{Binding AddScreenshotFieldCommand}"
-                                Cursor="Hand"
-                                Visibility="{Binding HasCallType, Converter={StaticResource BoolToVis}}">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border
-                                            x:Name="Bg"
-                                            Padding="{TemplateBinding Padding}"
-                                            Background="{StaticResource BrushColor3}"
-                                            BorderBrush="{StaticResource BrushBorderColor3}"
-                                            BorderThickness="1"
-                                            CornerRadius="8">
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontFamily="{StaticResource InterFont}"
-                                                FontSize="12"
-                                                FontWeight="Medium"
-                                                Foreground="{StaticResource SubText}"
-                                                Text="+ Додати ще скріншот" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>
+                        <!--  Підказка: поки не набрано потрібної кількості скрінів (RequiredScreenshotCount —
+                             2 для "ще не було спілкування", 1 для "вже було"), кнопка "Відправити" неактивна
+                             (CanSubmit). Не показуємо взагалі, доки тип дзвінка ще не обрано (ShowScreenshotHint).  -->
+                        <TextBlock
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Center"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            Foreground="{StaticResource SubText}"
+                            Text="{Binding ScreenshotHintText}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowScreenshotHint}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
 
                         <!--  Submit button  -->
                         <Button

@@ -30,6 +30,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<IUploadOrchestrator, UploadOrchestrator>();
         services.AddSingleton<PendingUploadRetryService>();
         services.AddSingleton<MissedCallDeliveryService>();
+        services.AddSingleton<PendingScreenshotUploadRetryService>();
         return services;
     }
 

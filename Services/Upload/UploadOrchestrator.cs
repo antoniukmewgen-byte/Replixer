@@ -39,7 +39,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         if (_settings.IsGoogleDriveEnabled)
         {
             string? folderId = await ResolveTargetFolderAsync(ct);
-            string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
+            string? driveUrl = await _drive.UploadAsync(filePath, folderId, ct: ct);
 
             var (tgMessageId, tgWarning) = await SendTelegramAsync(
                 sendTelegram, filePath, telegramCaption, driveUrl);
@@ -134,7 +134,7 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         if (needDrive && driveUrl is null)
         {
             string? folderId = await ResolveTargetFolderAsync(ct);
-            driveUrl = await _drive.UploadAsync(filePath, folderId, ct);
+            driveUrl = await _drive.UploadAsync(filePath, folderId, ct: ct);
         }
 
         int?    tgMessageId = existingTelegramMessageId;
@@ -173,6 +173,9 @@ public sealed class UploadOrchestrator : IUploadOrchestrator
         var (_, warning, speedMinutes, speedWorkMinutes) = await PostKommoAsync(kommoLeadUrl, note, driveUrl: null, callStartTime, leadSource: null, callType);
         return new KommoNoteDeliveryResult(warning, speedMinutes, speedWorkMinutes);
     }
+
+    public Task<(int? ProcessingSpeedMinutes, int? ProcessingSpeedWorkMinutes)> RecalculateProcessingSpeedAsync(string kommoLeadUrl, DateTime callStartTime)
+        => _kommo.RecalculateProcessingSpeedAsync(kommoLeadUrl, callStartTime);
 
     private async Task<(int? MessageId, string? Warning)> SendTelegramAsync(
         bool send, string filePath, string? caption, string? driveUrl)

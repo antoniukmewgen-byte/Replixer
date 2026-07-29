@@ -79,7 +79,9 @@ public class GoogleDriveUploadService
         }
     }
 
-    public async Task<string?> UploadAsync(string filePath, string? folderId, CancellationToken ct = default)
+    // mimeType — за замовчуванням "audio/mpeg" для зворотної сумісності з існуючими викликами
+    // (завантаження аудіозаписів дзвінків); для скріншотів викликач передає "image/png".
+    public async Task<string?> UploadAsync(string filePath, string? folderId, string mimeType = "audio/mpeg", CancellationToken ct = default)
     {
         if (_service is null)
         {
@@ -91,7 +93,7 @@ public class GoogleDriveUploadService
         const int maxAttempts = 3;
         for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            var (link, isNetworkError, ex) = await TryUploadOnceAsync(filePath, folderId, attempt, ct);
+            var (link, isNetworkError, ex) = await TryUploadOnceAsync(filePath, folderId, mimeType, attempt, ct);
             if (link is not null) return link;
             if (!isNetworkError) return null;
             if (attempt == maxAttempts) break;
@@ -104,7 +106,7 @@ public class GoogleDriveUploadService
     }
 
     private async Task<(string? link, bool isNetworkError, Exception? ex)> TryUploadOnceAsync(
-        string filePath, string? folderId, int attempt, CancellationToken ct)
+        string filePath, string? folderId, string mimeType, int attempt, CancellationToken ct)
     {
         Debug.WriteLine($"[GDrive] ── UploadAsync (attempt {attempt}) ──────────────────");
         Debug.WriteLine($"[GDrive] File     : {filePath}");
@@ -115,7 +117,7 @@ public class GoogleDriveUploadService
             var metadata = new Google.Apis.Drive.v3.Data.File
             {
                 Name     = Path.GetFileName(filePath),
-                MimeType = "audio/mpeg",
+                MimeType = mimeType,
             };
 
             if (!string.IsNullOrWhiteSpace(folderId))
@@ -132,7 +134,7 @@ public class GoogleDriveUploadService
             long totalBytes = stream.Length;
             Debug.WriteLine($"[GDrive] File size : {totalBytes:N0} bytes ({totalBytes / 1024.0 / 1024.0:F2} MB)");
 
-            var request = _service!.Files.Create(metadata, stream, "audio/mpeg");
+            var request = _service!.Files.Create(metadata, stream, mimeType);
             request.Fields            = "id,webContentLink,name";
             request.SupportsAllDrives = true;
 
