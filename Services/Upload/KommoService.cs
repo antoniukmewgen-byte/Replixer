@@ -428,6 +428,12 @@ public class KommoService : IDisposable
             // кодом країни — номер може прийти і в форматі +380..., і в місцевому 0955...
             bool isUkrainian = ianaId is "Europe/Kyiv" or "Europe/Kiev";
 
+            // США і Україна лишаються "як є" (реальний географічний пояс номера); для БУДЬ-ЯКОЇ
+            // іншої країни рахуємо робочий час так, ніби клієнт у Маямі (America/New_York), а не
+            // по його справжньому поясу.
+            bool isUS = phoneNumberUtil.GetRegionCodeForNumber(phoneNumber) == "US";
+            if (!isUS && !isUkrainian) ianaId = "America/New_York";
+
             try
             {
                 return (TimeZoneInfo.FindSystemTimeZoneById(ianaId), isUkrainian);
