@@ -289,8 +289,7 @@ public class AppSettings : INotifyPropertyChanged
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            File.WriteAllText(SettingsPath, JsonSerializer.Serialize(this, JsonOptions));
+            AtomicWrite(SettingsPath, JsonSerializer.Serialize(this, JsonOptions));
         }
         catch (Exception ex)
         {
@@ -302,14 +301,31 @@ public class AppSettings : INotifyPropertyChanged
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            await File.WriteAllTextAsync(SettingsPath, json, ct);
+            await AtomicWriteAsync(SettingsPath, json, ct);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             Debug.WriteLine($"[AppSettings] PersistAsync failed: {ex.Message}");
         }
+    }
+
+    // Writes to a temp file then renames over the destination, so a crash/power loss
+    // mid-write leaves either the old file or the new one intact, never a truncated/corrupt one.
+    private static void AtomicWrite(string path, string content)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        string tempPath = path + ".tmp";
+        File.WriteAllText(tempPath, content);
+        File.Move(tempPath, path, overwrite: true);
+    }
+
+    private static async Task AtomicWriteAsync(string path, string content, CancellationToken ct)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        string tempPath = path + ".tmp";
+        await File.WriteAllTextAsync(tempPath, content, ct);
+        File.Move(tempPath, path, overwrite: true);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

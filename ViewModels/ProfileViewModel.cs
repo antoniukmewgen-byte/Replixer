@@ -2,7 +2,6 @@ using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Upload;
-using Replixer.ViewModels.Dialogs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -314,7 +313,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
 
     private async Task AuthorizeTelegramAsync()
     {
-        _telegram.InputHandler ??= HandleTelegramInputAsync;
         TelegramAuthError     = null;
         IsAuthorizingTelegram = true;
         var (ok, error) = await _telegram.AuthorizeAsync(_settings.TelegramPhone);
@@ -326,24 +324,6 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
             if (error is not null)
                 ErrorReporter.Report("TELEGRAM AUTH", error);
         });
-    }
-
-    private Task<string?> HandleTelegramInputAsync(string prompt)
-    {
-        if (Application.Current.MainWindow?.DataContext is not IDialogHost mainVm)
-        {
-            Debug.WriteLine("[Profile] HandleTelegramInputAsync: MainWindow is not an IDialogHost — cannot show input dialog");
-            return Task.FromResult<string?>(null);
-        }
-
-        var tcs = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var vm  = new InputDialogViewModel(prompt, result =>
-        {
-            mainVm.HideInputDialog();
-            tcs.TrySetResult(result);
-        });
-        mainVm.ShowInputDialog(vm);
-        return tcs.Task;
     }
 
     private void LogoutTelegram()

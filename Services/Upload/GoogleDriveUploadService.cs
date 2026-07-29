@@ -97,8 +97,9 @@ public class GoogleDriveUploadService
             if (link is not null) return link;
             if (!isNetworkError) return null;
             if (attempt == maxAttempts) break;
-            Debug.WriteLine($"[GDrive] Network error, retrying in 5s (attempt {attempt}/{maxAttempts})…");
-            await Task.Delay(5000, ct);
+            var delay = TimeSpan.FromSeconds(5 * Math.Pow(2, attempt - 1)); // 5s, 10s
+            Debug.WriteLine($"[GDrive] Network error, retrying in {delay.TotalSeconds:F0}s (attempt {attempt}/{maxAttempts})…");
+            await Task.Delay(delay, ct);
         }
 
         ErrorReporter.Report("GOOGLE_DRIVE", "Немає з'єднання з Google Drive після 3 спроб — перевірте інтернет.");
@@ -247,6 +248,7 @@ public class GoogleDriveUploadService
         catch (Exception ex)
         {
             Debug.WriteLine($"[GDrive] GetOrCreateUserFolder failed: {ex.Message}");
+            ErrorReporter.Report("GOOGLE_DRIVE", $"Не вдалося створити/знайти папку користувача \"{userName}\": {ex.Message}", ex);
             return null;
         }
     }

@@ -237,8 +237,8 @@ public class KommoService : IDisposable
             }
             catch (HttpRequestException ex) when (attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] PostNote attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] PostNote attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -496,8 +496,8 @@ public class KommoService : IDisposable
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] GetContactPhone attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] GetContactPhone attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -553,8 +553,8 @@ public class KommoService : IDisposable
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] GetCompanyPhone attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] GetCompanyPhone attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -700,8 +700,8 @@ public class KommoService : IDisposable
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] GetLeadDetails attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] GetLeadDetails attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -747,8 +747,8 @@ public class KommoService : IDisposable
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] PatchLeadField attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] PatchLeadField attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -821,6 +821,7 @@ public class KommoService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] GetLeadPipelineStatus failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus виняток — лід {leadId}: {ex.Message}", ex);
             return (null, null);
         }
     }
@@ -860,6 +861,7 @@ public class KommoService : IDisposable
         catch (Exception ex)
         {
             Debug.WriteLine($"[Kommo] GetPipelineStatusSortOrder failed: {ex.Message}");
+            ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder виняток — воронка {pipelineId}: {ex.Message}", ex);
             return null;
         }
     }
@@ -894,8 +896,8 @@ public class KommoService : IDisposable
             }
             catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
-                Debug.WriteLine($"[Kommo] PatchLeadStatus attempt {attempt} failed: {ex.Message} — retrying in 2s");
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                Debug.WriteLine($"[Kommo] PatchLeadStatus attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
             }
             catch (Exception ex)
             {
@@ -908,6 +910,9 @@ public class KommoService : IDisposable
 
     private static bool IsTransientNetworkError(Exception ex) =>
         ex is HttpRequestException or TaskCanceledException or System.Net.Sockets.SocketException;
+
+    // Exponential backoff between retry attempts (2s, 4s for the current maxAttempts=3 call sites).
+    private static Task RetryDelayAsync(int attempt) => Task.Delay(TimeSpan.FromSeconds(2 * Math.Pow(2, attempt - 1)));
 
     public void Dispose() => _http.Dispose();
 

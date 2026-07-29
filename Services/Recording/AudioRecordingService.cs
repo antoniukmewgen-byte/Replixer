@@ -146,6 +146,7 @@ public class AudioRecordingService : IDisposable
         {
             Debug.WriteLine($"[Recording] Start failed: {ex.Message}");
             LastError = ex.Message;
+            IsRecording = false;
             CleanupCaptures();
             return false;
         }
@@ -305,12 +306,32 @@ public class AudioRecordingService : IDisposable
         if (IsRecording)
         {
             IsRecording = false;
-            // Set stopped flags before StopRecording() so DataAvailable callbacks
-            // bail out immediately and never touch writers that CleanupCaptures() is about to dispose.
-            _loopbackStopped = true;
-            _micStopped      = true;
+
+            // Wait for RecordingStopped (fired after the WASAPI capture thread's last
+            // DataAvailable call) before disposing writers below, so we never dispose
+            // out from under an in-flight callback. Mirrors StopCapturesAsync, but blocking
+            // since Dispose() is synchronous.
+            using var loopbackDone = new ManualResetEventSlim(false);
+            using var micDone      = new ManualResetEventSlim(false);
+
+            if (_loopbackCapture != null)
+                _loopbackCapture.RecordingStopped += (_, _) => { _loopbackStopped = true; loopbackDone.Set(); };
+            else
+                loopbackDone.Set();
+
+            if (_micCapture != null)
+                _micCapture.RecordingStopped += (_, _) => { _micStopped = true; micDone.Set(); };
+            else
+                micDone.Set();
+
             _loopbackCapture?.StopRecording();
             _micCapture?.StopRecording();
+
+            loopbackDone.Wait(TimeSpan.FromSeconds(2));
+            micDone.Wait(TimeSpan.FromSeconds(2));
+
+            _loopbackStopped = true;
+            _micStopped      = true;
         }
         CleanupCaptures();
     }

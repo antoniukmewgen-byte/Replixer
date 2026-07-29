@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet build *)"
+      "Bash(dotnet build *)",
+      "Bash(ls .github/workflows/)",
+      "Bash(find . -iname \"*.yml\" -not -path \"*/obj/*\" -not -path \"*/bin/*\")",
+      "Bash(powershell -c \"Get-Content 'D:\\\\GitHub\\\\Replixer\\\\App.xaml.cs'\")"
     ]
   }
 }

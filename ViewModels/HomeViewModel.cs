@@ -407,15 +407,15 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private void WireEntryEditCommand(RecordingEntry entry)
     {
-        entry.EditReportCommand = new RelayCommand(
-            execute:    () => _ = EditEntryReportAsync(entry),
+        entry.EditReportCommand = new AsyncRelayCommand(
+            execute:    () => EditEntryReportAsync(entry),
             canExecute: () => entry.HasTelegramMessage && !entry.IsBackgroundRetrying);
     }
 
     private void WireEntryRetryCommand(RecordingEntry entry)
     {
-        entry.RetryCommand = new RelayCommand(
-            execute:    () => _ = RetryEntryAsync(entry),
+        entry.RetryCommand = new AsyncRelayCommand(
+            execute:    () => RetryEntryAsync(entry),
             // !IsBackgroundRetrying — щоб не зіткнутися з фоновим PendingUploadRetryService,
             // який саме зараз тихо доробляє цей самий запис (інакше можлива подвійна відправка).
             canExecute: () => entry.Status == RecordingStatus.Error && entry.HasRetryableFile && !entry.IsBackgroundRetrying);
@@ -423,8 +423,8 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
     private void WireEntryResumeDraftCommand(RecordingEntry entry)
     {
-        entry.ResumeDraftCommand = new RelayCommand(
-            execute:    () => _ = ResumeDraftAsync(entry),
+        entry.ResumeDraftCommand = new AsyncRelayCommand(
+            execute:    () => ResumeDraftAsync(entry),
             canExecute: () => entry.Status == RecordingStatus.Draft && entry.HasRetryableFile);
     }
 

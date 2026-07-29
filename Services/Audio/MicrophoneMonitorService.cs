@@ -20,37 +20,48 @@ public class MicrophoneMonitorService : IMonitorService
 
     public void Start()
     {
-        _pollTimer = new Timer(PollCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        // Single-shot timer rescheduled at the end of each PollCallback (see finally below),
+        // instead of a fixed period, so a slow tick (registry/WASAPI stall) can never overlap
+        // with the next one and race on _isCallActive/_activeApp.
+        _pollTimer = new Timer(PollCallback, null, TimeSpan.Zero, Timeout.InfiniteTimeSpan);
     }
 
     private void PollCallback(object? state)
     {
-        string? micApp   = GetMicrophoneActiveApp();
-        string? audioApp = GetAudioOutputActiveApp();
-
-        if (!_isCallActive)
+        try
         {
-            if (micApp != null && audioApp != null &&
-                string.Equals(micApp, audioApp, StringComparison.OrdinalIgnoreCase))
+            string? micApp   = GetMicrophoneActiveApp();
+            string? audioApp = GetAudioOutputActiveApp();
+
+            if (!_isCallActive)
             {
-                _isCallActive = true;
-                _activeApp    = micApp;
-                Debug.WriteLine($"[AudioMonitor] {micApp} — call started (mic + speaker)");
-                CallDetected?.Invoke(micApp);
+                if (micApp != null && audioApp != null &&
+                    string.Equals(micApp, audioApp, StringComparison.OrdinalIgnoreCase))
+                {
+                    _isCallActive = true;
+                    _activeApp    = micApp;
+                    Debug.WriteLine($"[AudioMonitor] {micApp} — call started (mic + speaker)");
+                    CallDetected?.Invoke(micApp);
+                }
+            }
+            else
+            {
+                bool micActive   = string.Equals(micApp,   _activeApp, StringComparison.OrdinalIgnoreCase);
+                bool audioActive = string.Equals(audioApp, _activeApp, StringComparison.OrdinalIgnoreCase);
+
+                if (!micActive && !audioActive)
+                {
+                    _isCallActive = false;
+                    Debug.WriteLine($"[AudioMonitor] {_activeApp} — call ended (mic + speaker both gone)");
+                    CallEnded?.Invoke(_activeApp);
+                    _activeApp = string.Empty;
+                }
             }
         }
-        else
+        finally
         {
-            bool micActive   = string.Equals(micApp,   _activeApp, StringComparison.OrdinalIgnoreCase);
-            bool audioActive = string.Equals(audioApp, _activeApp, StringComparison.OrdinalIgnoreCase);
-
-            if (!micActive && !audioActive)
-            {
-                _isCallActive = false;
-                Debug.WriteLine($"[AudioMonitor] {_activeApp} — call ended (mic + speaker both gone)");
-                CallEnded?.Invoke(_activeApp);
-                _activeApp = string.Empty;
-            }
+            try { _pollTimer?.Change(TimeSpan.FromSeconds(1), Timeout.InfiniteTimeSpan); }
+            catch (ObjectDisposedException) { } // Stop() disposed the timer while this tick was running
         }
     }
 
@@ -154,8 +165,8 @@ public class MicrophoneMonitorService : IMonitorService
 
                         try
                         {
-                            var process = Process.GetProcessById((int)session.GetProcessID);
-                            var match   = _targetProcesses.FirstOrDefault(p =>
+                            using var process = Process.GetProcessById((int)session.GetProcessID);
+                            var match = _targetProcesses.FirstOrDefault(p =>
                                 process.ProcessName.Contains(p, StringComparison.OrdinalIgnoreCase));
 
                             if (match != null)
