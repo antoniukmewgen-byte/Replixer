@@ -634,7 +634,18 @@ public class KommoService : IDisposable
 
                         if (!TryGetOccupiedValue(vals, out var val)) continue;
 
-                        long? numericValue = val.ValueKind == JsonValueKind.Number ? val.GetInt64() : null;
+                        // Числові кастомні поля Kommo ("Скорость обработки в мин"/"...в рабочее время")
+                        // часто повертаються як РЯДОК ("value": "15"), а не як JSON-число — особливо
+                        // якщо значення колись проставили вручну в інтерфейсі Kommo, а не через API.
+                        // TryGetOccupiedValue вище й так вважає такий рядок "зайнятим" полем, але без
+                        // цього парсингу саме числове значення губилось (лишалось null), тож воно не
+                        // потрапляло в Google Таблицю, хоча в CRM вже реально стояло.
+                        long? numericValue = val.ValueKind switch
+                        {
+                            JsonValueKind.Number                                      => val.GetInt64(),
+                            JsonValueKind.String when long.TryParse(val.GetString(), out var parsed) => parsed,
+                            _                                                          => null,
+                        };
 
                         if (id == FirstContactFieldId)
                         {
