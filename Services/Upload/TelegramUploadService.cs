@@ -109,6 +109,16 @@ public class TelegramUploadService : IDisposable
             _isReady = false;
             InvalidatePeerCache();
             _client?.Dispose();
+
+            // Завжди починаємо з чистого файлу сесії. Якщо попередня спроба логіну впала
+            // посеред хендшейку (напр. через тимчасово зламаний api_hash — див. v1.5.8/1.5.9),
+            // DpapiSessionStream.Write() вже міг встигнути персистнути на диск частковий/сміттєвий
+            // стан сесії (Persist() викликається на кожен Write(), а не лише по завершенню логіну).
+            // Без видалення тут новий WTelegram.Client підхопив би саме ці биті дані замість
+            // чистого старту, і повторна авторизація користувача не допомагала б.
+            if (File.Exists(SessionPath))
+                File.Delete(SessionPath);
+
             _client = new WTelegram.Client(ConfigProvider, new DpapiSessionStream(SessionPath));
             var user = await RunOnDedicatedThreadAsync(() => _client.LoginUserIfNeeded());
             _isReady = user != null;
