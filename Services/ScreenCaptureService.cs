@@ -53,6 +53,11 @@ public class ScreenCaptureService
 
             if (!success) return null;
 
+            // Фідбек одразу після фактичного захоплення кадру (а не після повільнішого
+            // кодування в PNG/збереження нижче) — щоб менеджер бачив підтвердження "скрін
+            // зроблено" максимально близько до реального моменту зйомки.
+            ScreenshotFeedbackService.Flash();
+
             var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
                 hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
