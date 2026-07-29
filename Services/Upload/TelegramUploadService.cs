@@ -94,6 +94,14 @@ public class TelegramUploadService : IDisposable
             return (false, "Введіть номер телефону");
 
         _pendingPhone = NormalizePhone(phone);
+
+        // Serialize against EnsureClientAsync — both construct a WTelegram.Client bound to
+        // the same session file (telegram_session.dat). WTelegram opens that file exclusively,
+        // so if a background retry (EnsureClientAsync) and a manual re-auth (this method) race
+        // to construct a client at the same time, the loser gets
+        // "IOException: file is being used by another process". Sharing _clientLock makes the
+        // second caller simply wait its turn instead of colliding.
+        await _clientLock.WaitAsync();
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SessionPath)!);
@@ -116,6 +124,7 @@ public class TelegramUploadService : IDisposable
         }
         finally
         {
+            _clientLock.Release();
             _pendingPhone = null;
         }
     }
