@@ -487,7 +487,22 @@ public class TelegramUploadService : IDisposable
     {
         private readonly BlockingCollection<(SendOrPostCallback Callback, object? State)> _queue = new();
 
-        public override void Post(SendOrPostCallback d, object? state) => _queue.Add((d, state));
+        public override void Post(SendOrPostCallback d, object? state)
+        {
+            try
+            {
+                _queue.Add((d, state));
+            }
+            catch (InvalidOperationException)
+            {
+                // Pump already completed (the wrapped async chain finished) but some
+                // unrelated continuation — e.g. a background update-listener the client
+                // spun up as a side effect of logging in — still captured this context
+                // and is trying to post to it. Fall back to the ThreadPool instead of
+                // throwing on whatever thread is posting.
+                ThreadPool.QueueUserWorkItem(_ => d(state));
+            }
+        }
 
         public override void Send(SendOrPostCallback d, object? state) => d(state);
 

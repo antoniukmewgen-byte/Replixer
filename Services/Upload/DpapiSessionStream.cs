@@ -65,7 +65,15 @@ internal sealed class DpapiSessionStream : Stream
 
     private void Persist()
     {
-        var encrypted = ProtectedData.Protect(_buffer.ToArray(), null, DataProtectionScope.CurrentUser);
+        // Use Position (bytes written so far), not Length: if the caller writes a shorter
+        // session than the one previously buffered and only calls SetLength() afterwards
+        // to truncate, ToArray()-ing the whole (still-untruncated) buffer here would leak
+        // stale trailing bytes from the previous, longer session into the saved file.
+        var length    = (int)_buffer.Position;
+        var plaintext = new byte[length];
+        Buffer.BlockCopy(_buffer.GetBuffer(), 0, plaintext, 0, length);
+
+        var encrypted = ProtectedData.Protect(plaintext, null, DataProtectionScope.CurrentUser);
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
         var tempPath = _path + ".tmp";
         File.WriteAllBytes(tempPath, encrypted);
