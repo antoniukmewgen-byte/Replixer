@@ -1,6 +1,7 @@
 using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -108,8 +109,8 @@ public class TelegramUploadService : IDisposable
             _isReady = false;
             InvalidatePeerCache();
             _client?.Dispose();
-            _client = new WTelegram.Client(ConfigProvider);
-            var user = await _client.LoginUserIfNeeded();
+            _client = new WTelegram.Client(ConfigProvider, new DpapiSessionStream(SessionPath));
+            var user = await RunOnDedicatedThreadAsync(() => _client.LoginUserIfNeeded());
             _isReady = user != null;
             Debug.WriteLine($"[TG] Authorized as: {user?.username ?? user?.first_name}");
             return user != null ? (true, null) : (false, "Авторизація не вдалася");
@@ -336,13 +337,13 @@ public class TelegramUploadService : IDisposable
             // initialized the client while we were waiting.
             if (_isReady && _client != null) return;
 
-            _client = new WTelegram.Client(ConfigProvider);
+            _client = new WTelegram.Client(ConfigProvider, new DpapiSessionStream(SessionPath));
 
             // LoginUserIfNeeded() has no built-in timeout — a hung MTProto handshake
             // would block the calling thread indefinitely and freeze the UI for up to 30s
             // (HomeViewModel.Dispose waits on _pendingStopTask). We impose a hard 30s cap.
             using var cts  = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            var loginTask  = _client.LoginUserIfNeeded();
+            var loginTask  = RunOnDedicatedThreadAsync(() => _client.LoginUserIfNeeded());
             var completed  = await Task.WhenAny(loginTask, Task.Delay(Timeout.Infinite, cts.Token));
 
             if (completed != loginTask)
@@ -442,5 +443,60 @@ public class TelegramUploadService : IDisposable
         }
 
         return tcs.Task.Result;
+    }
+
+    // Runs the given async work on a single dedicated background thread with its own
+    // message-pump SynchronizationContext, instead of the shared ThreadPool.
+    // LoginUserIfNeeded() invokes ConfigProvider synchronously mid-flow to request the
+    // verification code/2FA password (AskForInput above), which blocks the calling thread
+    // for up to 3 minutes. Without this, every continuation of that async chain — including
+    // ones resumed after internal network awaits — would be scheduled on a ThreadPool
+    // worker, starving the shared pool for the duration of the wait.
+    private static Task<T> RunOnDedicatedThreadAsync<T>(Func<Task<T>> asyncFunc)
+    {
+        var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        var thread = new Thread(() =>
+        {
+            var pump = new SingleThreadSyncContext();
+            SynchronizationContext.SetSynchronizationContext(pump);
+            try
+            {
+                var task = asyncFunc();
+                task.ContinueWith(t =>
+                {
+                    pump.Complete();
+                    if (t.IsFaulted)       tcs.TrySetException(t.Exception!.InnerExceptions);
+                    else if (t.IsCanceled) tcs.TrySetCanceled();
+                    else                   tcs.TrySetResult(t.Result);
+                }, TaskScheduler.Default);
+                pump.RunOnCurrentThread();
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
+        })
+        { IsBackground = true, Name = "TelegramAuthThread" };
+        thread.Start();
+
+        return tcs.Task;
+    }
+
+    private sealed class SingleThreadSyncContext : SynchronizationContext
+    {
+        private readonly BlockingCollection<(SendOrPostCallback Callback, object? State)> _queue = new();
+
+        public override void Post(SendOrPostCallback d, object? state) => _queue.Add((d, state));
+
+        public override void Send(SendOrPostCallback d, object? state) => d(state);
+
+        public void RunOnCurrentThread()
+        {
+            foreach (var (callback, state) in _queue.GetConsumingEnumerable())
+                callback(state);
+        }
+
+        public void Complete() => _queue.CompleteAdding();
     }
 }
