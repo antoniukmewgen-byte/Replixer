@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Нагадування"
-    Width="320"
+    Width="368"
     AllowsTransparency="True"
     Background="Transparent"
     FontFamily="{StaticResource InterFont}"
@@ -23,7 +23,17 @@
         CallCheatSheetWindow, воно не ховається/закривається програмно ніде в коді.
         Кнопки закриття немає навмисно, щоб менеджер не міг випадково прибрати нагадування.
     -->
+    <!--
+        Margin навколо картки — навмисно, не декоративний відступ: DropShadowEffect нижче
+        (BlurRadius=24, ShadowDepth=6) розмиває тінь ЗА межі Border, і без вільного прозорого
+        простору навколо ця тінь просто обрізається прямокутними межами вікна (AllowsTransparency
+        + Background="Transparent" на Window), даючи різкий "чорний напівпрозорий квадрат" замість
+        плавного згасання. 24px з боків/зверху покриває BlurRadius, знизу трохи більше (30px) —
+        бо ShadowDepth=6 ще й зсуває тінь вниз. Ширину вікна відповідно збільшено з 320 до 368
+        (320 + 24*2), щоб сама картка лишилась візуально тих самих 320px.
+    -->
     <Border
+        Margin="24,24,24,30"
         Background="{StaticResource OtherBrushColor4}"
         BorderBrush="{StaticResource OtherBrushSubColor4}"
         BorderThickness="1.5"

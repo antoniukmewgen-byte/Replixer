@@ -16,8 +16,28 @@ internal static class ScreenCaptureInterop
     public const uint PW_RENDERFULLCONTENT = 0x00000002;
     public const uint SRCCOPY = 0x00CC0020;
 
+    private static readonly IntPtr HWND_TOPMOST   = new(-1);
+    private static readonly IntPtr HWND_NOTOPMOST = new(-2);
+    private const uint SWP_NOMOVE     = 0x0002;
+    private const uint SWP_NOSIZE     = 0x0001;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+    // Тимчасово фіксує вікно месенджера "поверх усіх" (або знімає фіксацію), щоб під час ручного
+    // вибору області скріна (ScreenshotSelectionWindow) жодне інше вікно не могло випадково
+    // перекрити його — оверлей затемнення інакше показував би "дірку" не в те місце.
+    // pin=false повертає стандартну поведінку z-order, щоб вікно не лишалось приліпленим
+    // назавжди після того, як скрін уже зроблено/скасовано.
+    public static void SetWindowTopmost(IntPtr hWnd, bool pin)
+    {
+        if (hWnd == IntPtr.Zero) return;
+        SetWindowPos(hWnd, pin ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
 
     // Використовується, щоб визначити, якому процесу належить поточне foreground-вікно —
     // так ми чекаємо, поки саме вікно месенджера (Telegram/Viber/WhatsApp) стане активним,

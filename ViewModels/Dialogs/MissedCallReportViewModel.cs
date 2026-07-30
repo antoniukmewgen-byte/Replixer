@@ -2,11 +2,13 @@ using Replixer.Infrastructure;
 using Replixer.Models;
 using Replixer.Services;
 using Replixer.Services.Upload;
+using Replixer.Views;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Replixer.ViewModels.Dialogs;
@@ -371,8 +373,43 @@ public class MissedCallReportViewModel : ViewModelBase
             return;
         }
 
-        await Task.Delay(RenderSettleDelay);
-        await CaptureAndUploadScreenshotAsync(messenger);
+        // Фіксуємо вікно месенджера "поверх усіх" на весь час підбору рамки — інакше будь-яке
+        // інше вікно (тост, спливаюче нагадування тощо) могло б випадково перекрити його якраз
+        // під час паузи нижче чи ручного ресайзу, і "дірка" в оверлеї показувала б не той вміст.
+        // Знімаємо фіксацію в finally незалежно від результату, щоб вікно не лишилось приліпленим.
+        var hWnd = ScreenCaptureInterop.GetForegroundWindow();
+        ScreenCaptureInterop.SetWindowTopmost(hWnd, pin: true);
+        try
+        {
+            await Task.Delay(RenderSettleDelay);
+
+            if (!ScreenCaptureInterop.GetWindowRect(hWnd, out var winRect))
+            {
+                SetMessengerStatus(messenger, "Не вдалося визначити межі вікна — скрін не зроблено", isError: true);
+                return;
+            }
+
+            var initialRect = new Int32Rect(winRect.Left, winRect.Top, winRect.Right - winRect.Left, winRect.Bottom - winRect.Top);
+
+            SetMessengerStatus(messenger, $"Підберіть область скріна для {messenger}…");
+
+            // Модально блокує потік до підтвердження/скасування — це навмисно: поки менеджер
+            // підбирає рамку, взаємодія з рештою застосунку/системи заблокована самим оверлеєм
+            // (ScreenshotSelectionWindow — не click-through), тож немає сенсу асинхронно
+            // повертати керування UI раніше.
+            var chosen = ScreenshotSelectionWindow.Show(initialRect);
+            if (chosen is null)
+            {
+                SetMessengerStatus(messenger, "Скріншот скасовано");
+                return;
+            }
+
+            await CaptureAndUploadScreenshotAsync(messenger, chosen.Value);
+        }
+        finally
+        {
+            ScreenCaptureInterop.SetWindowTopmost(hWnd, pin: false);
+        }
     }
 
     // Опитує GetForegroundWindow(), поки активним вікном не стане процес потрібного
@@ -425,9 +462,9 @@ public class MissedCallReportViewModel : ViewModelBase
     // завантаження — Drive стає єдиним місцем зберігання скріна. Якщо завантажити одразу не
     // вдалось (мережа тощо) — файл лишається на диску і ставиться в чергу фонового ретраю
     // (_screenshotRetry), щоб посилання не загубилось назавжди.
-    private async Task CaptureAndUploadScreenshotAsync(string messenger)
+    private async Task CaptureAndUploadScreenshotAsync(string messenger, Int32Rect region)
     {
-        var path = _capture.CaptureForegroundWindow(messenger);
+        var path = _capture.CaptureRegion(region.X, region.Y, region.Width, region.Height, messenger);
         if (path is null)
         {
             SetMessengerStatus(messenger, "Не вдалося зробити скріншот", isError: true);

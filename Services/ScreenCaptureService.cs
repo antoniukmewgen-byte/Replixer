@@ -31,8 +31,14 @@ public class ScreenCaptureService
         if (hWnd == IntPtr.Zero) return null;
         if (!ScreenCaptureInterop.GetWindowRect(hWnd, out var rect)) return null;
 
-        int width  = rect.Right  - rect.Left;
-        int height = rect.Bottom - rect.Top;
+        return CaptureRegion(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top, messenger);
+    }
+
+    // Той самий захват через BitBlt, але для довільного прямокутника екрана (у фізичних пікселях,
+    // системи координат GetWindowRect/віртуального екрана), а не обов'язково для межі вікна.
+    // Використовується ScreenshotSelectionWindow — коли менеджер сам підкоригував рамку захвату.
+    public string? CaptureRegion(int x, int y, int width, int height, string messenger)
+    {
         if (width <= 0 || height <= 0) return null;
 
         var screenDc = ScreenCaptureInterop.GetDC(IntPtr.Zero);
@@ -48,7 +54,7 @@ public class ScreenCaptureService
 
             bool success = ScreenCaptureInterop.BitBlt(
                 memDc, 0, 0, width, height,
-                screenDc, rect.Left, rect.Top, ScreenCaptureInterop.SRCCOPY);
+                screenDc, x, y, ScreenCaptureInterop.SRCCOPY);
             ScreenCaptureInterop.SelectObject(memDc, oldObject);
 
             if (!success) return null;

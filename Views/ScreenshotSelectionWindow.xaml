@@ -1,0 +1,197 @@
+<Window
+    x:Class="Replixer.Views.ScreenshotSelectionWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    AllowsTransparency="True"
+    Background="Transparent"
+    KeyDown="OnWindowKeyDown"
+    ResizeMode="NoResize"
+    ShowActivated="True"
+    ShowInTaskbar="False"
+    SizeToContent="Manual"
+    SnapsToDevicePixels="True"
+    Topmost="True"
+    WindowStartupLocation="Manual"
+    WindowState="Normal"
+    WindowStyle="None">
+
+    <Window.Resources>
+        <!--  Спільні для декількох елементів ефекти — Freezable-ресурси безпечно шарити через
+              StaticResource між кількома Border.Effect, це не той самий кейс, що "один Visual —
+              один батько".  -->
+        <DropShadowEffect x:Key="GreenGlow" BlurRadius="24" Color="#22C679" Direction="0" Opacity="0.6" ShadowDepth="0" />
+        <DropShadowEffect x:Key="CardShadow" BlurRadius="20" Color="Black" Direction="270" Opacity="0.45" ShadowDepth="6" />
+
+        <Style x:Key="ActionButtonBase" TargetType="Button">
+            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="FontFamily" Value="{DynamicResource InterFont}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+
+        <Style x:Key="PrimaryActionButton" BasedOn="{StaticResource ActionButtonBase}" TargetType="Button">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bg"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{DynamicResource OtherBrushSubColor1}"
+                            CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.85" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.65" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryActionButton" BasedOn="{StaticResource ActionButtonBase}" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Text}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Bg"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{DynamicResource BrushColor3}"
+                            BorderBrush="{DynamicResource BrushBorderColor4}"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BrushColor4}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Кутові ручки (уніфіковане зміщення розміру по X і Y) — круглі, фірмовий зелений +
+              біле кільце, трохи більші за бокові, щоб виглядали як головна "точка захвату".  -->
+        <Style x:Key="CornerHandleStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Fill" Value="{DynamicResource OtherBrushSubColor1}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Stroke" Value="White" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+
+        <!--  Бокові ручки — витягнуті "капсули" замість кружечків: одразу зрозуміло, що вони
+              тягнуться лише в одному напрямку (на відміну від кутових).  -->
+        <Style x:Key="EdgeHandleHorizontal" TargetType="Rectangle">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Fill" Value="{DynamicResource OtherBrushSubColor1}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="RadiusX" Value="5" />
+            <Setter Property="RadiusY" Value="5" />
+            <Setter Property="Stroke" Value="White" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+
+        <Style BasedOn="{StaticResource EdgeHandleHorizontal}" TargetType="Rectangle" x:Key="EdgeHandleVertical">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="28" />
+        </Style>
+    </Window.Resources>
+
+    <!--
+        Кореневий Grid навмисно НЕ click-through — але тут КРИТИЧНО важливо, що фон НЕ
+        буквальний "Transparent" (#00FFFFFF, альфа=0), а майже прозорий колір з альфою=1
+        (#01000000). Річ у тім, що це вікно — AllowsTransparency="True", тобто layered-вікно,
+        і в такому режимі Windows (DWM) визначає клікабельність за ФАКТИЧНОЮ альфою
+        відрендереного пікселя на рівні ОС, а не за WPF-властивістю IsHitTestVisible: у зонах,
+        де альфа реально 0, клік пролітає наскрізь до вікна під низом (тут — до месенджера),
+        яким би не був WPF hit-test. Із буквальним "Transparent" це й траплялось: клік усередині
+        рамки вибору (де окрім прозорого фону нічого не намальовано) долітав прямо в Telegram
+        (можна було обрати чат, пересунути вікно тощо), хоча кнопки/ручки/панель (реально
+        непрозорі пікселі) працювали нормально. Альфа=1 оком не відрізнити від справжньої
+        прозорості, але для DWM цього достатньо, щоб вважати піксель "непорожнім" і віддати
+        клік саме нашому вікну.
+    -->
+    <Grid Background="#01000000">
+
+        <!--  Затемнення всього екрана, крім прямокутника вибору (EvenOdd "дірка") — тон узятий
+              не з чистого чорного, а з фонового кольору самого застосунку (BrushColor1 #0F0F0F),
+              щоб дизайн лишався "у стилі" навіть у затемненій зоні.  -->
+        <Path Fill="#E60F0F0F" Stretch="Fill">
+            <Path.Data>
+                <GeometryGroup FillRule="EvenOdd">
+                    <RectangleGeometry x:Name="OuterGeometry" />
+                    <RectangleGeometry x:Name="HoleGeometry" />
+                </GeometryGroup>
+            </Path.Data>
+        </Path>
+
+        <!--  Рамка вибору — тонка фірмова зелена лінія з м'яким зовнішнім світінням. Background
+              навмисно "#01000000" (альфа=1), а не буквальний Transparent — див. коментар біля
+              кореневого Grid: інакше клік усередині рамки (по самій "дірці") пролітав би
+              наскрізь у вікно месенджера. Рамку саму по собі (за середину) НЕ перетягуємо —
+              лише ручки міняють розмір, тож курсор тут звичайний, а не "стрілки на 4 боки".  -->
+        <Border
+            x:Name="SelectionBorder"
+            Background="#01000000"
+            BorderBrush="{DynamicResource OtherBrushSubColor1}"
+            BorderThickness="2"
+            CornerRadius="2"
+            Effect="{StaticResource GreenGlow}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top" />
+
+        <!--  Ручки зміни розміру.  -->
+        <Ellipse x:Name="HandleNW" Style="{StaticResource CornerHandleStyle}" Cursor="SizeNWSE" Tag="NW" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Ellipse x:Name="HandleNE" Style="{StaticResource CornerHandleStyle}" Cursor="SizeNESW" Tag="NE" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Ellipse x:Name="HandleSE" Style="{StaticResource CornerHandleStyle}" Cursor="SizeNWSE" Tag="SE" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Ellipse x:Name="HandleSW" Style="{StaticResource CornerHandleStyle}" Cursor="SizeNESW" Tag="SW" MouseLeftButtonDown="OnResizeHandleDown" />
+
+        <Rectangle x:Name="HandleN" Style="{StaticResource EdgeHandleHorizontal}" Cursor="SizeNS" Tag="N" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Rectangle x:Name="HandleS" Style="{StaticResource EdgeHandleHorizontal}" Cursor="SizeNS" Tag="S" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Rectangle x:Name="HandleE" Style="{StaticResource EdgeHandleVertical}" Cursor="SizeWE" Tag="E" MouseLeftButtonDown="OnResizeHandleDown" />
+        <Rectangle x:Name="HandleW" Style="{StaticResource EdgeHandleVertical}" Cursor="SizeWE" Tag="W" MouseLeftButtonDown="OnResizeHandleDown" />
+
+        <!--  Панель дій під рамкою — картка в стилі застосунку замість голих кнопок.  -->
+        <Border
+            x:Name="ActionPanel"
+            Padding="8"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Background="{DynamicResource BrushColor2}"
+            BorderBrush="{DynamicResource BrushBorderColor2}"
+            BorderThickness="1"
+            CornerRadius="14"
+            Effect="{StaticResource CardShadow}">
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    x:Name="CaptureButton"
+                    Click="OnCaptureClick"
+                    Content="Зробити скрін"
+                    Style="{StaticResource PrimaryActionButton}" />
+                <Button
+                    Margin="8,0,0,0"
+                    Click="OnCancelClick"
+                    Content="Скасувати"
+                    Style="{StaticResource SecondaryActionButton}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
