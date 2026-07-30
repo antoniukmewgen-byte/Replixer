@@ -156,6 +156,22 @@ public sealed class UpdateService
             script = $$"""
                 $ErrorActionPreference = 'Stop'
                 $logPath = '{{Esc(logPath)}}'
+
+                # Killing the old process (below) doesn't guarantee the OS has released its
+                # module handle on Replixer.dll/.exe the instant WaitForExit returns — AV/EDR
+                # real-time scanning or a slow disk can hold it a little longer. Retry instead
+                # of failing the whole update on one transient "used by another process".
+                function Copy-ItemWithRetry {
+                    param([string]$Path, [string]$Destination, [int]$MaxAttempts = 10, [int]$DelayMs = 300)
+                    for ($i = 1; $i -le $MaxAttempts; $i++) {
+                        try { Copy-Item -LiteralPath $Path -Destination $Destination -Force; return }
+                        catch {
+                            if ($i -eq $MaxAttempts) { throw }
+                            Start-Sleep -Milliseconds $DelayMs
+                        }
+                    }
+                }
+
                 try {
                     $proc = Get-Process -Id {{pid}} -ErrorAction SilentlyContinue
                     if ($proc) {
@@ -176,7 +192,7 @@ public sealed class UpdateService
                         $dest    = Join-Path '{{Esc(installDir)}}' $rel
                         $destDir = Split-Path $dest -Parent
                         if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-                        Copy-Item -LiteralPath $_.FullName -Destination $dest -Force
+                        Copy-ItemWithRetry -Path $_.FullName -Destination $dest
                     }
 
                     Remove-Item -LiteralPath '{{Esc(stagingDir)}}' -Recurse -Force -ErrorAction SilentlyContinue

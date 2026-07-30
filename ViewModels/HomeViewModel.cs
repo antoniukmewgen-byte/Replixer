@@ -674,7 +674,13 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         _reportTcs?.TrySetResult(null);
         _activeReportVm = null;
 
-        _pendingStopTask?.Wait(TimeSpan.FromSeconds(30));
+        // Bounded to a few seconds, not the full upload timeout: UploadOrchestrator
+        // already treats a partially-finished upload as "leave file on disk" and
+        // PendingUploadRetryService picks it up on next launch, so waiting longer
+        // here buys nothing but risks the update-installer script (which kills the
+        // process after its own 30s WaitForExit) racing us mid-shutdown — see
+        // replixer_update.log "used by another process" reports.
+        _pendingStopTask?.Wait(TimeSpan.FromSeconds(5));
         _currentDialog?.Dispose();
         _recordingsVm.Recordings.CollectionChanged   -= OnRecordingsChanged;
         _recordingsVm.Recordings.CollectionChanged   -= OnRecentActivitySourceChanged;
