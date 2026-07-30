@@ -47,6 +47,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
     private readonly AppSettings          _settings;
     private CallToastWindow? _toast;
     private UpdateInfo?      _pendingUpdate;
+    private readonly CancellationTokenSource _startupUpdateCheckCts = new();
 
     public NotificationsViewModel Notifications { get; }
 
@@ -86,7 +87,7 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public async Task StartupUpdateCheckAsync()
     {
-        _pendingUpdate = await _updateService.CheckForUpdateAsync();
+        _pendingUpdate = await _updateService.CheckForUpdateWithNetworkWaitAsync(_startupUpdateCheckCts.Token);
         if (_pendingUpdate is null) return;
 
         UpdateAvailable = true;
@@ -213,6 +214,8 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
 
     public void Dispose()
     {
+        _startupUpdateCheckCts.Cancel();
+        _startupUpdateCheckCts.Dispose();
         _telegram.InputHandler = null;
         _homeVm.DialogRequested           -= OnCallDialogRequested;
         _homeVm.CallReportRequested       -= OnCallReportRequested;

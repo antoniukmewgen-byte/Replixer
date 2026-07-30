@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -39,6 +40,69 @@ public sealed class UpdateService
     public static Version GetCurrentVersion()
         => Assembly.GetExecutingAssembly().GetName().Version ?? new Version(1, 0, 0);
 
+    private static readonly TimeSpan NetworkSettleDelay = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan RetryCooldown       = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// Startup variant of <see cref="CheckForUpdateAsync"/>: if the first attempt fails
+    /// because there's genuinely no network yet (right after boot/login while Wi-Fi/VPN is
+    /// still connecting, or after waking from sleep), keeps listening for Windows to report
+    /// connectivity and retries — for as long as the app runs, not just a few minutes. There's
+    /// no artificial deadline; the only thing that stops this is <paramref name="ct"/> being
+    /// cancelled, which <see cref="Replixer.ViewModels.MainViewModel"/> does on app shutdown.
+    /// </summary>
+    public async Task<UpdateInfo?> CheckForUpdateWithNetworkWaitAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var info = await CheckForUpdateAsync(ct);
+            if (info is not null || NetworkInterface.GetIsNetworkAvailable())
+                return info;
+
+            while (true)
+            {
+                if (!await WaitForNetworkAvailableAsync(ct))
+                    return null; // ct cancelled — app is shutting down
+
+                await Task.Delay(NetworkSettleDelay, ct); // DNS/adapter needs a moment after "available"
+                info = await CheckForUpdateAsync(ct);
+                if (info is not null || NetworkInterface.GetIsNetworkAvailable())
+                    return info;
+
+                // Adapter reports "up" but the actual check still failed (e.g. captive
+                // portal, DNS server itself still down) — avoid hammering on flapping
+                // connections before listening for the next availability event.
+                await Task.Delay(RetryCooldown, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    private static async Task<bool> WaitForNetworkAvailableAsync(CancellationToken ct)
+    {
+        if (NetworkInterface.GetIsNetworkAvailable()) return true;
+
+        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        NetworkAvailabilityChangedEventHandler handler = (_, e) =>
+        {
+            if (e.IsAvailable) tcs.TrySetResult(true);
+        };
+
+        NetworkChange.NetworkAvailabilityChanged += handler;
+        using var reg = ct.Register(() => tcs.TrySetResult(false));
+        try
+        {
+            return await tcs.Task;
+        }
+        finally
+        {
+            NetworkChange.NetworkAvailabilityChanged -= handler;
+        }
+    }
+
     public async Task<UpdateInfo?> CheckForUpdateAsync(CancellationToken ct = default)
     {
         for (var attempt = 0; ; attempt++)
@@ -66,6 +130,15 @@ public sealed class UpdateService
                 var delay = RetryDelays[attempt];
                 Debug.WriteLine($"[Update] Check attempt {attempt + 1} failed ({ex.Message}). Retrying in {delay.TotalSeconds}s…");
                 await Task.Delay(delay, ct);
+            }
+            catch (Exception ex) when (IsTransient(ex))
+            {
+                // Retries exhausted but it's still a plain connectivity failure (DNS not
+                // resolving, host unreachable, etc.) — typical right after boot/login when
+                // network isn't up yet, or a temporary ISP/VPN blip. Not a code bug and it
+                // self-heals on the next check, so don't spam the error channel for it.
+                Debug.WriteLine($"[Update] Check failed after {RetryCount} retries (still transient): {ex.Message}");
+                return null;
             }
             catch (Exception ex)
             {
