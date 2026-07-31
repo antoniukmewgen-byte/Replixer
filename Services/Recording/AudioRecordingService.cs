@@ -36,6 +36,16 @@ public class AudioRecordingService : IDisposable
     private volatile bool _loopbackStopped;
     private volatile bool _micStopped;
 
+    // StopRecordingAsync() (natural end-of-call) and Dispose() (app shutdown) can both try to
+    // stop/dispose the same recording if the app closes at the exact moment a call ends. Without
+    // coordination both paths would race to StopRecording()+dispose the same WaveFileWriter,
+    // which crashed with ObjectDisposedException inside WaveFileWriter.Dispose→UpdateHeader.
+    // _stopClaimed ensures only ONE of the two paths performs the actual stop-and-wait sequence;
+    // _stopFinished lets the other one wait for that path to finish instead of tearing down
+    // captures/writers out from under it.
+    private int _stopClaimed;
+    private readonly ManualResetEventSlim _stopFinished = new(false);
+
     public bool    IsRecording       { get; private set; }
     public string  LastSavedFilePath { get; private set; } = string.Empty;
     public string? CurrentFilePath   => _finalMp3Path;
@@ -111,6 +121,8 @@ public class AudioRecordingService : IDisposable
             _loopbackBytesWritten = 0;
             _loopbackStopped      = false;
             _micStopped           = false;
+            _stopClaimed          = 0;
+            _stopFinished.Reset();
 
             _loopbackCapture = new WasapiLoopbackCapture();
             _loopbackCapture.DataAvailable += (_, e) =>
@@ -155,22 +167,33 @@ public class AudioRecordingService : IDisposable
     public async Task<string?> StopRecordingAsync()
     {
         if (!IsRecording) return null;
-        IsRecording = false;
+        // If Dispose() (app shutdown) already claimed the stop, don't race it — bail out and
+        // let Dispose finish the job.
+        if (Interlocked.CompareExchange(ref _stopClaimed, 1, 0) != 0) return null;
 
-        await StopCapturesAsync().ConfigureAwait(false);
+        try
+        {
+            IsRecording = false;
 
-        _loopbackWriter?.Dispose(); _loopbackWriter = null;
-        _micWriter?.Dispose();      _micWriter      = null;
+            await StopCapturesAsync().ConfigureAwait(false);
 
-        using var mixCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-        string? path = await Task.Run(() => MixAndSaveToMp3(mixCts.Token)).ConfigureAwait(false);
+            SafeDispose(ref _loopbackWriter);
+            SafeDispose(ref _micWriter);
 
-        CleanupCaptures();
+            using var mixCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            string? path = await Task.Run(() => MixAndSaveToMp3(mixCts.Token)).ConfigureAwait(false);
 
-        if (path != null)
-            LastSavedFilePath = path;
+            CleanupCaptures();
 
-        return path;
+            if (path != null)
+                LastSavedFilePath = path;
+
+            return path;
+        }
+        finally
+        {
+            _stopFinished.Set();
+        }
     }
 
     private async Task StopCapturesAsync()
@@ -286,10 +309,30 @@ public class AudioRecordingService : IDisposable
 
     private void CleanupCaptures()
     {
-        _loopbackCapture?.Dispose(); _loopbackCapture = null;
-        _micCapture?.Dispose();      _micCapture      = null;
-        _loopbackWriter?.Dispose();  _loopbackWriter  = null;
-        _micWriter?.Dispose();       _micWriter       = null;
+        SafeDispose(ref _loopbackCapture);
+        SafeDispose(ref _micCapture);
+        SafeDispose(ref _loopbackWriter);
+        SafeDispose(ref _micWriter);
+    }
+
+    // Atomically takes ownership of the field (swap-to-null) before disposing, so if
+    // StopRecordingAsync() and Dispose() both reach the same field concurrently, only one of
+    // them actually gets the live instance and calls .Dispose() on it — the other sees null.
+    // This is what prevents the double-dispose ObjectDisposedException crash from before.
+    //
+    // The try/catch here matters just as much as the swap: if e.g. the mic device disappears
+    // mid-capture, _loopbackCapture/_micCapture/_loopbackWriter/_micWriter's .Dispose() can
+    // itself throw. Without a per-field catch, one throwing Dispose() would abort CleanupCaptures()
+    // before the remaining fields got their turn — leaving a stale, already-broken writer sitting
+    // in a field. That stale reference would then fail StartRecording()'s "already recording"
+    // guard on the next attempt (silent generic error), and get Dispose()'d a second time at app
+    // shutdown → the exact ObjectDisposedException crash seen in production.
+    private static void SafeDispose<T>(ref T? field) where T : class, IDisposable
+    {
+        var value = Interlocked.Exchange(ref field, null);
+        if (value is null) return;
+        try { value.Dispose(); }
+        catch (Exception ex) { Debug.WriteLine($"[Recording] Dispose failed for {typeof(T).Name}: {ex.Message}"); }
     }
 
     private static void SafeDelete(string? path)
@@ -305,34 +348,54 @@ public class AudioRecordingService : IDisposable
     {
         if (IsRecording)
         {
-            IsRecording = false;
+            if (Interlocked.CompareExchange(ref _stopClaimed, 1, 0) == 0)
+            {
+                // We claimed the stop — nobody else (StopRecordingAsync) is touching it.
+                IsRecording = false;
 
-            // Wait for RecordingStopped (fired after the WASAPI capture thread's last
-            // DataAvailable call) before disposing writers below, so we never dispose
-            // out from under an in-flight callback. Mirrors StopCapturesAsync, but blocking
-            // since Dispose() is synchronous.
-            using var loopbackDone = new ManualResetEventSlim(false);
-            using var micDone      = new ManualResetEventSlim(false);
+                try
+                {
+                    // Wait for RecordingStopped (fired after the WASAPI capture thread's last
+                    // DataAvailable call) before disposing writers below, so we never dispose
+                    // out from under an in-flight callback. Mirrors StopCapturesAsync, but blocking
+                    // since Dispose() is synchronous.
+                    using var loopbackDone = new ManualResetEventSlim(false);
+                    using var micDone      = new ManualResetEventSlim(false);
 
-            if (_loopbackCapture != null)
-                _loopbackCapture.RecordingStopped += (_, _) => { _loopbackStopped = true; loopbackDone.Set(); };
+                    if (_loopbackCapture != null)
+                        _loopbackCapture.RecordingStopped += (_, _) => { _loopbackStopped = true; loopbackDone.Set(); };
+                    else
+                        loopbackDone.Set();
+
+                    if (_micCapture != null)
+                        _micCapture.RecordingStopped += (_, _) => { _micStopped = true; micDone.Set(); };
+                    else
+                        micDone.Set();
+
+                    _loopbackCapture?.StopRecording();
+                    _micCapture?.StopRecording();
+
+                    loopbackDone.Wait(TimeSpan.FromSeconds(2));
+                    micDone.Wait(TimeSpan.FromSeconds(2));
+
+                    _loopbackStopped = true;
+                    _micStopped      = true;
+                }
+                finally
+                {
+                    _stopFinished.Set();
+                }
+            }
             else
-                loopbackDone.Set();
-
-            if (_micCapture != null)
-                _micCapture.RecordingStopped += (_, _) => { _micStopped = true; micDone.Set(); };
-            else
-                micDone.Set();
-
-            _loopbackCapture?.StopRecording();
-            _micCapture?.StopRecording();
-
-            loopbackDone.Wait(TimeSpan.FromSeconds(2));
-            micDone.Wait(TimeSpan.FromSeconds(2));
-
-            _loopbackStopped = true;
-            _micStopped      = true;
+            {
+                // StopRecordingAsync() already claimed the stop (e.g. the call ended naturally
+                // at the exact moment the app was closing) — wait for it to finish its own
+                // graceful stop instead of ripping captures/writers out from under it. That race
+                // is what previously caused ObjectDisposedException in WaveFileWriter.Dispose.
+                _stopFinished.Wait(TimeSpan.FromSeconds(10));
+            }
         }
         CleanupCaptures();
+        _stopFinished.Dispose();
     }
 }
