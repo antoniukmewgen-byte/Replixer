@@ -212,8 +212,18 @@ public sealed class MainViewModel : ViewModelBase, IDialogHost, IDisposable
         }
     }
 
+    private bool _disposed;
+
+    // App.OnExit() disposes this VM explicitly (to control teardown order relative to other
+    // singletons) AND the DI ServiceProvider disposes it again afterwards (since MainViewModel
+    // is registered as a singleton and the container tracks/disposes every IDisposable it
+    // created). Without this guard, the second call re-ran Cancel()/Dispose() on the already
+    // disposed _startupUpdateCheckCts → ObjectDisposedException on app shutdown.
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
         _startupUpdateCheckCts.Cancel();
         _startupUpdateCheckCts.Dispose();
         _telegram.InputHandler = null;

@@ -71,7 +71,21 @@ public sealed class ProfileViewModel : ViewModelBase, IDisposable
     public bool IsTelegramEnabled
     {
         get => _settings.IsTelegramEnabled;
-        set => _settings.IsTelegramEnabled = value;
+        set
+        {
+            // Вимкнення тумблера — це намір відв'язати Telegram, а не просто приховати
+            // блок налаштувань: зносимо авторизацію (сесію + статус), щоб при повторному
+            // вмиканні користувач проходив авторизацію заново, а не мовчки підхопив
+            // стару/можливо вже недійсну сесію.
+            if (!value)
+            {
+                _telegram.Logout();
+                IsTelegramConnected = null;
+                TelegramAuthError   = null;
+                _settings.TelegramPhone = string.Empty;
+            }
+            _settings.IsTelegramEnabled = value;
+        }
     }
 
     public string TelegramPhone
