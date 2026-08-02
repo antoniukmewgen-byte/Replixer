@@ -11,6 +11,13 @@ namespace Replixer.Services.Upload;
 
 public class TelegramUploadService : IDisposable
 {
+    // Повертається з EditMessageAsync, коли Telegram відповідає MESSAGE_ID_INVALID — це означає,
+    // що повідомлення з таким msgId більше не існує в чаті (найімовірніше, його видалили вручну),
+    // а не транзиентну мережеву/API помилку. Викликач (HomeViewModel.EditEntryReportAsync)
+    // звіряється з цим маркером, щоб скинути entry.TelegramMessageId — інакше кожна наступна
+    // спроба редагування звіту знову впиралась би в ту саму помилку назавжди.
+    public const string MessageDeletedWarning = "Telegram: повідомлення видалено з чату (можливо, його прибрали вручну)";
+
     private static int    ApiId   => AppSecrets.TelegramApiId;
     private static string ApiHash => AppSecrets.TelegramApiHash;
 
@@ -246,6 +253,11 @@ public class TelegramUploadService : IDisposable
             Debug.WriteLine($"[TG] ✗ Auth key unregistered — invalidating session");
             HandleAuthKeyUnregistered();
             return "Telegram: сесія анульована, потрібна повторна авторизація";
+        }
+        catch (TL.RpcException ex) when (ex.Message == "MESSAGE_ID_INVALID")
+        {
+            Debug.WriteLine("[TG] ✗ Message no longer exists (likely deleted from chat)");
+            return MessageDeletedWarning;
         }
         catch (Exception ex)
         {

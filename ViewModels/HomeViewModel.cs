@@ -596,6 +596,12 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         string? tgError    = tgTask.Result;
         string? kommoError = kommoTask.Result;
 
+        // Повідомлення видалили з чату вручну — msgId більше нічого не варте. Скидаємо його,
+        // інакше кожна наступна спроба редагування цього звіту знову й знову впиралась би
+        // в ту саму MESSAGE_ID_INVALID (а не бо щось справді зламалось у додатку).
+        if (tgError == TelegramUploadService.MessageDeletedWarning)
+            entry.TelegramMessageId = null;
+
         if (tgError is null && kommoError is null)
         {
             entry.ReportData = newData;

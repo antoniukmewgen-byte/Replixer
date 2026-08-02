@@ -411,9 +411,16 @@ public class KommoService : IDisposable
             }
             catch (NumberParseException) when (!rawPhone.TrimStart().StartsWith('+'))
             {
-                // No "+" and no default region to fall back on — assume the digits already
-                // include a country calling code, just missing the leading "+".
-                phoneNumber = phoneNumberUtil.Parse("+" + rawPhone.TrimStart(), null);
+                var trimmed = rawPhone.TrimStart();
+                phoneNumber = trimmed.StartsWith('0')
+                    // Local Ukrainian national format with a trunk "0" (e.g. "0 (98) 721 26 42") —
+                    // no country code, so parse with defaultRegion "UA" instead of blindly
+                    // prepending "+" (which would produce an invalid "+0..." E.164 string, since no
+                    // country calling code can start with "0").
+                    ? phoneNumberUtil.Parse(trimmed, "UA")
+                    // No "+" but the digits already look like they include a country calling code —
+                    // just missing the leading "+".
+                    : phoneNumberUtil.Parse("+" + trimmed, null);
             }
 
             // Skips the strict validity check and always returns a best-effort geographic guess
