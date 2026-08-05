@@ -164,6 +164,11 @@ public class AudioRecordingService : IDisposable
         }
     }
 
+    // Флоор/стеля для бюджету часу на мікшування — щоб короткі дзвінки не чекали дарма (стеля
+    // нижче), а довгі не впирались у той самий фіксований ліміт, що й короткі (флоор вище).
+    private static readonly TimeSpan MinMixTimeout = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan MaxMixTimeout = TimeSpan.FromMinutes(30);
+
     public async Task<string?> StopRecordingAsync()
     {
         if (!IsRecording) return null;
@@ -180,7 +185,19 @@ public class AudioRecordingService : IDisposable
             SafeDispose(ref _loopbackWriter);
             SafeDispose(ref _micWriter);
 
-            using var mixCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+            // Раніше тут був фіксований ліміт 5 хв на будь-який дзвінок. Мікшування (ресемплінг +
+            // мокс + LAME-кодування) зазвичай на порядки швидше за реальний час дзвінка, але на
+            // повільному/навантаженому ПК час обробки росте разом з обсягом аудіо — тому бюджет
+            // масштабуємо від фактичної тривалості дзвінка, а не тримаємо однаковим для 5-хвилинної
+            // і 3-годинної розмови. MinMixTimeout — щоб короткі дзвінки не відрізались завчасно;
+            // MaxMixTimeout — щоб дійсно зависла обробка (напр. зациклений енкодер) не чекала вічно.
+            var recordingDuration = TimeSpan.FromSeconds(
+                (double)(Stopwatch.GetTimestamp() - _loopbackStartStamp) / Stopwatch.Frequency);
+            var mixTimeout = recordingDuration / 2;
+            if (mixTimeout < MinMixTimeout) mixTimeout = MinMixTimeout;
+            if (mixTimeout > MaxMixTimeout) mixTimeout = MaxMixTimeout;
+
+            using var mixCts = new CancellationTokenSource(mixTimeout);
             string? path = await Task.Run(() => MixAndSaveToMp3(mixCts.Token)).ConfigureAwait(false);
 
             CleanupCaptures();
@@ -271,7 +288,7 @@ public class AudioRecordingService : IDisposable
         }
         catch (OperationCanceledException)
         {
-            Debug.WriteLine("[Recording] Mix timed out after 5 minutes");
+            Debug.WriteLine("[Recording] Mix timed out (adaptive budget exceeded)");
             LastError = "Час обробки аудіо вийшов";
             return null;
         }
