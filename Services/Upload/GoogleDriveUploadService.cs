@@ -6,11 +6,25 @@ using Replixer.Infrastructure;
 using Replixer.Services;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Replixer.Services.Upload;
 
 public class GoogleDriveUploadService
 {
+    // Сервіс-акаунт спільний для ВСІХ завантажень (живий дзвінок, фоновий retry записів,
+    // фоновий retry скріншотів, недодзвони) — тож і ліміт запитів (userRateLimitExceeded/
+    // rateLimitExceeded, 403/429) теж спільний. Раніше кожен виклик UploadAsync, зіткнувшись
+    // із таким лімітом, одразу здавався (GoogleApiException не потрапляв під isNetworkError),
+    // а зовнішні PendingUploadRetryService/PendingScreenshotUploadRetryService тикають кожні
+    // 10с НЕЗАЛЕЖНО від причини попередньої помилки — тобто щоразу знову била в API, не
+    // даючи вікну обмеження в Google взагалі спливти (реальний випадок: одна й та сама
+    // помилка трималась ~50 хв поспіль). Цей cooldown — спільний "запобіжник" на рівні
+    // сервісу: щойно ловимо ліміт, наступні ~100с (вікно, яке сама Google згадує в описі
+    // userRateLimitExceeded) НІХТО не робить реального мережевого запиту — UploadAsync
+    // одразу повертає null, і виклик просто чекає на наступний тик фонового сервісу.
+    private static readonly TimeSpan RateLimitCooldown = TimeSpan.FromSeconds(100);
+    private DateTime _rateLimitedUntilUtc = DateTime.MinValue;
 
     private readonly DriveService? _service;
 
@@ -90,11 +104,27 @@ public class GoogleDriveUploadService
             return null;
         }
 
+        var cooldownLeft = _rateLimitedUntilUtc - DateTime.UtcNow;
+        if (cooldownLeft > TimeSpan.Zero)
+        {
+            Debug.WriteLine($"[GDrive] Skipping — still in rate-limit cooldown for {cooldownLeft.TotalSeconds:F0}s more");
+            return null;
+        }
+
         const int maxAttempts = 3;
         for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
             var (link, isNetworkError, ex) = await TryUploadOnceAsync(filePath, folderId, mimeType, attempt, ct);
             if (link is not null) return link;
+
+            if (IsRateLimitError(ex))
+            {
+                _rateLimitedUntilUtc = DateTime.UtcNow + RateLimitCooldown;
+                ErrorReporter.Report("GOOGLE_DRIVE",
+                    $"Google Drive: перевищено ліміт запитів (userRateLimitExceeded) — призупиняємо завантаження на {RateLimitCooldown.TotalSeconds:F0}с, щоб не заганяти ліміт у нескінченний цикл.");
+                return null;
+            }
+
             if (!isNetworkError) return null;
             if (attempt == maxAttempts) break;
             var delay = TimeSpan.FromSeconds(5 * Math.Pow(2, attempt - 1)); // 5s, 10s
@@ -105,6 +135,16 @@ public class GoogleDriveUploadService
         ErrorReporter.Report("GOOGLE_DRIVE", "Немає з'єднання з Google Drive після 3 спроб — перевірте інтернет.");
         return null;
     }
+
+    // userRateLimitExceeded/rateLimitExceeded/quotaExceeded — усі приходять як GoogleApiException
+    // з HTTP 403 (інколи 429), з причиною в Error.Errors[].Reason. На відміну від звичайної
+    // мережевої помилки, повторювати такий запит одразу — контрпродуктивно: саме часті повтори
+    // й тримають вікно обмеження відкритим.
+    private static bool IsRateLimitError(Exception? ex) =>
+        ex is Google.GoogleApiException apiEx &&
+        (apiEx.HttpStatusCode == System.Net.HttpStatusCode.Forbidden ||
+         apiEx.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests) &&
+        (apiEx.Error?.Errors?.Any(e => e.Reason is "userRateLimitExceeded" or "rateLimitExceeded" or "quotaExceeded") ?? false);
 
     private async Task<(string? link, bool isNetworkError, Exception? ex)> TryUploadOnceAsync(
         string filePath, string? folderId, string mimeType, int attempt, CancellationToken ct)
@@ -179,7 +219,9 @@ public class GoogleDriveUploadService
 
             bool isNet = result.Exception is System.Net.Http.HttpRequestException
                                           or System.Net.Sockets.SocketException;
-            if (!isNet)
+            // Rate-limit звітуємо окремо й коротко на рівні UploadAsync (там же виставляється
+            // cooldown) — тут не дублюємо тим самим сирим стектрейсом.
+            if (!isNet && !IsRateLimitError(result.Exception))
                 ErrorReporter.Report("GOOGLE_DRIVE", $"Upload failed: {error}", result.Exception);
             return (null, isNet, result.Exception);
         }
@@ -198,11 +240,26 @@ public class GoogleDriveUploadService
             Debug.WriteLine($"[GDrive] ✗ Socket error: {ex.Message}");
             return (null, true, ex);
         }
+        catch (FileNotFoundException ex)
+        {
+            // Файл, який мав вантажитись, фізично зник з диска між тим, як фоновий retry
+            // вирішив, що він ще є (File.Exists у RetryEntryAsync), і фактичним відкриттям
+            // потоку тут — найчастіше це антивірус/EDR, що прибрав щойно створений
+            // аудіо/скрін-файл із Temp, або хтось вручну чистив Temp-папку. У самому
+            // застосунку немає жодного шляху, який видаляв би файл до успішного завершення
+            // ВСІХ кроків (Drive+Telegram+Kommo) — тож ретраїти тут нема сенсу, наступний
+            // тик фонового сервісу й так побачить, що файлу немає, і сам зніме прапорці.
+            Debug.WriteLine($"[GDrive] ✗ File vanished before upload: {ex.Message}");
+            ErrorReporter.Report("GOOGLE_DRIVE",
+                $"Файл зник з диска до завантаження (ймовірно, антивірус або очищення Temp-папки): {Path.GetFileName(filePath)}");
+            return (null, false, ex);
+        }
         catch (Exception ex)
         {
             Debug.WriteLine($"[GDrive] ✗ Exception: {ex.GetType().Name}: {ex.Message}");
             Debug.WriteLine($"[GDrive]   StackTrace: {ex.StackTrace}");
-            ErrorReporter.Report("GOOGLE_DRIVE", $"Upload exception: {ex.Message}", ex);
+            if (!IsRateLimitError(ex))
+                ErrorReporter.Report("GOOGLE_DRIVE", $"Upload exception: {ex.Message}", ex);
             return (null, false, ex);
         }
         finally
