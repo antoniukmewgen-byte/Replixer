@@ -1,40 +1,40 @@
 {
-  "version": "1.6.4",
+  "version": "1.6.5",
   "files": [
     {
       "path": "Accessibility.dll",
-      "sha256": "fb5e8c93aad80cbd0523cd6eb9ee56191412bde9a6e91b3d9af8c73ba01c07b9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Accessibility.dll"
+      "sha256": "7ce3bd7a5d0ec61be7d5d139e51831c4a20ae32cb7635baac739846fd0fc07b4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Accessibility.dll"
     },
     {
       "path": "clretwrc.dll",
-      "sha256": "2dba4804094fb9080ad7954d6664c168f85c244691198046faf9d33e12e70107",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/clretwrc.dll"
+      "sha256": "e9f9ccaa20a91570e6e505fd85197b86e8e6582b67864a8630c1a82afb9866a7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/clretwrc.dll"
     },
     {
       "path": "clrgc.dll",
-      "sha256": "ca2d50a39e14bbe2666d53789317e87daf65af8b2870ab400b352bb2734aec33",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/clrgc.dll"
+      "sha256": "83a829823c333bfbcf0bd82bc015a61af10ce136d8eb7933b28d97c9193c578b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/clrgc.dll"
     },
     {
       "path": "clrgcexp.dll",
-      "sha256": "e683eb9c26c7cf77ae7f27369472d107e7426d6421a5e6aba24e58a35630f9e4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/clrgcexp.dll"
+      "sha256": "d006be1e64e796161c8f3abb462c23753d86103a82282013b1c5309c76613f1f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/clrgcexp.dll"
     },
     {
       "path": "clrjit.dll",
-      "sha256": "9a74076395f6e7bcbb932c8b6eb412d1fbbff43b954c49f9d5015e467d8402e9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/clrjit.dll"
+      "sha256": "e7bf743e7bf9a01c8c2bcdc0d828212fd8dfc285be9d4ec21962becf456df648",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/clrjit.dll"
     },
     {
       "path": "coreclr.dll",
-      "sha256": "58859f85a30cc71313b281898e7cfbdbb9eccb95ae2a3f865329efd47ebf31bb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/coreclr.dll"
+      "sha256": "c98c3078a4f2495dd7d3ced967c7a6981545194ed163454703580b740f435521",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/coreclr.dll"
     },
     {
       "path": "createdump.exe",
-      "sha256": "b6b5611f41d6a3f03ab9c37ee5fdfdb6837d72910779be23d125f3212fafeae8",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/createdump.exe"
+      "sha256": "d34b488bd20b87aaa8f1739aa834b877f76b22ff9ef1bdec7d0386a307f42a89",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/createdump.exe"
     },
     {
       "path": "D3DCompiler_47_cor3.dll",
@@ -43,8 +43,8 @@
     },
     {
       "path": "DirectWriteForwarder.dll",
-      "sha256": "74d4380ad87b4c695309a3e2b3b93bc331c232a4e280e9aa94c21429e6f484b8",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/DirectWriteForwarder.dll"
+      "sha256": "2526dcb41392b1756fd8fdb517fdca1c852b774b957e6e6c66715f616e5fc027",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/DirectWriteForwarder.dll"
     },
     {
       "path": "Google.Apis.Auth.dll",
@@ -78,13 +78,13 @@
     },
     {
       "path": "hostfxr.dll",
-      "sha256": "d1012d5b8ff1329d5baa6d58aa02c4277acbe58cfd1dc5f10d7e6bb8e9a0d94a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/hostfxr.dll"
+      "sha256": "44f97e946b36415176dbc56a4426565a5e9b3e722c0ad579e20a749e3c0c7bcd",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/hostfxr.dll"
     },
     {
       "path": "hostpolicy.dll",
-      "sha256": "e9c723bf674ef7f6e6c1cc5d4ee694715b864f480c56baaf354b8cf7c9b40b87",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/hostpolicy.dll"
+      "sha256": "ded1d42c38688a1cacd20026b1f981c22fd583f621b7123296ef0f2af9cd656d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/hostpolicy.dll"
     },
     {
       "path": "libmp3lame.32.dll",
@@ -98,8 +98,8 @@
     },
     {
       "path": "Microsoft.CSharp.dll",
-      "sha256": "e140acec05bde933bf7075d501b6adb357b8e1c53c0519827731904fb2a3420f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.CSharp.dll"
+      "sha256": "2d073ff1f059dda2814c320ac5782536dc268b335e23e8e8b4d0d3b0833b617f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.CSharp.dll"
     },
     {
       "path": "Microsoft.DiaSymReader.Native.amd64.dll",
@@ -118,68 +118,68 @@
     },
     {
       "path": "Microsoft.VisualBasic.Core.dll",
-      "sha256": "897f3d3938b03156202acf780bbe156227e034785bd17305b17657c911c62203",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.VisualBasic.Core.dll"
+      "sha256": "6c267acb79006291cda2484bd9d39f289419b7d3448e1a1f30ef7c2ad7dce82c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.VisualBasic.Core.dll"
     },
     {
       "path": "Microsoft.VisualBasic.dll",
-      "sha256": "1e010737f239cc165a3a06adbb777186fdb7f8beedd5b69cd3508f942d462d8e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.VisualBasic.dll"
+      "sha256": "a7ac7e8ea4a71db42adb99f55af9ba270c3518652fe1a1f47b4eea939553138d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.VisualBasic.dll"
     },
     {
       "path": "Microsoft.VisualBasic.Forms.dll",
-      "sha256": "99d82d60ea0f0923f39e31f5cb34696b28da5cee78d08a69ffdf91f98d46c13e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.VisualBasic.Forms.dll"
+      "sha256": "640f7fc1fcd098e04f3f8d03668039719cfe799d2a12eda7a9c6a2e9bc1e2acf",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.VisualBasic.Forms.dll"
     },
     {
       "path": "Microsoft.Win32.Primitives.dll",
-      "sha256": "1c6d1ee2a3d8a82a097d5e1eda84fbddca57fbe5fc426f0f39aa9d2b486bc3dc",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.Win32.Primitives.dll"
+      "sha256": "07ee7d2780a74c523af5ca4babdc63d006fa896b3a1463c2e638c5bb2843f9b9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.Win32.Primitives.dll"
     },
     {
       "path": "Microsoft.Win32.Registry.AccessControl.dll",
-      "sha256": "7d4810fb5a2802701c5cde65394d0240640edc6b63538a42badd2a7b3e7cdc36",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.Win32.Registry.AccessControl.dll"
+      "sha256": "21452fb52e66252603c5efb3f3f8e330af094435840f8807803e4ee458e4625b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.Win32.Registry.AccessControl.dll"
     },
     {
       "path": "Microsoft.Win32.Registry.dll",
-      "sha256": "eb249fb10eb8687d3505fd9276480fb9a0c13dc975ce6bcc35e2e2e723e8d559",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.Win32.Registry.dll"
+      "sha256": "5f7623b92c1ef07c98546f63c83613f5f5f7af6513dc52e2e9e11447b6c1c7f6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.Win32.Registry.dll"
     },
     {
       "path": "Microsoft.Win32.SystemEvents.dll",
-      "sha256": "e47266840881921f19fd26df39d23cfbc247f7c4f7f8799a91c96e68f6a08513",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Microsoft.Win32.SystemEvents.dll"
+      "sha256": "4c2b3c4a44fa0ff1dd288d2fd0b2d4c8a5f713c149a4b2d37a26e03a7da261fa",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Microsoft.Win32.SystemEvents.dll"
     },
     {
-      "path": "mscordaccore_amd64_amd64_10.0.1026.32716.dll",
-      "sha256": "01625b0382d7ccab664ddb0997de2bb66e059fc547061f3d830914d6229a07f6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/mscordaccore_amd64_amd64_10.0.1026.32716.dll"
+      "path": "mscordaccore_amd64_amd64_10.0.1126.37416.dll",
+      "sha256": "c1b92da5356bb36f4ab55aa54b2d25a8a27518cf7a456eb4957ddfe94e2d428c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/mscordaccore_amd64_amd64_10.0.1126.37416.dll"
     },
     {
       "path": "mscordaccore.dll",
-      "sha256": "01625b0382d7ccab664ddb0997de2bb66e059fc547061f3d830914d6229a07f6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/mscordaccore.dll"
+      "sha256": "c1b92da5356bb36f4ab55aa54b2d25a8a27518cf7a456eb4957ddfe94e2d428c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/mscordaccore.dll"
     },
     {
       "path": "mscordbi.dll",
-      "sha256": "35aa0553836e034308189a97ed55b6722636960cb201e252c20bd49f8ac65ead",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/mscordbi.dll"
+      "sha256": "f3553412af82ab90180a0d412dd87b7bfc087043484a572dc2dce07eca9906fa",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/mscordbi.dll"
     },
     {
       "path": "mscorlib.dll",
-      "sha256": "ec2fdd1e7113428e9c2e0aa8bea39d54f4dafc2102434aa0a13c31f7ed1a4fb2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/mscorlib.dll"
+      "sha256": "a2c8875b7823b631ae669c6e78dc4b58bb577ce30206ccc03dbbc56981e1714e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/mscorlib.dll"
     },
     {
       "path": "mscorrc.dll",
-      "sha256": "331ce4f5bd1cfd59a4e1537ca62d5cc5693675b8c82a42125ab24e8d5104d1a0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/mscorrc.dll"
+      "sha256": "0c5efacadabaf31e07e131fe7e9150454fb1dd148222a053a2f743551d42184c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/mscorrc.dll"
     },
     {
       "path": "msquic.dll",
-      "sha256": "99daf179ee2dfb5c36493543647b64fc58a24aba0b16d5e9232b06003fbc9054",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.2/msquic.dll"
+      "sha256": "24da0bf4d7b7e0adb598297d170fa547f94f398bd6f2b515ae87f0a207c999c7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/msquic.dll"
     },
     {
       "path": "NAudio.Asio.dll",
@@ -223,8 +223,8 @@
     },
     {
       "path": "netstandard.dll",
-      "sha256": "f9078068add6f69455772c526a69a134ae520199eb1c5513f7d80a871fc09851",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/netstandard.dll"
+      "sha256": "ce09cef0d758196f2467f320d840c03202453efe9fb1920dddd24ea8277bbbb3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/netstandard.dll"
     },
     {
       "path": "Newtonsoft.Json.dll",
@@ -233,8 +233,8 @@
     },
     {
       "path": "PenImc_cor3.dll",
-      "sha256": "e6a8bdb6a49f6bd8b3a5cc6b4dbc460588c0e58b08a613e2c2a32fa5875592dd",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PenImc_cor3.dll"
+      "sha256": "8052e85cd5a3ae9a939872b32de5b90a827456a21d8ccfc4d0c76599f1fcc217",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PenImc_cor3.dll"
     },
     {
       "path": "PhoneNumbers.dll",
@@ -243,463 +243,463 @@
     },
     {
       "path": "PresentationCore.dll",
-      "sha256": "b8fbf245f2868dc992c329e67f1277119dc3a3914048ec73ee88fa45acf7e0ec",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationCore.dll"
+      "sha256": "c2ac0752b0a3018331519b8aec6fa085346bfc59609ea29954821a0ab19ee839",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationCore.dll"
     },
     {
       "path": "PresentationFramework-SystemCore.dll",
-      "sha256": "873649ee72af2e09159930b42bcfcc7015996d038eab6e496cbb0427208e3252",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework-SystemCore.dll"
+      "sha256": "4f259c2085ac4453e42f465d62673d6b932bbc5a26d053461b65d605b04c392f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework-SystemCore.dll"
     },
     {
       "path": "PresentationFramework-SystemData.dll",
-      "sha256": "3cc57eb889fe702d7300aa22377728f0485e7863c06c637b6c1842b16582d75e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework-SystemData.dll"
+      "sha256": "097cd5aab0816a52b8bf784afd6b587e66bdc68fd4c9089615026bdd706b2222",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework-SystemData.dll"
     },
     {
       "path": "PresentationFramework-SystemDrawing.dll",
-      "sha256": "ae04da784c11e42ccede011582779c268b9423855c7daeda38d17a123ff874ed",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework-SystemDrawing.dll"
+      "sha256": "de894badf00611f47c053bafbd45be4ccd73a945fb34b4bcd0fe8290740e69aa",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework-SystemDrawing.dll"
     },
     {
       "path": "PresentationFramework-SystemXml.dll",
-      "sha256": "5c2934090f581ff82e864cab00f04bb95d6b6c30ad1f59706be4eccd0dd09b64",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework-SystemXml.dll"
+      "sha256": "bf68aa126af58c0733846e1df00f705a18a2dda051ce120754eca5e27b585cf5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework-SystemXml.dll"
     },
     {
       "path": "PresentationFramework-SystemXmlLinq.dll",
-      "sha256": "e62529326eb786087da485e4b768b5098ea7a11d878a11d4f109dd08f79e21fa",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework-SystemXmlLinq.dll"
+      "sha256": "1531f60dfc898626522ce3b59efa25e7b50e0886055e6f18d4558f400a4ecb0f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework-SystemXmlLinq.dll"
     },
     {
       "path": "PresentationFramework.Aero.dll",
-      "sha256": "fe5b219210e5f8a8597f11539df822bd0502756d9246e1954705b536a33153a6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Aero.dll"
+      "sha256": "e8b0e3ef3dba55f865ae30b9da7225ec43ea666fb05b15fff7f2ff2bba241bf4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Aero.dll"
     },
     {
       "path": "PresentationFramework.Aero2.dll",
-      "sha256": "7d78bdc09d7da568c8fe73811148c761e542901cecf6c1e21b0d9b1bf239c5a6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Aero2.dll"
+      "sha256": "5673f7f99321cef2eba08453b5c94f723a48fe94e8b746c6882c022696fea7ea",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Aero2.dll"
     },
     {
       "path": "PresentationFramework.AeroLite.dll",
-      "sha256": "002f840532f2617ecc9e671d4a9a5e68b0fd2545ed5d0d0fcee570fdb9cf43d5",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.AeroLite.dll"
+      "sha256": "f6b5a3684bf1b036cf7cdc8b8287f9e098a15a106c51111d789db7e93c841a8c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.AeroLite.dll"
     },
     {
       "path": "PresentationFramework.Classic.dll",
-      "sha256": "3acfc16fd649252ecdc5ee4af779d6567004bcbc06d14d91c47073839bf9bee3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Classic.dll"
+      "sha256": "71cc82c96ecba63970a66bb7f05b37ae04eed20967e0906edce02cac7337897d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Classic.dll"
     },
     {
       "path": "PresentationFramework.dll",
-      "sha256": "3a22e5bd32d90b034a5ec19657b506cac2647b46cdaef5d33e134b09585de5d2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.dll"
+      "sha256": "fa9aa188f9c92dc95b4e56f303b1875244bf45786733948c79034fe95fb0cd86",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.dll"
     },
     {
       "path": "PresentationFramework.Fluent.dll",
-      "sha256": "ef4a411c6468d5bc2b3f8c114931c59acf9fc9f9dd6e7543e510dc5c82ae71a2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Fluent.dll"
+      "sha256": "4a9bf1a9b7002b626e57615768c802bace6b835ad2bf2bf34bcc51bdecf79289",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Fluent.dll"
     },
     {
       "path": "PresentationFramework.Luna.dll",
-      "sha256": "3061d425c84588fd00b19a66b44ebeb64e09d4309aec5b4505f632ac103f4eb9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Luna.dll"
+      "sha256": "d3a3f42fe8fa15e5655620fdd526300bc3ae94a63d1ba13ded1d899b2a304e75",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Luna.dll"
     },
     {
       "path": "PresentationFramework.Royale.dll",
-      "sha256": "7dc8252abd4b13c9a794096a97278edf8997b33793ff097fc91838c7a1512834",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationFramework.Royale.dll"
+      "sha256": "01f3efec49e73e83fe6561e51a01ad34dae52445f260c7217cd75a86e036ca35",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationFramework.Royale.dll"
     },
     {
       "path": "PresentationNative_cor3.dll",
-      "sha256": "7382f135c559fba317f73fbeaf9b84a4f34e760207fd6f31225698b260e26623",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationNative_cor3.dll"
+      "sha256": "42e2e543c17e1b37499baf00d956433b8afb655348ec0fae89c926fb7d149b6e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationNative_cor3.dll"
     },
     {
       "path": "PresentationUI.dll",
-      "sha256": "c4dddb3014180a096a5d4150e5dc70d70842959d295de846519c5f3351d46fcd",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/PresentationUI.dll"
+      "sha256": "5f0aacc579e63b5ff75f0ce77b03cdc68f819163fb7f3572de31433f4459284c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/PresentationUI.dll"
     },
     {
       "path": "ReachFramework.dll",
-      "sha256": "8c1350c47b060c1b9a5a2db0a7e49c534951e6172c020d7776ee734ee6c83b5d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/ReachFramework.dll"
+      "sha256": "0a29d87be9b09a4e2c65f7f585715797cc71f77b091aed53a3b65a06250fdfec",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/ReachFramework.dll"
     },
     {
       "path": "Replixer.deps.json",
-      "sha256": "e8da7861332ad430c6c5248a2cf0b1c5e56178e9c3fe48884a4034d9f0ddaad1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.4/Replixer.deps.json"
+      "sha256": "9aab1e260636e6173b9d66a5c5233c4a77f3f4f2050b1116ca87b7fd2ca6f186",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Replixer.deps.json"
     },
     {
       "path": "Replixer.dll",
-      "sha256": "0615aca31ea809513b7d22205e019eb956d9155633f84fd3a9a551f58ec7739a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.4/Replixer.dll"
+      "sha256": "64768e85e1dc738f4ba8394c7f8bf8d78ee4069c8197e887c5e9ab58b452d76a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Replixer.dll"
     },
     {
       "path": "Replixer.exe",
-      "sha256": "9d506392c88d026bb43590f935aee18fd7544904bd58f8c453d4cbd2f2b4b0e8",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.4/Replixer.exe"
+      "sha256": "a018d393803e70e62babbac7a63efd47fa5f7e4465b109fceb051b783bb51389",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Replixer.exe"
     },
     {
       "path": "Replixer.runtimeconfig.json",
-      "sha256": "e5403125c688e832b1e625563584ce284cd6f0ba7cadc0b8668c8773e732fa4d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/Replixer.runtimeconfig.json"
+      "sha256": "b8e11d3bb7959b149bcdd07d2e12279489658a582225540cef5806534b11046a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/Replixer.runtimeconfig.json"
     },
     {
       "path": "System.AppContext.dll",
-      "sha256": "1776b3c8d8e40ce4baee66904870272305546233cab9c84bccf95cbe685b7887",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.AppContext.dll"
+      "sha256": "36447d0e4c9c86352905726eaf37292c55caed5b87c74c22836ae8b0334395c3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.AppContext.dll"
     },
     {
       "path": "System.Buffers.dll",
-      "sha256": "4a5e9e4b8d439bfede0435440e252000a5f2e4a5d4b915f243e909ca61bc528b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Buffers.dll"
+      "sha256": "7efc8dfef9548771ec328610de7b8e5c4308a8ea6b1ca73021f336fc00653176",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Buffers.dll"
     },
     {
       "path": "System.CodeDom.dll",
-      "sha256": "3c77f3cf4047ff988ecd1221be3a4993f7ad0326c79f1b45a42208945a5e957f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.CodeDom.dll"
+      "sha256": "97700d9efaae699829db24da93bb1343e426c1990d5805e9181b24ff11a4874d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.CodeDom.dll"
     },
     {
       "path": "System.Collections.Concurrent.dll",
-      "sha256": "5a4b728246443eb3b4c0a16d9b3d04bc0bce60b7a1998fa4a75716358cc572ff",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Collections.Concurrent.dll"
+      "sha256": "569667e92dda0af323a9f289c6bbe7a046bab7354f9fa0d37fc97404a0499ed3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Collections.Concurrent.dll"
     },
     {
       "path": "System.Collections.dll",
-      "sha256": "fc52be0abceac360478ffffce876c99997b4af56fc36fbf07cfc38ac5b7fdd7f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Collections.dll"
+      "sha256": "5aea9c285f011d1e83f05834e12632ee5ebf65da1d546e696f525af47101a3b0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Collections.dll"
     },
     {
       "path": "System.Collections.Immutable.dll",
-      "sha256": "c1537a4f73a7d9fa028b127a5dd7d4f0e839c75c22c8e895722283a8aadf6028",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Collections.Immutable.dll"
+      "sha256": "623ad5fa5ac38c460df0073f37fbb649e219ac486c926b822f77ebf02676d56c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Collections.Immutable.dll"
     },
     {
       "path": "System.Collections.NonGeneric.dll",
-      "sha256": "b64b8f2acaf773bc08e20e3a43d562a15a98d9a8c19f3e5db292dfe4fe21cf38",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Collections.NonGeneric.dll"
+      "sha256": "8cf296b4868c0dea441c452c50ed5c322837bf736a7c173f46dda4ebdfeb4c0b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Collections.NonGeneric.dll"
     },
     {
       "path": "System.Collections.Specialized.dll",
-      "sha256": "8a1cf61a6cd079444ae790123ffc90bcd8d369ec5aed0f2f95d159a6479690b3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Collections.Specialized.dll"
+      "sha256": "61702e1173c49f32e7b1804667a249f8709680f01859d46cf30e74197fedc1c5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Collections.Specialized.dll"
     },
     {
       "path": "System.ComponentModel.Annotations.dll",
-      "sha256": "fe7b216e9ac726cbcc31dcdaaf99f74918ad3c255100e3571f635e46f3fe5a36",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.Annotations.dll"
+      "sha256": "be6047dc8b7d2545c2dd099c6868d3736ecd81ea053c6714e9a6f92ff547358e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.Annotations.dll"
     },
     {
       "path": "System.ComponentModel.DataAnnotations.dll",
-      "sha256": "ca01349cd2181d50d15bc476d542d23e62a2771d4bf9d467ad8d4f61563f5754",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.DataAnnotations.dll"
+      "sha256": "c4ad5b72e9461f82b6f5346af3b2f4f46d76763daaf51586943f99f1cc7d5afb",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.DataAnnotations.dll"
     },
     {
       "path": "System.ComponentModel.dll",
-      "sha256": "23c6a24f67244c647a614af3249181dc68ad02acc3ebd3cdedf62b2df8da503a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.dll"
+      "sha256": "615f1d4f821d25f46e61bc70dd879b4129daa754f42f427a23fa68c4dc74f09a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.dll"
     },
     {
       "path": "System.ComponentModel.EventBasedAsync.dll",
-      "sha256": "d0e3554dc311c75014a9c7e9cf8137d5881d6f7a8c3b739fd9e85fec2be13164",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.EventBasedAsync.dll"
+      "sha256": "704d58b299577d640f365a4541089d99d8187b3071ff680599d3640251e470da",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.EventBasedAsync.dll"
     },
     {
       "path": "System.ComponentModel.Primitives.dll",
-      "sha256": "52e0988e01955d09170339429cede1d578690418b8851e19ddbba7d22a6490f7",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.Primitives.dll"
+      "sha256": "b671ae0e9463f65d2ad08366c890043fd570f7d3149bb57bc16b8d427d9684f5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.Primitives.dll"
     },
     {
       "path": "System.ComponentModel.TypeConverter.dll",
-      "sha256": "f41fb0c7373b94e082d41a49a02f95ac6da92114aa712dcd8eddcfd27fbfd592",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ComponentModel.TypeConverter.dll"
+      "sha256": "d24ca7be9b39ff4117edb0d207ff5ab1a0e1587557a3daaa44391f0b04d93816",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ComponentModel.TypeConverter.dll"
     },
     {
       "path": "System.Configuration.ConfigurationManager.dll",
-      "sha256": "f369d13fb2ead61ee4117d6e71fd1a3cc8d1ca69a7762072c402bbf9d52d1a67",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Configuration.ConfigurationManager.dll"
+      "sha256": "bd36ea6b9d4cb140d6f2b88b30678d9e2559a4ecde7ac5956828a84ae1f7a6d3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Configuration.ConfigurationManager.dll"
     },
     {
       "path": "System.Configuration.dll",
-      "sha256": "24d363fccb6cef1b612ff6c3d9e2524c766713aaa3b5762aed169cc41c5caf30",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Configuration.dll"
+      "sha256": "495b65cd3c8488fa39a4905f072d14b336a5851c87f1b70d3b57afc565025a9f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Configuration.dll"
     },
     {
       "path": "System.Console.dll",
-      "sha256": "d6c46a682587937775464bb1a3850a9d3e11408440731fefb07d298cd6d7a99c",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Console.dll"
+      "sha256": "a50d6f54e509342c49b6b7c8d72684f68701fc97fade19956d4618a4a30e84fa",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Console.dll"
     },
     {
       "path": "System.Core.dll",
-      "sha256": "f8732fb6c15b84e7c10026d7d01ac6c7772b8e8fecebe6b0a6b6c4776b3d763d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Core.dll"
+      "sha256": "c4908dd3c89942880310cd1c19cc2dca2c8ce3d564be04be80897cb7f5b9d351",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Core.dll"
     },
     {
       "path": "System.Data.Common.dll",
-      "sha256": "ea52008bc561c36fb8b78aa42ab760fe4d00d8f05ed2f953a2f2432fa5712bdb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Data.Common.dll"
+      "sha256": "951bc9ff57eea7c382eb75cc595a9598afde341db853291b937be37da6ca3e81",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Data.Common.dll"
     },
     {
       "path": "System.Data.DataSetExtensions.dll",
-      "sha256": "ec6614f5a6ebd42061848ad3475adb2e1717815309a7c5c4e87b5590108c2f98",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Data.DataSetExtensions.dll"
+      "sha256": "abd30bf053ce162967b8ee2b95e4a4a60ddf288bb959cd64dfc107bc6c7d762e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Data.DataSetExtensions.dll"
     },
     {
       "path": "System.Data.dll",
-      "sha256": "36fabeaaf88affe70bd3cfffc82ed936d4c94e1b43cae48b6dbe6e98c72af119",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Data.dll"
+      "sha256": "ef6e30cc3aa9c93ca43f58f3cdc763ed31614b35ce835be57cb7da57358d2734",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Data.dll"
     },
     {
       "path": "System.Design.dll",
-      "sha256": "3d71b899684cb44b700039f88c74f5704f5f1a0afd0700a28b9f83d6c695a750",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Design.dll"
+      "sha256": "50250d023c53b39520dff62d7263e70cd432e2a2355b8b16320ced2dcf0fcd08",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Design.dll"
     },
     {
       "path": "System.Diagnostics.Contracts.dll",
-      "sha256": "3ef6f93deeca5b85edb693194e5b4529220420a0c6ca0f3a9d1a2ac0826ac0a0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.Contracts.dll"
+      "sha256": "764267aee046b300a4598eea0fa328348ec496c01281b31d00573a25ad8bd58f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.Contracts.dll"
     },
     {
       "path": "System.Diagnostics.Debug.dll",
-      "sha256": "df925984086638f1046e1c5bd695107c7a3397e43767c01248a36360e4d6fa9b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.Debug.dll"
+      "sha256": "44b71cb2bc82e2e93c99c095a0e493f3c4afc0e50aafe8e91849629da295e6dc",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.Debug.dll"
     },
     {
       "path": "System.Diagnostics.DiagnosticSource.dll",
-      "sha256": "aa6ed09aa5b7588d8cdcf9d88c9c5317be654c06cdb08d161b61c607dc09c14f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.DiagnosticSource.dll"
+      "sha256": "3e8ff9bb002715f5ab50263f6fe7c340355a5a963c03821c3a240ffa36b9f223",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.DiagnosticSource.dll"
     },
     {
       "path": "System.Diagnostics.EventLog.dll",
-      "sha256": "0cff5f7a957b808ec95a849698742c829738eebe0018bad1ab321c00621b6550",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.EventLog.dll"
+      "sha256": "9d49f6a312b511677c6aa47fb50c5f8ca3f0041090dd76c3363dea99428b13e0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.EventLog.dll"
     },
     {
       "path": "System.Diagnostics.EventLog.Messages.dll",
-      "sha256": "d61a4474c6002ff132b4e7dccf7d92fee24928722c77c2d258b5f4464dd7392a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.EventLog.Messages.dll"
+      "sha256": "48b87f5f629d05588fa885628bf3febf96ad731e5294664feda288ffe62d2ea9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.EventLog.Messages.dll"
     },
     {
       "path": "System.Diagnostics.FileVersionInfo.dll",
-      "sha256": "ff481f04e205c815ddbb48e622515b426e6614c9ad968ed4f3db42a63420a3bb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.FileVersionInfo.dll"
+      "sha256": "cbf1da7048153697f1c47175b61579e5f8e79e178d62b04787d626055ed9792e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.FileVersionInfo.dll"
     },
     {
       "path": "System.Diagnostics.PerformanceCounter.dll",
-      "sha256": "4e815a011f3c33af61398605524dcb0367b474acd5924bc45a8ff064bcde15d2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.PerformanceCounter.dll"
+      "sha256": "3daab70f7ea0663258ca764b8273d67a9d41d1d6cb3d2a21440b8967a7b86593",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.PerformanceCounter.dll"
     },
     {
       "path": "System.Diagnostics.Process.dll",
-      "sha256": "f2ad68f64541926edb0ea5f040775a49991ac0f24baf98b2de62ab038b69c895",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.Process.dll"
+      "sha256": "2b4871e02b366113c6ccf3b1436fadde5e69fc0a3e3ac421e2fa0f7af8c2bc3b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.Process.dll"
     },
     {
       "path": "System.Diagnostics.StackTrace.dll",
-      "sha256": "2436e12f3c710100f38b9404fb3893c3da3ee295641f5b4be442a4aa0deea8fa",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.StackTrace.dll"
+      "sha256": "6578cef25cba5dcd0f7c34f2bbe6fad5c2cb59b601ab708c5f3e8d1dbfc60a95",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.StackTrace.dll"
     },
     {
       "path": "System.Diagnostics.TextWriterTraceListener.dll",
-      "sha256": "b5d9e94d097856e49a5c61a87b442d42f2f70d76d7ce7b7e897f594b5194558f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.TextWriterTraceListener.dll"
+      "sha256": "65fbeb64bd73d658860c4a65799c1e57edc2d985e73fec1fe585b1dc660b1c91",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.TextWriterTraceListener.dll"
     },
     {
       "path": "System.Diagnostics.Tools.dll",
-      "sha256": "d0712e1303d134cb75f4425a2f764390d965dec6b41195600bfae18f97b0e0f5",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.Tools.dll"
+      "sha256": "4bfc11bebae21c6a604f090f8ec94ce2d76d57fcfeafd8ffc9beb139af2a086e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.Tools.dll"
     },
     {
       "path": "System.Diagnostics.TraceSource.dll",
-      "sha256": "08c9b12b71be630bd29fbca96af28e790962efc8f2006363788ac592b1b97886",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.TraceSource.dll"
+      "sha256": "63e22e512f3db18ab51d57663364479ce56fcd924085fd0d6bd136f299106fa6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.TraceSource.dll"
     },
     {
       "path": "System.Diagnostics.Tracing.dll",
-      "sha256": "1e531d4462aa8134d81405ea745153395e068504704f84f447d50b4586dcc213",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Diagnostics.Tracing.dll"
+      "sha256": "3275b203f9ec3d62c6a6c57b0771513f99f5c3d81cb4505b77ee679165fed800",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Diagnostics.Tracing.dll"
     },
     {
       "path": "System.DirectoryServices.dll",
-      "sha256": "4f1219de5788eed232aa111b96be4762a61b77d5dcc16eec37b33336d9aa1baf",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.DirectoryServices.dll"
+      "sha256": "a5f5d8a09f176174397a076a08f30d532e3035136e6b725a9c5b6b061429fe33",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.DirectoryServices.dll"
     },
     {
       "path": "System.dll",
-      "sha256": "f2bdfd2096aeadf69ea2c9e747f0ca2842127cde1770d1643bf13bfc70649361",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.dll"
+      "sha256": "72f6fa05b4c1696d7d50f8a93086165980276ce6661f0f8a77fe426028309720",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.dll"
     },
     {
       "path": "System.Drawing.Common.dll",
-      "sha256": "50efa359aab4998e57dd91575829d4f473abc99c3eec1b432ad751a6d780969c",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Drawing.Common.dll"
+      "sha256": "1da14a3fda965ba22320026099df2b0388f1b85d417fecb14be86d9b0170a89e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Drawing.Common.dll"
     },
     {
       "path": "System.Drawing.Design.dll",
-      "sha256": "ee72829181cafb17fe4fdf5f39b4e00b90e863cef41bb2420d4c46f2964895a5",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Drawing.Design.dll"
+      "sha256": "c2a5c1f2d68683bf2b2d5207f07cd73cc90bc8ea26d82691d8633fb6b10b1d9a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Drawing.Design.dll"
     },
     {
       "path": "System.Drawing.dll",
-      "sha256": "9affdb3c61b8b044d8b305286802b0bb2555a1965b0b49d1aa119e92bbf9ebbc",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Drawing.dll"
+      "sha256": "e962e9cf231ab5d5d8dca30ec1fbc1c2e22020e5a9451018ea50ff21fb7fb6ef",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Drawing.dll"
     },
     {
       "path": "System.Drawing.Primitives.dll",
-      "sha256": "d55e07078df7e78a52992e8123f27ad01e632d6ed0ae12c08f099af33b36dbdb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Drawing.Primitives.dll"
+      "sha256": "e8c09040a03d506e08e8165cba4e80cd2d69fb26629d7df65b0d72c1a290c216",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Drawing.Primitives.dll"
     },
     {
       "path": "System.Dynamic.Runtime.dll",
-      "sha256": "eaa819f663bef9cb04890c9797aa7b0110bca064e62ea47aa221548707baae5b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Dynamic.Runtime.dll"
+      "sha256": "00b37b775253d8011e0220bacadda3566224272ea787cb0c4cc24fa6b70643ff",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Dynamic.Runtime.dll"
     },
     {
       "path": "System.Formats.Asn1.dll",
-      "sha256": "36d5622b54e87a3444af5e26e5b69e8cb048f41cceb66583689e555232defed3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Formats.Asn1.dll"
+      "sha256": "ae3627515191e83d6ea062d3566af536a587d8f04ca6cce8aa71599b092d4a25",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Formats.Asn1.dll"
     },
     {
       "path": "System.Formats.Nrbf.dll",
-      "sha256": "4e0b9a92620e4305cf8690b003ef38c72bf9151d80a14456b109d5d4d57d8964",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Formats.Nrbf.dll"
+      "sha256": "a8ae7b08354ae3f024c54ed6aeddb73ad9d4beab1f08fa1340a1c05feceaecd1",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Formats.Nrbf.dll"
     },
     {
       "path": "System.Formats.Tar.dll",
-      "sha256": "37916824b9f130f7e924be01b1bb1a479636972c3b27af307b26592597fad2b3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Formats.Tar.dll"
+      "sha256": "d630c4db760a4a793f7ff3df0a3f6edeec40bcb94307e92ac493ad2d3eda1eaa",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Formats.Tar.dll"
     },
     {
       "path": "System.Globalization.Calendars.dll",
-      "sha256": "17934d74ca8ae2adf890be3bbfdffd02c4d74d090010d808b4403e721f33a67b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Globalization.Calendars.dll"
+      "sha256": "885967adb01ef10e764ef54a0f6d646fd41deab81bd80908407d0ba8f834dcac",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Globalization.Calendars.dll"
     },
     {
       "path": "System.Globalization.dll",
-      "sha256": "3ae6f3c344796033247f710612f2944688def8c79ba80b4846b8b14c984f844f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Globalization.dll"
+      "sha256": "28db274e2cbb417c61c346d437a0c8265fc0b3bb93cba7330e5ef75cb4d16226",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Globalization.dll"
     },
     {
       "path": "System.Globalization.Extensions.dll",
-      "sha256": "aeb5d04073661df29bd5ec68f5a5786df4ca620ba168a9aa58b91ab6ad316fe1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Globalization.Extensions.dll"
+      "sha256": "5dc6a7838a0b2f472fdc093fd1206c61df3494c66d1e5bfb1081ee00a372f50b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Globalization.Extensions.dll"
     },
     {
       "path": "System.IO.Compression.Brotli.dll",
-      "sha256": "3b770188543233b988f44f5fe48e92ffb2c81c63978b89ff8da574edaf43e60c",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Compression.Brotli.dll"
+      "sha256": "f6ac00e499ec8f6cd60e092c83391ea9bc176baabed66e9479ddcea796de3448",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Compression.Brotli.dll"
     },
     {
       "path": "System.IO.Compression.dll",
-      "sha256": "fcc979a99b747680a81f5eaf71add66f3876588e59c90edf826c37e525d4f0b2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Compression.dll"
+      "sha256": "99fc38bd6a7defd709b7459ff7e454543c15442d1c295238094504b6301a1050",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Compression.dll"
     },
     {
       "path": "System.IO.Compression.FileSystem.dll",
-      "sha256": "aaea6b18581abe925d9ee38749773363d73c8c033c63b284af3faa228430ade9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Compression.FileSystem.dll"
+      "sha256": "aa87020c837176940637a4c672b2f2b33fd2517506fa12cae1f655ff1e515cc6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Compression.FileSystem.dll"
     },
     {
       "path": "System.IO.Compression.Native.dll",
-      "sha256": "a61a917b3df5d74af1f997a82c0137076fe0fd3c3e0038423e3690924fb10c67",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Compression.Native.dll"
+      "sha256": "5869c7b088d1886f19f91b8be0d4b6db89ddb07dcfb02fb7dd759c92ef722919",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Compression.Native.dll"
     },
     {
       "path": "System.IO.Compression.ZipFile.dll",
-      "sha256": "7634d9c46f688033a8a7cc6bee22770b032e2e611da5cc1d57f3d63984774ff0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Compression.ZipFile.dll"
+      "sha256": "88d270860e5c00343057793d6a9b63b7e4cfdf847e62d8161a6ac8d1aa4bffb8",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Compression.ZipFile.dll"
     },
     {
       "path": "System.IO.dll",
-      "sha256": "7b40c8b70bf1b61924b4fade11d4325151debc2f5733f32fbe3409621914c802",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.dll"
+      "sha256": "7a820716ee9ab010ea624b9448ea1acb4c78b0f79dfc9d98db01b7f99c610b6a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.dll"
     },
     {
       "path": "System.IO.FileSystem.AccessControl.dll",
-      "sha256": "1e8dca7e8cec6bfa9c1baf966550ef4b2482bae6439d6d2ae55dadc265ff11a0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.FileSystem.AccessControl.dll"
+      "sha256": "1d5f0b64af1920709aa26d5b38991787b458eaa6da8bb8d86b4bb46ca0434026",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.FileSystem.AccessControl.dll"
     },
     {
       "path": "System.IO.FileSystem.dll",
-      "sha256": "ff3fe903e942724ebb71f363d973cb4225b4f14d0e05ebf73d0b30e0f46c1486",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.FileSystem.dll"
+      "sha256": "1d619955d7495e7e040c446fb1a24fa4ff4b9145f9a7d39dd90e92c59666930c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.FileSystem.dll"
     },
     {
       "path": "System.IO.FileSystem.DriveInfo.dll",
-      "sha256": "375e715d0b7af1b756fcd06c7912791bf714be03832ecf0d9c4d7f885c98cc3a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.FileSystem.DriveInfo.dll"
+      "sha256": "9a7268c66cc9a63128c2d23c4abb0eec155e59f352f5a6859eecff62912dafbf",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.FileSystem.DriveInfo.dll"
     },
     {
       "path": "System.IO.FileSystem.Primitives.dll",
-      "sha256": "6d025a5ee98a81ac276250eea1a2677ea0792c75f9d1a9807c8a775e75b100ce",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.FileSystem.Primitives.dll"
+      "sha256": "6bf2b62e83f43b9e2a679abdcab875f37280a36e4c6e9feab99a410ab43f846c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.FileSystem.Primitives.dll"
     },
     {
       "path": "System.IO.FileSystem.Watcher.dll",
-      "sha256": "791ffd9ad477481c3ca2d255b325a991d03aec46b6c51241e96247379efc37dd",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.FileSystem.Watcher.dll"
+      "sha256": "a03f59c4562fe7c1e8f768765b1637239f145c37d4805c8c693ae48f426828eb",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.FileSystem.Watcher.dll"
     },
     {
       "path": "System.IO.IsolatedStorage.dll",
-      "sha256": "b2150acfade522755ed15027112541bb4655107bb85122507c03d9e879e682a1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.IsolatedStorage.dll"
+      "sha256": "66e5ef5d0e23b4edd96f6d19b32d3e0a04ce57270d5ac55acced2bf177bbf68d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.IsolatedStorage.dll"
     },
     {
       "path": "System.IO.MemoryMappedFiles.dll",
-      "sha256": "de6de29fd36c52173c9a82c059c430cc6ca3ffb4a61aabf896c8ff56e6eed3d4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.MemoryMappedFiles.dll"
+      "sha256": "21b24bb967a254328e2644e2dbfe00e1205463663504819bbfcae6f6b43d426d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.MemoryMappedFiles.dll"
     },
     {
       "path": "System.IO.Packaging.dll",
-      "sha256": "0f9d06c92fc03a9300cdbc3c33c84ff5597ca2e75fa6edbb4ebc54db91b514cb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Packaging.dll"
+      "sha256": "81b79f1aa729fc08fb39d56682f82378589f2f2b5a0b9997a7a1cd10be5d3a11",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Packaging.dll"
     },
     {
       "path": "System.IO.Pipelines.dll",
-      "sha256": "427b8641bbcce1e355c8b72415bd8ef10c91eb4171c77fae001674df495cb5f8",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Pipelines.dll"
+      "sha256": "93ce5ddafb25ba6aeae208ffc750da0f243f25e89fe7dbc5287e1d8b4f26a2e0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Pipelines.dll"
     },
     {
       "path": "System.IO.Pipes.AccessControl.dll",
-      "sha256": "dac370e76771c3843c8238fe91562f09d8f28e318a6da1b05f76afbf40eff8cf",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Pipes.AccessControl.dll"
+      "sha256": "d7c4e7f1a4cbada634b82e5939de9d9b3c87cc44ba8d4c1319bae0a796083e3c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Pipes.AccessControl.dll"
     },
     {
       "path": "System.IO.Pipes.dll",
-      "sha256": "ea4e651e0c0e18ecc380013769d1864f9777b2d28964d8dab24c37ff6ed59206",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.Pipes.dll"
+      "sha256": "244167c32b3db092253e21a2301afa1e763fc861ca8a2304cb29feb773b85322",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.Pipes.dll"
     },
     {
       "path": "System.IO.UnmanagedMemoryStream.dll",
-      "sha256": "67eb115d743c83cade373af3fdf7d6d4e4fdd6e26105b21e8968727821f707e0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.IO.UnmanagedMemoryStream.dll"
+      "sha256": "a988846408abf1513ac7ab81a9f72218ffcab410b2a06caf3844677604032075",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.IO.UnmanagedMemoryStream.dll"
     },
     {
       "path": "System.Linq.AsyncEnumerable.dll",
-      "sha256": "f62a69be4b87aefd74ca7080f4d1fac332a8b81640ec40e1c61ed3b2133aa1bc",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Linq.AsyncEnumerable.dll"
+      "sha256": "0009a3da0de5b968f777f715103c873a5de5f1840b870c95f6b7c11ac05246c4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Linq.AsyncEnumerable.dll"
     },
     {
       "path": "System.Linq.dll",
-      "sha256": "4a5d41332ed37f7e195503ebd3f478da2ad0008cb8a9f85739b53d2df7d33d46",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Linq.dll"
+      "sha256": "139264775432faf15a813e607e1919ea869d3321079ba134ffa36b350577c271",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Linq.dll"
     },
     {
       "path": "System.Linq.Expressions.dll",
-      "sha256": "75efc145c24374e41b3523b4bbf06e5fa415cb63c6bc4da717aa58440871c0c3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Linq.Expressions.dll"
+      "sha256": "f5d05f16c2f31ae822bca8db63019067c8d83b09376b0a60c38b9c98fa0e088f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Linq.Expressions.dll"
     },
     {
       "path": "System.Linq.Parallel.dll",
-      "sha256": "ce2d359ab186c59558967d3442e705558e0d13f814ec39f40c16b9076385652f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Linq.Parallel.dll"
+      "sha256": "d8cdfa91b3cedc1d928848a2724f230b130ee549e8b9008ad38e3ed10e8e9af6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Linq.Parallel.dll"
     },
     {
       "path": "System.Linq.Queryable.dll",
-      "sha256": "d7d0418293d01388701c4cc557223daa2e88e1afede9b67445f9058acaebe675",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Linq.Queryable.dll"
+      "sha256": "eddadcb60dd56a06eb83f6f1284f9ae42c181af3cde4b19350938b1930d6f531",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Linq.Queryable.dll"
     },
     {
       "path": "System.Management.dll",
@@ -708,638 +708,638 @@
     },
     {
       "path": "System.Memory.dll",
-      "sha256": "03c2fe17dbd4e1cd709f6da1ff221eafaf3f076d23f8fc62ddff5302c152e97d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Memory.dll"
+      "sha256": "58a4dc8a9efac1fe0ee67138b0dda35b2b812addc14c5d8251cc222b278a5c2d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Memory.dll"
     },
     {
       "path": "System.Net.dll",
-      "sha256": "115811026128a2bdc84ead6c4f6a7b35b296d092420fa5794d3c07402ab9e9d4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.dll"
+      "sha256": "d7a4c693b1922e0e69aee3597ac72c25e0a5e1d3ac2d1072d7d8dc854d27e488",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.dll"
     },
     {
       "path": "System.Net.Http.dll",
-      "sha256": "277ee31df794738d802c9dca109565ee1f549e733741af03b17f907208d13538",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Http.dll"
+      "sha256": "8ae9f649d43f1f3fb635170784bcb753d305bc36a42703b4b0bedb15a29729f0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Http.dll"
     },
     {
       "path": "System.Net.Http.Json.dll",
-      "sha256": "93d66d4f208cd3f36c0c52814f62c3a06e28e909f551e6f6f01ce66db4282148",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Http.Json.dll"
+      "sha256": "552422be522e40937de77bdcaee0575282d2f2d449b19dd81f1a3ef23e85b73f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Http.Json.dll"
     },
     {
       "path": "System.Net.HttpListener.dll",
-      "sha256": "53d55125f448882ec2d002cce5726b5825a22847642f8c659cba0ae1bd2b97d1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.HttpListener.dll"
+      "sha256": "c3bbbb42561e9de67da6accd846fa710944d38b4bde88ee111943ea4afb5b82f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.HttpListener.dll"
     },
     {
       "path": "System.Net.Mail.dll",
-      "sha256": "01d3bb4d99659b85e6af59ca33f78fd7c4f5b5bc540be69b384f086687b04d3d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Mail.dll"
+      "sha256": "5e053f23212c0f0eb0ee1a17a94ced79afd7d8d2175b35f2750b85eb570b5db0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Mail.dll"
     },
     {
       "path": "System.Net.NameResolution.dll",
-      "sha256": "ea47fa390901b0afe369711065f79d86f1cf01a307746a82c4dfd3bb94e156a0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.NameResolution.dll"
+      "sha256": "1003e24eaf96e8aa019b188fefabab4a6ca488d5c51e70600140bfa4dabe3bda",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.NameResolution.dll"
     },
     {
       "path": "System.Net.NetworkInformation.dll",
-      "sha256": "7a520cbc73fab570bc069717d0b73efc03cc100196ff42137dba24066eeedb83",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.NetworkInformation.dll"
+      "sha256": "47b220c9a183125c8cf9e2a7b21b45947b3b1951412d719d7c5f047277c4927e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.NetworkInformation.dll"
     },
     {
       "path": "System.Net.Ping.dll",
-      "sha256": "927c63c02f6ac45d190c8994a1890c1e45d1144474d48d436fa101eba46e3ddc",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Ping.dll"
+      "sha256": "c337caf03b0d50c7cf4a4822872bd34603d11e7f689d211ecaea3ee74f65518a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Ping.dll"
     },
     {
       "path": "System.Net.Primitives.dll",
-      "sha256": "e0be3d784a346ffa419a5b4f6aba91d20a909a122b01ce331c4ac1560bf93c3c",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Primitives.dll"
+      "sha256": "e678e0129a87751c624cbe2e3ab83d55055a091a5b77d8138f02255deda4b6c4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Primitives.dll"
     },
     {
       "path": "System.Net.Quic.dll",
-      "sha256": "16f6b9232becca3460e98f84d007b59f0d3db52372f7daae91ab315d95071241",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Quic.dll"
+      "sha256": "a02b202989ff28adee64fae1c9cc7290057ca2f234ed7a05c647617399e6d4c7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Quic.dll"
     },
     {
       "path": "System.Net.Requests.dll",
-      "sha256": "7942b966861e88d53fcf6b9e2225ae9339211ecea137d642a770d2a7a6cd422f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Requests.dll"
+      "sha256": "f2735dd7adbc04c505805e9f069f9d545f34f1ff689e2a9d6bcda1a2480d3da7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Requests.dll"
     },
     {
       "path": "System.Net.Security.dll",
-      "sha256": "f799f93fbad3c47ea98133afc31011b68dd808813b4fb73208c6dda7bdd657b4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Security.dll"
+      "sha256": "1605bb05b7cd623dc79c8f4ec2e10ea5779b5bd343f909a9c0dece472ee2a8f2",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Security.dll"
     },
     {
       "path": "System.Net.ServerSentEvents.dll",
-      "sha256": "6cc0f5145098168824cb6ccec1227e7f30ceb8f9756bfcb93f9faa89a97f5016",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.ServerSentEvents.dll"
+      "sha256": "792c085fff01183ac597f69bf33db289d7301aabde1cc388904621a47efe719c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.ServerSentEvents.dll"
     },
     {
       "path": "System.Net.ServicePoint.dll",
-      "sha256": "61ea5c4619572e1cce028e75e4184901ecf2bd7aaf2f93e498b448a7fa3750ac",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.ServicePoint.dll"
+      "sha256": "9645242a547b02bc0cbfa78c365fe8cbf02869c182debe4ce37bac32be1ca42b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.ServicePoint.dll"
     },
     {
       "path": "System.Net.Sockets.dll",
-      "sha256": "53811a06f50f436db22d1279e5a209220ff363154e7c8981c8248d38f4c7798b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.Sockets.dll"
+      "sha256": "b4bf19b0c8e412b9d0f479fc5268bf44e04ca656cd121044ca51f2652595af6c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.Sockets.dll"
     },
     {
       "path": "System.Net.WebClient.dll",
-      "sha256": "7f4a639cf94a0856bc1496dea2e2a998d5784e505a197fcac1b5d07e140b26ad",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.WebClient.dll"
+      "sha256": "ab06cb5eaff5ca00045dd847e167f0107a53114aca47d26ed3500adf38bd142b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.WebClient.dll"
     },
     {
       "path": "System.Net.WebHeaderCollection.dll",
-      "sha256": "36a83ef10e19143a421839d2ae9634b22982e94feb7d0e0a6a602d057de093e6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.WebHeaderCollection.dll"
+      "sha256": "7abfc26269a95cec0d93ca2a6b8148aa45d504c8f50a62fbbbad72408966d45a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.WebHeaderCollection.dll"
     },
     {
       "path": "System.Net.WebProxy.dll",
-      "sha256": "1cd3e7330632c77de0eb0a30ced6a99b97bfe36418cafddcd0de525010a65219",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.WebProxy.dll"
+      "sha256": "d6f5fbc775d7b1639c1740e3e10834f6fb729fc5fe7619b972df79d528abaf18",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.WebProxy.dll"
     },
     {
       "path": "System.Net.WebSockets.Client.dll",
-      "sha256": "2ddca43e2f4f81c06afdf1fd0556a7533499d5c440310341bbc287060d3bacf3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.WebSockets.Client.dll"
+      "sha256": "ff5d42603b662a634857dcc6e1239547025d03794aea4f84d624579765c23ba9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.WebSockets.Client.dll"
     },
     {
       "path": "System.Net.WebSockets.dll",
-      "sha256": "2794e1d55e990713018d520a3f2c3cdc764db44816abcd7272f0f3a110b6d5d1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Net.WebSockets.dll"
+      "sha256": "36fefd219495298b0b28a6bbf1d99fb9b2471467f5a0d382af9730f0a32fc8f1",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Net.WebSockets.dll"
     },
     {
       "path": "System.Numerics.dll",
-      "sha256": "2cce5d7469a5e13bb7b8380da457c75e406ae260faceb7d5fcfc7efbddd02e2f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Numerics.dll"
+      "sha256": "fd4f0bc0541231fc01c21cab517a948019d4c9adbf66f81b65b276298e6ab922",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Numerics.dll"
     },
     {
       "path": "System.Numerics.Vectors.dll",
-      "sha256": "444d4cf2eb56a1e61ea5413813c9aab0d6a47749e620526907b4caa7db95edc6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Numerics.Vectors.dll"
+      "sha256": "6beaf983fa8c33d25160c7a77e185967e8f113a5c02e6dc27f05f26e1b34763c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Numerics.Vectors.dll"
     },
     {
       "path": "System.ObjectModel.dll",
-      "sha256": "12cb278af864552e15af8c2ad2b0a29f2d4c571431b4d90a0c2e8ed9e57d90be",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ObjectModel.dll"
+      "sha256": "16d9a18630f1d33ec7a709ab2f31652c91ebdfbc7a5a481378aebe2e1102ffc2",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ObjectModel.dll"
     },
     {
       "path": "System.Printing.dll",
-      "sha256": "890bdb69ec73a52f951a32feae327bea4282335cdcc4dd3f1de3f1017f400000",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Printing.dll"
+      "sha256": "ec96107496d33dfea819bb17be9b2ee7aa4cd456317d878ab1ae1c5dcc9cf53c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Printing.dll"
     },
     {
       "path": "System.Private.CoreLib.dll",
-      "sha256": "76a49f17e83f613bc8a5b55fc98830b764e7838265aacbdbcc8f46707f80a3c9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.CoreLib.dll"
+      "sha256": "ed80a1a5dd066c0407ad59686f9af90a4f3e55dbf3e4c973b53cc8c9d0706f82",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.CoreLib.dll"
     },
     {
       "path": "System.Private.DataContractSerialization.dll",
-      "sha256": "61c1bae125a218e45e0bf517dc6633263280408c96c6d367d1839ee6a8bae936",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.DataContractSerialization.dll"
+      "sha256": "631a7719e6e67e4f86e553031c56038eafca2ab5fa161c8cff786a92838a0255",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.DataContractSerialization.dll"
     },
     {
       "path": "System.Private.Uri.dll",
-      "sha256": "27b93d6e754d7d2e538333e3c1d520c64d7eb012dde1705e776177b273662b7d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.Uri.dll"
+      "sha256": "0546093ec627bf832c244be56d9acca471778385c534e0107f2a6dc6a78f93d2",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.Uri.dll"
     },
     {
       "path": "System.Private.Windows.Core.dll",
-      "sha256": "2f715608f2a3d8cf7ed8e65cae1bbebd7a038fe3701d6e017af5e06a8be6c811",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.Windows.Core.dll"
+      "sha256": "a36f0a0545a03b5f852dbcc1915865b22c9d0553a115585342c474357fd8b649",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.Windows.Core.dll"
     },
     {
       "path": "System.Private.Windows.GdiPlus.dll",
-      "sha256": "c4d00284a5c9bc4f3dffdc94873fe2ba538a264fac96229dec4fadf490ee1b87",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.Windows.GdiPlus.dll"
+      "sha256": "601d66965c00f6a5d26ba795f0b711d69976ddc1aa66119643f38fdd08904869",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.Windows.GdiPlus.dll"
     },
     {
       "path": "System.Private.Xml.dll",
-      "sha256": "d62389b5b3617ec44e31232440a525a2618d5056b4b9ed86abf51250edf7bca0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.Xml.dll"
+      "sha256": "d570b8cb9507f2fcac88f80a2fe7597d3e2331a84f337820a7d794632a67ed5d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.Xml.dll"
     },
     {
       "path": "System.Private.Xml.Linq.dll",
-      "sha256": "05462aa6f954c3c3c52c668416efcad04b4b2ebe37df247fe20ed5caa47e7a6e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Private.Xml.Linq.dll"
+      "sha256": "0f4d2be70f3715853dca3bd6c9b67de7738a5f4ec6e9959f526ef1dbf1f7fa8e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Private.Xml.Linq.dll"
     },
     {
       "path": "System.Reflection.DispatchProxy.dll",
-      "sha256": "85c4c9d47aded01fd0c01780b8152aadf1cc20ac97853764756734b872a0eda0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.DispatchProxy.dll"
+      "sha256": "a08a235c45e6944b3a086f3df03e55b38a5958e7126948847eb33261fe1ca10b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.DispatchProxy.dll"
     },
     {
       "path": "System.Reflection.dll",
-      "sha256": "5e915aa614291026130ba1b619294868a8d9b4d9dfff1aa5cb8b745bcc451756",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.dll"
+      "sha256": "80fb9e206044c6f1c02bcc6895e2ce432119c670ea12248a6cba112afa78a9b6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.dll"
     },
     {
       "path": "System.Reflection.Emit.dll",
-      "sha256": "d995259a96cba4d1e13d8e65da0cc835af1961d9cf46340531d7d8ba3adbc6a3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Emit.dll"
+      "sha256": "b4208981583d74994aa4d855e12788676fdebce63ba848be63a6e0a7fbe2cb3d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Emit.dll"
     },
     {
       "path": "System.Reflection.Emit.ILGeneration.dll",
-      "sha256": "ab4bbc69ccddc720351b4293890d4461740203e54df614b5605fd69d2c4c8148",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Emit.ILGeneration.dll"
+      "sha256": "5e38d9d71ce8fbab210a590f20543b19a2bf0cf1265f3ed78d63519e3b73b979",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Emit.ILGeneration.dll"
     },
     {
       "path": "System.Reflection.Emit.Lightweight.dll",
-      "sha256": "99cd08aec7ed10f906dd9560f194a1c6ef843b60c1e34cab0bd6815e13725c19",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Emit.Lightweight.dll"
+      "sha256": "c15be07e2131fdc8806d47e222b58e545981c2a3e7dc9c069a6c6076271a291f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Emit.Lightweight.dll"
     },
     {
       "path": "System.Reflection.Extensions.dll",
-      "sha256": "dd4cf0a2f78784a58a0d9b937cd00c8d030940b79b9110c3420d388078b5869f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Extensions.dll"
+      "sha256": "4e6967d52cbc95ae9eda01b8d8705f59c2c56f8b69471efaa6eca8f0e22a9a6a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Extensions.dll"
     },
     {
       "path": "System.Reflection.Metadata.dll",
-      "sha256": "5e745d60bc682671b9a0813f515eca84b61710e1f84136b69fc09ec8821f92b2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Metadata.dll"
+      "sha256": "97152d5c07e1e5d7f080f871eff211ccdbecb2496e4eb1b086005cbd3656d431",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Metadata.dll"
     },
     {
       "path": "System.Reflection.Primitives.dll",
-      "sha256": "d25735120c998ff3fbd5cd9a0fee8033bf6736e88dc4efe59c7789f44a905e6a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.Primitives.dll"
+      "sha256": "d1ba728fab43e22821a1b19c508667995c0df10ee98d1f19e63aac94098ca8f5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.Primitives.dll"
     },
     {
       "path": "System.Reflection.TypeExtensions.dll",
-      "sha256": "3438380d510ed09241b34428690f752a1e08fbe392aefdb3c76ec3819af12156",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Reflection.TypeExtensions.dll"
+      "sha256": "fbf5445d2a288ddce3bf163a6b692dbf97a10f6a17bb9de7c0d2d71387c6e440",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Reflection.TypeExtensions.dll"
     },
     {
       "path": "System.Resources.Extensions.dll",
-      "sha256": "1c31cb27a2d0c9bbbf71e3236f66f234f3f0d84434b54c16b9df11cc8fceb414",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Resources.Extensions.dll"
+      "sha256": "bde0bbbe8210ce184e34f95995af65dbd42b0d526fe1ab27d9c40c825e07a83a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Resources.Extensions.dll"
     },
     {
       "path": "System.Resources.Reader.dll",
-      "sha256": "21e2a6135134183ef040aed2ff94de50efa63c1d2124aa0337ee49139d6c8299",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Resources.Reader.dll"
+      "sha256": "ae5e53448adf49f3bb0e6fcc4df836bcd413ce0eeeaad0b94f7363ad238d71dd",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Resources.Reader.dll"
     },
     {
       "path": "System.Resources.ResourceManager.dll",
-      "sha256": "dcda318334fbc517495c7fe6ec335cfe856a634112119c63b35a9e4ce9b9f667",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Resources.ResourceManager.dll"
+      "sha256": "c3456835cfbd88d081a3ee4030ce533cb6fbb27ad0f60f954a5ae7d45b1422cd",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Resources.ResourceManager.dll"
     },
     {
       "path": "System.Resources.Writer.dll",
-      "sha256": "d3d5485df887aab86de76c4d22d19641b6cbbd79754ca89c6805a6ce45baf60a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Resources.Writer.dll"
+      "sha256": "a478bbfeac355e728d914f6f5e1e893ab1454c6f92d28da84ff0a75f04476277",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Resources.Writer.dll"
     },
     {
       "path": "System.Runtime.CompilerServices.Unsafe.dll",
-      "sha256": "50b76c3723b529d6d6fde67b297409f875e20c7f7d45b8497be379c24207a322",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.CompilerServices.Unsafe.dll"
+      "sha256": "6f396205abe594c9c72e618f4278657b4ff9da9cd2bc17d8083481b287838ecc",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.CompilerServices.Unsafe.dll"
     },
     {
       "path": "System.Runtime.CompilerServices.VisualC.dll",
-      "sha256": "95f383b9cc7811be9b9aec45591fd2e0dbf6cd09406a29a3b3d8ed980f7d02b4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.CompilerServices.VisualC.dll"
+      "sha256": "67483e224e8019d1d725876485a6fca81dd977d5254cf26d79a26f2a73207fa9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.CompilerServices.VisualC.dll"
     },
     {
       "path": "System.Runtime.dll",
-      "sha256": "60d0795848d15c0ee9c37d6b97dfef12eb48292ffda3e9054204b2c3a6a89b19",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.dll"
+      "sha256": "ef6d37d9334fcdf7c7e4b9590b730eb5ba623192d47f0cbe4ec478962625e586",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.dll"
     },
     {
       "path": "System.Runtime.Extensions.dll",
-      "sha256": "a474fd258722ffb4af11ecd6e5765a27713307faa11dbf804414814a2099bb5a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Extensions.dll"
+      "sha256": "633f210388e326f0a2fba3148312fb2900a9e0ba32f08015bb606abc44a3d634",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Extensions.dll"
     },
     {
       "path": "System.Runtime.Handles.dll",
-      "sha256": "1f6aaa3ca188434c80ff6fad600915e0d2f3ada0746ff5d0f0ecf13ab398ac41",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Handles.dll"
+      "sha256": "834ed37905ecafb69c3d33d1b659e5f8216cef9995cbfcc7b2cf858752add880",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Handles.dll"
     },
     {
       "path": "System.Runtime.InteropServices.dll",
-      "sha256": "627a86a918f6669f94cf8db6ce064a4b2207b852ba6a4fecaccad7bb07859b4f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.InteropServices.dll"
+      "sha256": "9d0621f1e573bd20525287533bea24ec7824813eada7820a0c82252ede072ab9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.InteropServices.dll"
     },
     {
       "path": "System.Runtime.InteropServices.JavaScript.dll",
-      "sha256": "03dfff8c7082a64866feae2d0822da69708900d7635bb48b5b73881c8292cad0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.InteropServices.JavaScript.dll"
+      "sha256": "6fedecfa2fb691e50175dccf64860da8dd147b9d64d942997259a79a7edb77d5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.InteropServices.JavaScript.dll"
     },
     {
       "path": "System.Runtime.InteropServices.RuntimeInformation.dll",
-      "sha256": "cc959b69928f28420d31360ee8bf793c6f3e4d5809752cf1d386efe01dc49aaa",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.InteropServices.RuntimeInformation.dll"
+      "sha256": "506dc257f2f039746172057cf574992d4db07e31f9338b0ab2d90e88d385c472",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.InteropServices.RuntimeInformation.dll"
     },
     {
       "path": "System.Runtime.Intrinsics.dll",
-      "sha256": "a24e7018598b352d1ade1bc452b2c65a31902b56ce1fc1fccd8b26e2677943c8",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Intrinsics.dll"
+      "sha256": "c44fc7c6f2aff4a9c8b9a0b6abfd2c1b65a762b69fa982fcfca28c6001d022e3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Intrinsics.dll"
     },
     {
       "path": "System.Runtime.Loader.dll",
-      "sha256": "404791be0d21a5ee0119ec08416a5ae18f3bbfbbc9f4d6a6ad7c3a9c667aaa25",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Loader.dll"
+      "sha256": "c858230d105ec1225cd58ec22623bf59bddee9dfc7077d7f93957d3321ec55f7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Loader.dll"
     },
     {
       "path": "System.Runtime.Numerics.dll",
-      "sha256": "8c715e55c80a4ab31d086b5e51261d691b52b867b1c1f5d99c344ea4faa27f4b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Numerics.dll"
+      "sha256": "cadca5367aec4fb54df4a81cd033c62228f3e100736ef9701aafcd13123a5ef4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Numerics.dll"
     },
     {
       "path": "System.Runtime.Serialization.dll",
-      "sha256": "1f4c9a42ec5b5d4da23a82fc1952e01cf395e99cfabc8a7d0f5a4b304e24915a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Serialization.dll"
+      "sha256": "2092ad8e233c2a01a8dcc640ab218c1eabc059f6bebaaa8f81d1ce8225a939a0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Serialization.dll"
     },
     {
       "path": "System.Runtime.Serialization.Formatters.dll",
-      "sha256": "a971cba21d6064c58b38c10cb04092dd4b8ab2919a9f5544e94082154f5604ce",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Serialization.Formatters.dll"
+      "sha256": "ae2d71a1c6231a7e4c9f0264666acf90f743460ae7983d5331e9ad0271e7ad88",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Serialization.Formatters.dll"
     },
     {
       "path": "System.Runtime.Serialization.Json.dll",
-      "sha256": "473344505e44874494bd6a2964da9860c224dfab884a10e43992df868b44093f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Serialization.Json.dll"
+      "sha256": "7e44e9979e6c539e7ad22846ac9c6f250e888d28411ba88761122095dfed9727",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Serialization.Json.dll"
     },
     {
       "path": "System.Runtime.Serialization.Primitives.dll",
-      "sha256": "6e19e864162258ea14a5d15a0e5b6b08368aabd087d0696032338dc6bd48d71b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Serialization.Primitives.dll"
+      "sha256": "e15940836e5b22e89a0b7febfa0de2f158855563d9cca0ac36a84e4be9e3e683",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Serialization.Primitives.dll"
     },
     {
       "path": "System.Runtime.Serialization.Xml.dll",
-      "sha256": "a3d3d53a385bbe636dff506c09d008fe0d7c53d9e1a2ad431a2b6ddd5e0200ae",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Runtime.Serialization.Xml.dll"
+      "sha256": "286bbafd589189f1d684831c33dd81a4650e12b73db70920ba5d4e0a477fd33a",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Runtime.Serialization.Xml.dll"
     },
     {
       "path": "System.Security.AccessControl.dll",
-      "sha256": "0ce0621ed9cf8fde8aa78be726f7e4ba7b9e321c86ff1faa282a8e8ca1a62e86",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.AccessControl.dll"
+      "sha256": "5fda871ac0ab09ba62884ba4160b5c84f8d9513d16c773b7d01e3b82dae905b4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.AccessControl.dll"
     },
     {
       "path": "System.Security.Claims.dll",
-      "sha256": "29f395b2a9bd6de2a80c38c02354b74a7cca434da5125feb4a649787981b8fc6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Claims.dll"
+      "sha256": "ca5a036a17ed63c6f90d92570c657bcec451dc2c894b1ffff0688855b61e455c",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Claims.dll"
     },
     {
       "path": "System.Security.Cryptography.Algorithms.dll",
-      "sha256": "06a50cccb59d64852893af1794c71f6008b4fb83d7ab980df4459c202f42d726",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Algorithms.dll"
+      "sha256": "35677214a8b8388d82ff5bf45789790fa048612f6aca8b8f71efb3aa93ef70b1",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Algorithms.dll"
     },
     {
       "path": "System.Security.Cryptography.Cng.dll",
-      "sha256": "f09ca990c590839dd572d52daf96eb10472ace1c6a18c9c1b56bf88c5a78953b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Cng.dll"
+      "sha256": "328a4ea1c05177e97f65a24d68268c96674bbfbcfb5bc3906229eea2c46ac6d2",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Cng.dll"
     },
     {
       "path": "System.Security.Cryptography.Csp.dll",
-      "sha256": "8f69002eb9a370c998d243f7c1427f40d40d7665c71d30f9767919b26088ef4e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Csp.dll"
+      "sha256": "0be1ded6ac6b8bdc53d0d49bb01292770f9a022fe7d2d2f1a480223eca5ca6ba",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Csp.dll"
     },
     {
       "path": "System.Security.Cryptography.dll",
-      "sha256": "637104ff4a89fa341aad178fa4c6c85f247889d8d544f62411cc3febed9679b0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.dll"
+      "sha256": "bee61e6bdeff9fb0c4f3cbf9d48e9d1d97d12a8bb85d1eeab9178e818b582eee",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.dll"
     },
     {
       "path": "System.Security.Cryptography.Encoding.dll",
-      "sha256": "82529d4194905c197049fb657402e50566e5566a6c62b68cfbce1b5409f99d63",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Encoding.dll"
+      "sha256": "09fbbd2934040ba1260775f34a8b901f5f9edec9bd1a2203b3726686006b7829",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Encoding.dll"
     },
     {
       "path": "System.Security.Cryptography.OpenSsl.dll",
-      "sha256": "cfb536a8f944cf0dea22a0f19ed618fe610ce56ad440fde85d606e5a148683ca",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.OpenSsl.dll"
+      "sha256": "695ebdf0901afd27b7504dd4fdbc504a5aae8ea87d3b342da800789a6a94a732",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.OpenSsl.dll"
     },
     {
       "path": "System.Security.Cryptography.Pkcs.dll",
-      "sha256": "93dc6280df47d30ec2e4a9806d0ad468162daced93517df775ea335427770ccd",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Pkcs.dll"
+      "sha256": "f3e1cffab10cbbe7785026373277bb4bcc05bb90756a429c4d80f799336caabf",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Pkcs.dll"
     },
     {
       "path": "System.Security.Cryptography.Primitives.dll",
-      "sha256": "a371b402dadb1f19468862d1deba44b5d08e0fa633904742ec5c8c1922ed6081",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Primitives.dll"
+      "sha256": "c4d76a73f7147df7999b371adbc091850984a40cd45f4d0464e85424de412e30",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Primitives.dll"
     },
     {
       "path": "System.Security.Cryptography.ProtectedData.dll",
-      "sha256": "eb535b4eaaed42bd93e1cea9e03e25480d7371f6b1f2452216e9a8aff262ae5f",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.ProtectedData.dll"
+      "sha256": "0da76965a258fcf03cb1a605e1921a62c89600ef4e94d6baadf87af358e7e0cf",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.ProtectedData.dll"
     },
     {
       "path": "System.Security.Cryptography.X509Certificates.dll",
-      "sha256": "5e0e0595a937695c7cfd3099245816177e7c2b1233742274f28c93ff8d3c7bcd",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.X509Certificates.dll"
+      "sha256": "bcbcd0c436bfd24052ae4f7a3785b434436cbc18e6465f0be19437a453872cf3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.X509Certificates.dll"
     },
     {
       "path": "System.Security.Cryptography.Xml.dll",
-      "sha256": "6687e1b04ba68ec459f7d88b354027c7bcf7d17a7fb7fa33a7fcfada362b284a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Cryptography.Xml.dll"
+      "sha256": "c65b99c9eef09ae827899902d86fdee21f2b82ed39b9475ab57484af489d382e",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Cryptography.Xml.dll"
     },
     {
       "path": "System.Security.dll",
-      "sha256": "0a9e88553523ebefa42525def2a92577c9cc5c87b20bc6c3bcc386948388ba87",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.dll"
+      "sha256": "2a0ee1358a507f20bb9099afb2c79745212bca44c1102e580c20742ecca560d5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.dll"
     },
     {
       "path": "System.Security.Permissions.dll",
-      "sha256": "ebd3df064a835aa4484044190ea6eb469120e76c354a22086971dce7b98f9081",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Permissions.dll"
+      "sha256": "61e00448fec3dabe10f133798aad38468cc67894e0600d6b1af119422fe83ec8",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Permissions.dll"
     },
     {
       "path": "System.Security.Principal.dll",
-      "sha256": "45a74a4b6175b9d228969592a3175a8811aba9a74c94676aa7e46c0cdc125313",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Principal.dll"
+      "sha256": "f4e101d9d1b328868cd91199ca441e4ee273047fe96dd6ec34a1e889e523da21",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Principal.dll"
     },
     {
       "path": "System.Security.Principal.Windows.dll",
-      "sha256": "b04ee5bd519137cc929b355221af2d9649f149aca7808768a0cb99e423ff8668",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.Principal.Windows.dll"
+      "sha256": "ed56739aabc1fb6f81e8f71db89531beea985550f654d4d0e6c9a64c67e4e349",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.Principal.Windows.dll"
     },
     {
       "path": "System.Security.SecureString.dll",
-      "sha256": "3d548514379830c108543f276751874cb1a6d930f9b54f80953e72e90dca70a4",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Security.SecureString.dll"
+      "sha256": "f371fb101973637a772e44f75b48d66540466a914f61e4b1f4ae7eb01dad1b62",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Security.SecureString.dll"
     },
     {
       "path": "System.ServiceModel.Web.dll",
-      "sha256": "2c57d8b0f8d2a91088d1a074fb40ca8c1479a9d47071e5f99de5c11638d2edf7",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ServiceModel.Web.dll"
+      "sha256": "948e182337526b0decaab7a9274c1bde5be3e419b076cfe0161a335e22643ac3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ServiceModel.Web.dll"
     },
     {
       "path": "System.ServiceProcess.dll",
-      "sha256": "5cdd7ad9adb627d475931fe9f93d557fcd826ef393254b8a11a8c3c04b643453",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ServiceProcess.dll"
+      "sha256": "04e5ca5a4df4d31e8e6b527ce5a16b6f150a256384b2cbdabeeba1f6974cfa99",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ServiceProcess.dll"
     },
     {
       "path": "System.Text.Encoding.CodePages.dll",
-      "sha256": "e1ef93444fa374ef5267d2a49751d60e6ee832da88988d129977adfa881f462e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.Encoding.CodePages.dll"
+      "sha256": "56582910b3c0d17f10dc2eafc8e5746c6f23b57af56d7f0d4cd208f06ece1e28",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.Encoding.CodePages.dll"
     },
     {
       "path": "System.Text.Encoding.dll",
-      "sha256": "96a719292c97522390027535db13529173e5a3c728209c9d90dbd1b50fa71cb3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.Encoding.dll"
+      "sha256": "4c140de2fdd2c673ece196892e28786b85200b8f315fc9bb2de7aeb862372d9d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.Encoding.dll"
     },
     {
       "path": "System.Text.Encoding.Extensions.dll",
-      "sha256": "81229e9c66c02dbd1cc4de1cd58f6e6069a652e55e4375c8b18d987145479a04",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.Encoding.Extensions.dll"
+      "sha256": "2b63801416706c7817193a742fc8648c4afd6697ca342d4a2deb30450b99218d",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.Encoding.Extensions.dll"
     },
     {
       "path": "System.Text.Encodings.Web.dll",
-      "sha256": "775eab42196bf9466a69e9fc86e47b8da620b7652aa4b8a62245449131ce885d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.Encodings.Web.dll"
+      "sha256": "2c459f175331339b8580dec1842879b3f0532100fa426b97a1b74e1b5dee95d7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.Encodings.Web.dll"
     },
     {
       "path": "System.Text.Json.dll",
-      "sha256": "6945c5fc52f811e32b13597b0d2a14d365227245e21bf7daebc6986f729b25fa",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.Json.dll"
+      "sha256": "ed5f0f3773c89948471e3691f31963ea00d3577e17296ac4dfb97772e78b6fa3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.Json.dll"
     },
     {
       "path": "System.Text.RegularExpressions.dll",
-      "sha256": "b1f6aec1ed431cf5956d8bc870fb0d47c43455438c5c0110433fd125183f190d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Text.RegularExpressions.dll"
+      "sha256": "b8494ba41da52018409cccd851753717c6bd035fccdf5e4d5ac83e420d4678f4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Text.RegularExpressions.dll"
     },
     {
       "path": "System.Threading.AccessControl.dll",
-      "sha256": "14e0ec8285100d4a3259a899d9ffa5269797e8ae2e3c9e119783ece06ebc62c1",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.AccessControl.dll"
+      "sha256": "eec9d6f83ec123602039ec449b402c1bcb74ff00518eb87f8d007558e48c2b89",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.AccessControl.dll"
     },
     {
       "path": "System.Threading.Channels.dll",
-      "sha256": "37349d0028f2dde5da668cf7e8bfb56fa7ab583997a44e41e4da0b0fd00f8516",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Channels.dll"
+      "sha256": "ff8dcb281d2d35f01dbdf72e766e431c397f9db063f22f61a9a85f7bd173f5e8",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Channels.dll"
     },
     {
       "path": "System.Threading.dll",
-      "sha256": "96ef32e315217f24b6b701fc182cac464966cad1da94dd25a3609fe2d9f5a6ca",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.dll"
+      "sha256": "cadf13029ac996abaceccfd7c242e55888b669246163342a3b335eee9851b531",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.dll"
     },
     {
       "path": "System.Threading.Overlapped.dll",
-      "sha256": "d5e2b62198f2a9e1845a8bdd874f3f2e232eeec7a178ad1ca2313a5d9f183ab2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Overlapped.dll"
+      "sha256": "a0ef0237e67a16a347a8ed9b9286e3acef358aeb4a23463323c2efdf646fc0f5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Overlapped.dll"
     },
     {
       "path": "System.Threading.Tasks.Dataflow.dll",
-      "sha256": "cfcff09f4aee061e3eca6792908051f272c1b8b9d3d81fe1858ae047648c4ebc",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Tasks.Dataflow.dll"
+      "sha256": "83a9b71c298ba233393eb1cdbda26380cb2d50cefd2fd645b0ba1c34c7aeca9f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Tasks.Dataflow.dll"
     },
     {
       "path": "System.Threading.Tasks.dll",
-      "sha256": "2830ac695731137a529b7620482499eae9dc88730aa78b2dbbbe35e9ea6655d9",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Tasks.dll"
+      "sha256": "d95cee14d0dbb97d8f8a8f4dcc5eefa35f394f9d94b0fa0bf29068786aee6a06",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Tasks.dll"
     },
     {
       "path": "System.Threading.Tasks.Extensions.dll",
-      "sha256": "5f042ed8fcd4fcfbab2572e5f54b0b74f959d1f52404365450f763ef5400180b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Tasks.Extensions.dll"
+      "sha256": "6ec70446f8faefaa167a0e3360468203cb03ffab90369644e92c22dc650a9cd5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Tasks.Extensions.dll"
     },
     {
       "path": "System.Threading.Tasks.Parallel.dll",
-      "sha256": "ec95052ee31ac8bc4a08241939c3d3177ac671470caf898b8218245523ce4b21",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Tasks.Parallel.dll"
+      "sha256": "ff17dd0ddd3f2debdaced18f39b9f8a205630baeb3de20bbf0630935a8605aa6",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Tasks.Parallel.dll"
     },
     {
       "path": "System.Threading.Thread.dll",
-      "sha256": "40cd4539f24de04085f5b1f6c12680e0703368a13d2ef96fe8c20c7602cce2c2",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Thread.dll"
+      "sha256": "7b451de5e88adfdb49765bc0745a12e377318534d02e6bf81660c285a7aa6664",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Thread.dll"
     },
     {
       "path": "System.Threading.ThreadPool.dll",
-      "sha256": "8d12767f122b5da33597ac423d19c693fe6d8615d7e1aeaba9e49e2a6bcf16c5",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.ThreadPool.dll"
+      "sha256": "9e3bf9838ff48525e4f2fd1c7646956ba00183977c7e4762d999670aa901e101",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.ThreadPool.dll"
     },
     {
       "path": "System.Threading.Timer.dll",
-      "sha256": "37eb792b476add157a6c9837ccb81d4b7ff1d2cbcecf055ec8610b57053206c6",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Threading.Timer.dll"
+      "sha256": "5b21f38133328e8017bb7a4651007738ce76fcfa673af267b4c8b5e857d572d7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Threading.Timer.dll"
     },
     {
       "path": "System.Transactions.dll",
-      "sha256": "a330fd4b6173de21caf33c0ac79d329097791e688ab58926d2dc68341e853d17",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Transactions.dll"
+      "sha256": "9ba6785faf04de3b018a7e6bdb349c538ca861add4a3558c693fe4c9ef905335",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Transactions.dll"
     },
     {
       "path": "System.Transactions.Local.dll",
-      "sha256": "f6fca23ae3902c9e8f3b1951d26ea5d831bdf80b217d2e5a9f56deb5b1d90229",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Transactions.Local.dll"
+      "sha256": "cb3d436592fe994ba8f570cc7cb021ef347730e96e52e3b8695b7c7bd79a3967",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Transactions.Local.dll"
     },
     {
       "path": "System.ValueTuple.dll",
-      "sha256": "069f72a5d77ef21ff8d60c5b63c7e894999ebece4c8cfafc697aaa3bdc5605ae",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.ValueTuple.dll"
+      "sha256": "63e0eac320a2eac02f418e186232405427e036d9ce9dd80951923280308cfe59",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.ValueTuple.dll"
     },
     {
       "path": "System.Web.dll",
-      "sha256": "934c6ef3f2bc8959aba62ced6d1cef069d565210e65bf59b5980e7e39571528e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Web.dll"
+      "sha256": "45b1d8e331aeb3d4006afe64cde59eddac958968d6c432df3f869982d94996f0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Web.dll"
     },
     {
       "path": "System.Web.HttpUtility.dll",
-      "sha256": "1f8bf172cd56387c0c348bc65cf6a31548324da7ff7347d5190d84e9ff82a475",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Web.HttpUtility.dll"
+      "sha256": "03841ee0b42c5ed0d4b58c185e9cfa57a939c479256943644062b918cf595a08",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Web.HttpUtility.dll"
     },
     {
       "path": "System.Windows.Controls.Ribbon.dll",
-      "sha256": "af6646ac0c67d320e601d33516ceb95b43794acd304dab9ce6e66feb6169a2bf",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Controls.Ribbon.dll"
+      "sha256": "d21e5e5c9737c3bee3c723328a829cfffd91ebb0dea95cc7c989304ddad5fb39",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Controls.Ribbon.dll"
     },
     {
       "path": "System.Windows.dll",
-      "sha256": "ffd590ee80328cf902b4d66a8db1b2d34b7ad5ba8fdb93db51c4dc0c5829439a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.dll"
+      "sha256": "5898d03d2707c44b55883bc475f8c3aa779738a439db6ec2abbf9e0fac82e6d5",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.dll"
     },
     {
       "path": "System.Windows.Extensions.dll",
-      "sha256": "2bed13caaaf09c5caefdeb113642e19d58ccefcf2177a38b090f727d1e5aba4b",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Extensions.dll"
+      "sha256": "6b7a0939a35d28442e94dfe3fc6c6433efc85985ba765c4891be66d113b3e4a7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Extensions.dll"
     },
     {
       "path": "System.Windows.Forms.Design.dll",
-      "sha256": "381c2ccec9ea915334c811548957824e621e8d1105e5da9b629d38c46eef7e3c",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Forms.Design.dll"
+      "sha256": "4b96cf16ea44e11627be57f7ebd5580e7553547d83eb5dc61121ff0d84eff4b3",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Forms.Design.dll"
     },
     {
       "path": "System.Windows.Forms.Design.Editors.dll",
-      "sha256": "296e16fd71dcb2c1d8da26827f7b1420707016412a2095248ec40fc8427d77b3",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Forms.Design.Editors.dll"
+      "sha256": "c2ae228226d9d83601722c8801260a3907f52d4176b87e40470677ec61ef0758",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Forms.Design.Editors.dll"
     },
     {
       "path": "System.Windows.Forms.dll",
-      "sha256": "3161c84f8d0d255e3adff0687fd8eb6055eee41ca9d2ed69b5ccadc128474fcb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Forms.dll"
+      "sha256": "a178f2f0de086c30e743ce32b8bfbb150e802e1bab235ff14525b4a6e2227df9",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Forms.dll"
     },
     {
       "path": "System.Windows.Forms.Primitives.dll",
-      "sha256": "370e416f04f342c04a989878f530820f6f6664eef153dbd02aa58c274339081a",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Forms.Primitives.dll"
+      "sha256": "1ce7325bd95c3998fb34b158bd99c3b2105ec6627e4e878f2089c8b77e23cc96",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Forms.Primitives.dll"
     },
     {
       "path": "System.Windows.Input.Manipulations.dll",
-      "sha256": "9ea24dc154bc21576973490e57a7ee01001988267aa74f523c3eabe7d6776cbe",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Input.Manipulations.dll"
+      "sha256": "f17077862eb4c11a8771728e82a3c31c9dbd0c134068a031a128599529a6f172",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Input.Manipulations.dll"
     },
     {
       "path": "System.Windows.Presentation.dll",
-      "sha256": "ff3d3d3dab54263f2b8ce5ae555591b4bb96ead898c555d9a8e8c3b59867bb35",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Presentation.dll"
+      "sha256": "55099ef993f85a069abc50c01a8592b2dbc28d46c156737d4a7d373766e9d6c8",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Presentation.dll"
     },
     {
       "path": "System.Windows.Primitives.dll",
-      "sha256": "8753a7e50c3dbb721f25ab270693d334a2ed55b1cfcfd6e4994d2ee365edd446",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Windows.Primitives.dll"
+      "sha256": "a84e62af74b868e7bdab10758cc2017e77a0a38f822c7f896975cc0a100c4115",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Windows.Primitives.dll"
     },
     {
       "path": "System.Xaml.dll",
-      "sha256": "e9e0545fe5575c982bd06e977aabb54e36afc9eeaac8af19f901c4c857a13a7d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xaml.dll"
+      "sha256": "8f5eeaedc35f82a9b457d5562b688b6e1892732ecf6c0c18dd3159b976458d27",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xaml.dll"
     },
     {
       "path": "System.Xml.dll",
-      "sha256": "60eebcb2939feb3c23686c067a9f49a93020488c2594357670aac4e568d380b0",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.dll"
+      "sha256": "3bf8cf7c17a8ec51ef64a48707dbcbb0359e466a7903bb564a4c74228d895e32",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.dll"
     },
     {
       "path": "System.Xml.Linq.dll",
-      "sha256": "519999617d619d88f5489021ba690277a2648bc6b344e1649be679f0e51e6ccb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.Linq.dll"
+      "sha256": "06be8d12ab41b70960703ec77899da99e0a93a6d125e77e7f8154ab071220d54",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.Linq.dll"
     },
     {
       "path": "System.Xml.ReaderWriter.dll",
-      "sha256": "cdd1a8424361a33498e2a69051a7330ed356927f675b917422861138c99f6406",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.ReaderWriter.dll"
+      "sha256": "9ed86fcb4a068f56c61ce4d595d91b57df12999820bb11659e9a4b45103305ed",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.ReaderWriter.dll"
     },
     {
       "path": "System.Xml.Serialization.dll",
-      "sha256": "b2cf0f39e9e2d0867a899a7fd4a889ee6ad3cc6ed48a7079b28502d7c808a73e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.Serialization.dll"
+      "sha256": "868e566390c0a0800253511b757644433c512989a213f32153464a4611667d8b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.Serialization.dll"
     },
     {
       "path": "System.Xml.XDocument.dll",
-      "sha256": "bc290c6ecf7ff713a492b48f9d507cbfe85a50ccd00e187e68f422d75804efec",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.XDocument.dll"
+      "sha256": "58cf36935545fdf661b64dc2f8c57b7066d2a380252d194edb6708895a50e6a7",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.XDocument.dll"
     },
     {
       "path": "System.Xml.XmlDocument.dll",
-      "sha256": "4d07558fb3573e4a0d91b928361060d1fe7162b9017e17e759ad77c8fb6986ca",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.XmlDocument.dll"
+      "sha256": "e6d348ce2e40d5f8e767f3863f3217f6075f3e4e331270be1d13e45430f87811",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.XmlDocument.dll"
     },
     {
       "path": "System.Xml.XmlSerializer.dll",
-      "sha256": "2c7cfc2a8ec748d920753b7328c681f56a65608d029f36698b0af79945c0c253",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.XmlSerializer.dll"
+      "sha256": "96d2ef2d9503bcb06d4aa9f8e15efdf3ae94c30b9db4211da75020d0690238d2",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.XmlSerializer.dll"
     },
     {
       "path": "System.Xml.XPath.dll",
-      "sha256": "2f25f882a1816e7a6bb0445562a4b7cc1653b25c0697b184ab6808b22daa49bb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.XPath.dll"
+      "sha256": "8e21c30f514e711d8446c4eec9fe92cb8156efeaa476e67a26f17ba0a21e593f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.XPath.dll"
     },
     {
       "path": "System.Xml.XPath.XDocument.dll",
-      "sha256": "dd5ee3b63637b62a7808f4e8b8e6299258c0b043d8d103ff1f0b7d31230b7dcb",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/System.Xml.XPath.XDocument.dll"
+      "sha256": "75b319f01c19a9c1c8b08b6a26bb44e3329da177d974ba90d1a4a40bba3e7d3b",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/System.Xml.XPath.XDocument.dll"
     },
     {
       "path": "UIAutomationClient.dll",
-      "sha256": "4ff9647162a3b2b5cb2f9c5d4c72f67053b66a2b888595527d1817b34eb653ff",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/UIAutomationClient.dll"
+      "sha256": "be8e03688f1c1158b6a1a9b091ca864d9e7f338390537d71a1080f8a454bb2e4",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/UIAutomationClient.dll"
     },
     {
       "path": "UIAutomationClientSideProviders.dll",
-      "sha256": "9b390b974fc859ddf9e7bd2afd94e1f1d64705349ea8173067bce14f68bb939e",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/UIAutomationClientSideProviders.dll"
+      "sha256": "c60be0bba0652ff58fb38db1b0535e4bb9f6bd8bf035e56d89b7d87690963f19",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/UIAutomationClientSideProviders.dll"
     },
     {
       "path": "UIAutomationProvider.dll",
-      "sha256": "55d87d14c32dcc2b768c1bf217019bf9780867ecc78ffeb70fbcdce0f9b7f9b7",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/UIAutomationProvider.dll"
+      "sha256": "4c7676ed72bdcb17714ad11ee838d416fcbbdac4101ec1af9248cca91e9470b0",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/UIAutomationProvider.dll"
     },
     {
       "path": "UIAutomationTypes.dll",
-      "sha256": "d4b9677ed735fe4f8db62ebc5d989cfc433f025dfbf3fd961f9367c140276e5d",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/UIAutomationTypes.dll"
+      "sha256": "903fe486e2a90299568fc90e61fc735a2b6826de967bccb7e16ae77f1b5ca92f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/UIAutomationTypes.dll"
     },
     {
       "path": "vcruntime140_cor3.dll",
@@ -1348,18 +1348,18 @@
     },
     {
       "path": "WindowsBase.dll",
-      "sha256": "0367e9e3f0d7c44deefaef9fa39e8c93cafa89900b6d0e7602202837c6d83f55",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/WindowsBase.dll"
+      "sha256": "42e05225d944bde54e4f2cbe0142105fce822c574267b6f8e305ee8c45c664e8",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/WindowsBase.dll"
     },
     {
       "path": "WindowsFormsIntegration.dll",
-      "sha256": "6ebf3988f891ad7e8c648b8332c3a0c93f9cd116efe33eac0c420802c44fa011",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/WindowsFormsIntegration.dll"
+      "sha256": "994cb84f5f46df57be5ea9ed3de1c6b703212b9985a28440806fc131c7d0119f",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/WindowsFormsIntegration.dll"
     },
     {
       "path": "wpfgfx_cor3.dll",
-      "sha256": "c6be4d13f18a371c34e2c721fc077595a903b1b0d8def4c51dbe44ec7ecec2b7",
-      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.5.3/wpfgfx_cor3.dll"
+      "sha256": "0ba67759d290f5d75ff92979394077dcd533fe484511db3ea161d7e102246a73",
+      "url": "https://github.com/antoniukmewgen-byte/Replixer/releases/download/v1.6.5/wpfgfx_cor3.dll"
     },
     {
       "path": "WTelegramClient.dll",
