@@ -79,7 +79,7 @@
                             Minimum="0"
                             Value="{Binding DownloadProgress, Mode=OneWay}">
                             <ProgressBar.Template>
-                                <ControlTemplate TargetType="ProgressBar">
+                <ControlTemplate TargetType="ProgressBar">
                                     <Border
                                         x:Name="PART_Track"
                                         Background="{StaticResource BrushColor4}"
@@ -96,6 +96,60 @@
                                 </ControlTemplate>
                             </ProgressBar.Template>
                         </ProgressBar>
+                    </StackPanel>
+
+                    <!--  Error state — shown only after all internal retries are exhausted  -->
+                    <StackPanel Margin="0,0,0,0" Visibility="{Binding HasFailed, Converter={StaticResource BoolToVis}}">
+                        <TextBlock
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Center"
+                            FontFamily="{StaticResource InterFont}"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource SubText}"
+                            Text="{Binding ErrorMessage}"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
+                        <Button
+                            Padding="12,8"
+                            HorizontalAlignment="Center"
+                            Command="{Binding RetryCommand}"
+                            Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border
+                                        x:Name="Bg"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{StaticResource OtherBrushColor1}"
+                                        BorderBrush="{StaticResource OtherBrushSubColor1}"
+                                        BorderThickness="1"
+                                        CornerRadius="16">
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                            <TextBlock
+                                                x:Name="Label"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource InterFont}"
+                                                FontSize="14"
+                                                FontWeight="Medium"
+                                                Foreground="{StaticResource OtherBrushSubColor1}">
+                                                Спробувати ще раз
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="Bg" Property="Opacity" Value="0.3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                     </StackPanel>
 
                 </StackPanel>

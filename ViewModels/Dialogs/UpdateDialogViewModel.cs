@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Replixer.Infrastructure;
 using Replixer.Services;
 
@@ -32,17 +33,39 @@ public sealed class UpdateDialogViewModel : ViewModelBase
 
     public string DownloadProgressText => $"{_downloadProgress * 100:0}%";
 
+    // Заповнюється лише коли всі внутрішні ретраї DownloadUpdatesAsync вичерпані і виняток
+    // таки долетів сюди — раніше в цьому випадку діалог просто "завмирав" (прогрес-бар зникав
+    // разом з IsDownloading, а самого повідомлення чи способу повторити спробу в UI не було,
+    // менеджер лишався зі статичним вікном без жодної дії, крім перезапуску додатку).
+    private string? _errorMessage;
+    public string? ErrorMessage
+    {
+        get => _errorMessage;
+        private set
+        {
+            SetField(ref _errorMessage, value);
+            OnPropertyChanged(nameof(HasFailed));
+        }
+    }
+
+    public bool HasFailed => _errorMessage is not null;
+
+    public ICommand RetryCommand { get; }
+
     public UpdateDialogViewModel(UpdateService updateService, UpdateInfo info)
     {
         _updateService = updateService;
         _info          = info;
+        RetryCommand   = new RelayCommand(() => _ = DownloadAndInstallAsync());
 
         _ = DownloadAndInstallAsync();
     }
 
     private async Task DownloadAndInstallAsync()
     {
-        IsDownloading = true;
+        ErrorMessage     = null;
+        DownloadProgress = 0;
+        IsDownloading    = true;
         try
         {
             var dispatcher = System.Windows.Application.Current.Dispatcher;
@@ -55,6 +78,7 @@ public sealed class UpdateDialogViewModel : ViewModelBase
         catch (Exception ex)
         {
             IsDownloading = false;
+            ErrorMessage  = "Не вдалося завантажити оновлення. Перевірте з'єднання й спробуйте ще раз.";
             ErrorReporter.Report("UPDATE", $"Помилка завантаження оновлення до v{_info.NewVersion}: {ex.Message}", ex);
         }
     }

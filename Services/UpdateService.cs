@@ -335,6 +335,15 @@ public sealed class UpdateService
     private static readonly TimeSpan[] RetryDelays =
         [TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(8)];
 
+    // Окремий, довший ретрай-бюджет саме для завантаження файлів оновлення (на відміну від
+    // CheckForUpdateAsync — легкого GET на version.json). Файли важчі, а сам процес запускається
+    // не у фоні, а поки менеджер дивиться на діалог — короткого 14с вікна (3×2/4/8с) інколи не
+    // вистачає на мережевий "гикнеться-й-відновиться" (реальний випадок: HttpIOException
+    // ResponseEnded під час завантаження v1.6.5 всупереч уже наявним ретраям). ~1хв замість ~14с.
+    private const int DownloadRetryCount = 5;
+    private static readonly TimeSpan[] DownloadRetryDelays =
+        [TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(8), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)];
+
     private async Task DownloadFileAsync(
         string             url,
         string             destPath,
@@ -354,9 +363,9 @@ public sealed class UpdateService
             {
                 throw;
             }
-            catch (Exception ex) when (attempt < RetryCount && IsTransient(ex))
+            catch (Exception ex) when (attempt < DownloadRetryCount && IsTransient(ex))
             {
-                var delay = RetryDelays[attempt];
+                var delay = DownloadRetryDelays[attempt];
                 Debug.WriteLine($"[Update] Attempt {attempt + 1} failed ({ex.Message}). Retrying in {delay.TotalSeconds}s…");
                 await Task.Delay(delay, ct);
             }
