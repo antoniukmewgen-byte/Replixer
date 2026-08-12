@@ -233,6 +233,16 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
         WireEntryRetryCommand(entry);
         WireEntryResumeDraftCommand(entry);
         entry.SourcePath = _recorder.CurrentFilePath;
+
+        // Записуємо тривалість одразу, а не лише після завершення UploadAsync (як було раніше).
+        // entry.PropertyChanged одразу тригерить ScheduleSave() → значення потрапляє в
+        // recordings.json негайно. Якщо нижче (в await stopTask/reportTask/UploadAsync)
+        // стається зависання і додаток доводиться примусово перезапустити, CallDuration
+        // інакше лишався б дефолтним TimeSpan.Zero — а RetryEntryAsync використовує
+        // entry.ReportData?.Duration ?? entry.CallDuration для ShouldSkipTelegram, тож нульова
+        // тривалість для позиції "Менеджер" (duration < 10 хв) мовчки вмикала skipTelegram
+        // при повторній відправці, хоча дзвінок насправді міг бути довгим.
+        entry.CallDuration = callDuration;
         try
         {
             bool telegramMatters = _orchestrator.IsTelegramReady && PositionPolicy.IsTelegramVisible(_settings.Position);
@@ -263,10 +273,10 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
 
             if (wasInterrupted)
             {
-                entry.CallDuration = callDuration;
-                entry.ReportData   = _interruptedDraft;
-                _interruptedDraft  = null;
-                entry.Status       = RecordingStatus.Draft;
+                // entry.CallDuration вже встановлено вище (до await'ів).
+                entry.ReportData  = _interruptedDraft;
+                _interruptedDraft = null;
+                entry.Status      = RecordingStatus.Draft;
                 return;
             }
 
@@ -281,7 +291,7 @@ public sealed class HomeViewModel : ViewModelBase, IDisposable
             bool skipTelegram = PositionPolicy.ShouldSkipTelegram(_settings.Position, callDuration);
             string? callType  = ResolveCallType(reportData);
             var upload = await _orchestrator.UploadAsync(path, caption, reportData?.CrmUrl, callStartTime, reportData?.LeadSource, skipTelegram, callType);
-            entry.CallDuration      = callDuration;
+            // entry.CallDuration вже встановлено вище (до await'ів) — див. коментар там.
             entry.DriveUrl          = upload.DriveUrl;
             entry.FilePath          = upload.LocalPath;
             entry.TelegramMessageId = upload.TelegramMessageId;

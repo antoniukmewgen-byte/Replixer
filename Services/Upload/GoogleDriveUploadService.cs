@@ -273,41 +273,80 @@ public class GoogleDriveUploadService
         if (_service is null || string.IsNullOrWhiteSpace(parentFolderId) || string.IsNullOrWhiteSpace(userName))
             return null;
 
-        try
+        var cooldownLeft = _rateLimitedUntilUtc - DateTime.UtcNow;
+        if (cooldownLeft > TimeSpan.Zero)
         {
-            var listReq = _service.Files.List();
-            listReq.Q                        = $"name='{EscapeQuery(userName)}' and mimeType='application/vnd.google-apps.folder' and '{parentFolderId}' in parents and trashed=false";
-            listReq.Fields                   = "files(id,name)";
-            listReq.SupportsAllDrives        = true;
-            listReq.IncludeItemsFromAllDrives = true;
-            var listResult = await listReq.ExecuteAsync(ct);
-
-            if (listResult.Files?.Count > 0)
-            {
-                Debug.WriteLine($"[GDrive] User folder found: {listResult.Files[0].Id}");
-                return listResult.Files[0].Id;
-            }
-
-            var folder = new Google.Apis.Drive.v3.Data.File
-            {
-                Name     = userName,
-                MimeType = "application/vnd.google-apps.folder",
-                Parents  = new List<string> { parentFolderId },
-            };
-
-            var createReq = _service.Files.Create(folder);
-            createReq.Fields           = "id";
-            createReq.SupportsAllDrives = true;
-            var created = await createReq.ExecuteAsync(ct);
-            Debug.WriteLine($"[GDrive] User folder created: {created.Id}");
-            return created.Id;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[GDrive] GetOrCreateUserFolder failed: {ex.Message}");
-            ErrorReporter.Report("GOOGLE_DRIVE", $"Не вдалося створити/знайти папку користувача \"{userName}\": {ex.Message}", ex);
+            Debug.WriteLine($"[GDrive] GetOrCreateUserFolder skipped — still in rate-limit cooldown for {cooldownLeft.TotalSeconds:F0}s more");
             return null;
         }
+
+        // На відміну від UploadAsync, раніше тут не було жодного повтору — один же одноразовий
+        // мережевий збій (наприклад обрив з'єднання під час оновлення OAuth-токена, ще ДО будь-
+        // якого звернення до Drive API) одразу здавав виклик. Той самий 3-спробний паттерн з
+        // експоненційним бекофом, що й у UploadAsync, — щоб короткочасні глюки самі загоювались.
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                var listReq = _service.Files.List();
+                listReq.Q                        = $"name='{EscapeQuery(userName)}' and mimeType='application/vnd.google-apps.folder' and '{parentFolderId}' in parents and trashed=false";
+                listReq.Fields                   = "files(id,name)";
+                listReq.SupportsAllDrives        = true;
+                listReq.IncludeItemsFromAllDrives = true;
+                var listResult = await listReq.ExecuteAsync(ct);
+
+                if (listResult.Files?.Count > 0)
+                {
+                    Debug.WriteLine($"[GDrive] User folder found: {listResult.Files[0].Id}");
+                    return listResult.Files[0].Id;
+                }
+
+                var folder = new Google.Apis.Drive.v3.Data.File
+                {
+                    Name     = userName,
+                    MimeType = "application/vnd.google-apps.folder",
+                    Parents  = new List<string> { parentFolderId },
+                };
+
+                var createReq = _service.Files.Create(folder);
+                createReq.Fields           = "id";
+                createReq.SupportsAllDrives = true;
+                var created = await createReq.ExecuteAsync(ct);
+                Debug.WriteLine($"[GDrive] User folder created: {created.Id}");
+                return created.Id;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("[GDrive] GetOrCreateUserFolder cancelled");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                if (IsRateLimitError(ex))
+                {
+                    _rateLimitedUntilUtc = DateTime.UtcNow + RateLimitCooldown;
+                    ErrorReporter.Report("GOOGLE_DRIVE",
+                        $"Google Drive: перевищено ліміт запитів під час пошуку/створення папки \"{userName}\" — призупиняємо на {RateLimitCooldown.TotalSeconds:F0}с.");
+                    return null;
+                }
+
+                bool isNet = ex is System.Net.Http.HttpRequestException or System.Net.Sockets.SocketException;
+                if (isNet && attempt < maxAttempts)
+                {
+                    var delay = TimeSpan.FromSeconds(5 * Math.Pow(2, attempt - 1)); // 5s, 10s
+                    Debug.WriteLine($"[GDrive] GetOrCreateUserFolder network error, retrying in {delay.TotalSeconds:F0}s (attempt {attempt}/{maxAttempts}): {ex.Message}");
+                    await Task.Delay(delay, ct);
+                    continue;
+                }
+
+                Debug.WriteLine($"[GDrive] GetOrCreateUserFolder failed: {ex.Message}");
+                ErrorReporter.Report("GOOGLE_DRIVE", $"Не вдалося створити/знайти папку користувача \"{userName}\": {ex.Message}", ex);
+                return null;
+            }
+        }
+
+        return null;
     }
 
     private static DriveService CreateService()

@@ -244,7 +244,7 @@ public class KommoService : IDisposable
 
                 return null;
             }
-            catch (HttpRequestException ex) when (attempt < maxAttempts)
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
             {
                 Debug.WriteLine($"[Kommo] PostNote attempt {attempt} failed: {ex.Message} — retrying");
                 await RetryDelayAsync(attempt);
@@ -867,72 +867,92 @@ public class KommoService : IDisposable
 
     private async Task<(long? pipelineId, long? statusId)> GetLeadPipelineStatusAsync(string baseUrl, string token, string leadId)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/{leadId}");
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-
-            if (!res.IsSuccessStatusCode)
+            try
             {
-                var snippet = body.Length > 300 ? body[..300] : body;
-                ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
+                using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/{leadId}");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus HTTP {(int)res.StatusCode} — лід {leadId}: {snippet}");
+                    return (null, null);
+                }
+
+                using var doc = JsonDocument.Parse(body);
+                var root = doc.RootElement;
+                long? pipelineId = root.TryGetProperty("pipeline_id", out var pid) ? pid.GetInt64() : null;
+                long? statusId   = root.TryGetProperty("status_id", out var sid) ? sid.GetInt64() : null;
+                return (pipelineId, statusId);
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
+            {
+                Debug.WriteLine($"[Kommo] GetLeadPipelineStatus attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] GetLeadPipelineStatus failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus виняток — лід {leadId}: {ex.Message}", ex);
                 return (null, null);
             }
-
-            using var doc = JsonDocument.Parse(body);
-            var root = doc.RootElement;
-            long? pipelineId = root.TryGetProperty("pipeline_id", out var pid) ? pid.GetInt64() : null;
-            long? statusId   = root.TryGetProperty("status_id", out var sid) ? sid.GetInt64() : null;
-            return (pipelineId, statusId);
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] GetLeadPipelineStatus failed: {ex.Message}");
-            ErrorReporter.Report("KOMMO", $"GetLeadPipelineStatus виняток — лід {leadId}: {ex.Message}", ex);
-            return (null, null);
-        }
+        return (null, null);
     }
 
     // sort — офіційне поле Kommo, що визначає порядок стадій у воронці (менше значення = раніше).
     private async Task<Dictionary<long, int>?> GetPipelineStatusSortOrderAsync(string baseUrl, string token, long pipelineId)
     {
-        try
+        const int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/pipelines/{pipelineId}");
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var res  = await _http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-
-            if (!res.IsSuccessStatusCode)
+            try
             {
-                var snippet = body.Length > 300 ? body[..300] : body;
-                ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder HTTP {(int)res.StatusCode} — воронка {pipelineId}: {snippet}");
+                using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/leads/pipelines/{pipelineId}");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var res  = await _http.SendAsync(req);
+                var body = await res.Content.ReadAsStringAsync();
+
+                if (!res.IsSuccessStatusCode)
+                {
+                    var snippet = body.Length > 300 ? body[..300] : body;
+                    ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder HTTP {(int)res.StatusCode} — воронка {pipelineId}: {snippet}");
+                    return null;
+                }
+
+                using var doc = JsonDocument.Parse(body);
+                var root = doc.RootElement;
+
+                if (!root.TryGetProperty("_embedded", out var emb) ||
+                    !emb.TryGetProperty("statuses", out var statuses) ||
+                    statuses.ValueKind != JsonValueKind.Array)
+                    return null;
+
+                var result = new Dictionary<long, int>();
+                foreach (var s in statuses.EnumerateArray())
+                    if (s.TryGetProperty("id", out var idProp) && s.TryGetProperty("sort", out var sortProp))
+                        result[idProp.GetInt64()] = sortProp.GetInt32();
+
+                return result;
+            }
+            catch (Exception ex) when (IsTransientNetworkError(ex) && attempt < maxAttempts)
+            {
+                Debug.WriteLine($"[Kommo] GetPipelineStatusSortOrder attempt {attempt} failed: {ex.Message} — retrying");
+                await RetryDelayAsync(attempt);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Kommo] GetPipelineStatusSortOrder failed: {ex.Message}");
+                ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder виняток — воронка {pipelineId}: {ex.Message}", ex);
                 return null;
             }
-
-            using var doc = JsonDocument.Parse(body);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("_embedded", out var emb) ||
-                !emb.TryGetProperty("statuses", out var statuses) ||
-                statuses.ValueKind != JsonValueKind.Array)
-                return null;
-
-            var result = new Dictionary<long, int>();
-            foreach (var s in statuses.EnumerateArray())
-                if (s.TryGetProperty("id", out var idProp) && s.TryGetProperty("sort", out var sortProp))
-                    result[idProp.GetInt64()] = sortProp.GetInt32();
-
-            return result;
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Kommo] GetPipelineStatusSortOrder failed: {ex.Message}");
-            ErrorReporter.Report("KOMMO", $"GetPipelineStatusSortOrder виняток — воронка {pipelineId}: {ex.Message}", ex);
-            return null;
-        }
+        return null;
     }
 
     // Переводить лід у вказану стадію конкретної воронки. На відміну від PatchLeadFieldAsync
@@ -977,8 +997,13 @@ public class KommoService : IDisposable
         }
     }
 
+    // JsonException (у т.ч. JsonReaderException) додано поруч із мережевими помилками:
+    // Kommo API інколи повертає успішний HTTP-статус з ПОРОЖНІМ або обірваним тілом
+    // (короткочасний глюк на їхньому боці — таймаут проксі під навантаженням тощо),
+    // і без цього повторної спроби для такого випадку не було — метод здавався одразу
+    // з першої ж спроби, хоча повторний запит за секунди зазвичай повертає валідний JSON.
     private static bool IsTransientNetworkError(Exception ex) =>
-        ex is HttpRequestException or TaskCanceledException or System.Net.Sockets.SocketException;
+        ex is HttpRequestException or TaskCanceledException or System.Net.Sockets.SocketException or JsonException;
 
     // Exponential backoff between retry attempts (2s, 4s for the current maxAttempts=3 call sites).
     private static Task RetryDelayAsync(int attempt) => Task.Delay(TimeSpan.FromSeconds(2 * Math.Pow(2, attempt - 1)));

@@ -174,14 +174,41 @@ public class TelegramUploadService : IDisposable
             Debug.WriteLine($"[TG] Peer resolved: {peer}");
             Debug.WriteLine("[TG] Uploading file…");
 
-            var inputFile = await _client.UploadFileAsync(filePath);
-            var fileName  = Path.GetFileName(filePath);
-
+            var fileName = Path.GetFileName(filePath);
             var (msgText, entities) = BuildCaption(caption ?? $"Запис дзвінку: {fileName}", driveUrl);
-            var msg = await _client.SendMediaAsync(peer, msgText, inputFile, mimeType ?? "audio/mpeg", entities: entities, reply_to_msg_id: topicId ?? 0);
 
-            Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msg?.id}");
-            return msg?.id;
+            var client = _client;
+
+            // UploadFileAsync/SendMediaAsync go straight over WTelegram's own MTProto socket —
+            // there's no HttpClient underneath, so no built-in timeout (same class of issue as
+            // LoginUserIfNeeded — see the 30s cap in EnsureClientAsync above). If the network
+            // stalls mid-transfer (Wi-Fi hiccup, ISP blip) the socket just sits waiting for a
+            // server ACK indefinitely — no exception is ever thrown, which freezes the whole
+            // UploadOrchestrator chain (Telegram runs before Kommo) and leaves the recording
+            // stuck on "Завантаження..." until the app is force-restarted. Cap the whole
+            // upload+send step at 120s (generous — includes actual file transfer, unlike the
+            // 30s login cap) so a stall surfaces as a normal failure instead of an infinite hang.
+            async Task<int?> SendCoreAsync()
+            {
+                var inputFile = await client.UploadFileAsync(filePath);
+                var sentMsg   = await client.SendMediaAsync(peer, msgText, inputFile, mimeType ?? "audio/mpeg", entities: entities, reply_to_msg_id: topicId ?? 0);
+                return sentMsg?.id;
+            }
+
+            using var sendCts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            var sendTask  = SendCoreAsync();
+            var completed = await Task.WhenAny(sendTask, Task.Delay(Timeout.Infinite, sendCts.Token));
+
+            if (completed != sendTask)
+            {
+                Debug.WriteLine("[TG] ✗ Upload/send timed out after 120 s — network likely unstable");
+                ErrorReporter.Report("TELEGRAM", "Відправка файлу в Telegram перевищила 120 с — ймовірно, нестабільне з'єднання.");
+                return null;
+            }
+
+            int? msgId = await sendTask; // propagate any exception from the completed task
+            Debug.WriteLine($"[TG] ✓ Sent successfully, messageId={msgId}");
+            return msgId;
         }
         catch (TL.RpcException ex) when (ex.Code == 401)
         {
@@ -258,6 +285,17 @@ public class TelegramUploadService : IDisposable
         {
             Debug.WriteLine("[TG] ✗ Message no longer exists (likely deleted from chat)");
             return MessageDeletedWarning;
+        }
+        catch (TL.RpcException ex) when (ex.Message == "MESSAGE_NOT_MODIFIED")
+        {
+            // Telegram кидає це, коли новий текст побайтово збігається зі старим — тобто
+            // редагувати нічого не треба, повідомлення вже показує актуальний контент.
+            // Це м'який успіх, а не помилка: раніше він потрапляв у загальний catch нижче
+            // й помилково показував користувачу "Не вдалося оновити звіт", хоча по факту
+            // все вже було в потрібному стані (типовий сценарій — форма збережена без змін,
+            // що впливають на сформований caption).
+            Debug.WriteLine("[TG] ✓ Message already matches new content — nothing to edit");
+            return null;
         }
         catch (Exception ex)
         {
