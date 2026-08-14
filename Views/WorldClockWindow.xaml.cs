@@ -123,8 +123,14 @@ public partial class WorldClockWindow : Window
             rz.Icon.Data       = icon;
             rz.Icon.Fill       = accent;
             rz.Badge.Background = bg;
-            rz.Time.Text        = local.ToString("HH:mm");
             rz.Time.Foreground  = accent;
+
+            // Київ лишається у 24-годинному форматі (звичному для України), а всі американські
+            // пояси — у 12-годинному з AM/PM (звичному для США). CultureInfo.InvariantCulture
+            // гарантує англійські "AM"/"PM" незалежно від системної локалі Windows користувача.
+            rz.Time.Text = rz.Sub is null
+                ? local.ToString("HH:mm")
+                : local.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
 
             if (rz.Sub is null) continue; // Kyiv — фіксований підпис "Домашній пояс" з XAML
 
