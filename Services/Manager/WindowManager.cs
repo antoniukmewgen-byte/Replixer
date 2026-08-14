@@ -7,6 +7,7 @@ namespace Replixer.Services.Manager
     {
         private CallCheatSheetWindow? _cheatSheet;
         private MissedCallReminderWindow? _missedCallReminder;
+        private WorldClockWindow? _worldClock;
 
         public void ShowCheatSheet()
         {
@@ -50,6 +51,26 @@ namespace Replixer.Services.Manager
             _missedCallReminder.Top  = 16;
 
             _missedCallReminder.Show();
+        }
+
+        // Перемикач-віджет (як RecordCommand у трей-меню) — перший клік показує, другий ховає.
+        // Якщо користувач закрив вікно самостійно кнопкою "✕", _worldClock вже null (див. Closed
+        // нижче), тож наступний виклик просто відкриє його заново.
+        public void ToggleWorldClock()
+        {
+            if (_worldClock != null)
+            {
+                _worldClock.Close();
+                return;
+            }
+
+            _worldClock = new WorldClockWindow();
+            _worldClock.Closed += (_, _) => _worldClock = null;
+
+            _worldClock.Left = 20;
+            _worldClock.Top  = 50;
+
+            _worldClock.Show();
         }
     }
 }

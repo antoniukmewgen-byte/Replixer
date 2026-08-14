@@ -13,9 +13,10 @@ public sealed class TrayViewModel : ViewModelBase, IDisposable
 
     public event Action<string, string>? BalloonRequested;
 
-    public ICommand OpenCommand   { get; }
-    public ICommand RecordCommand { get; }
-    public ICommand ExitCommand   { get; }
+    public ICommand OpenCommand      { get; }
+    public ICommand RecordCommand    { get; }
+    public ICommand WorldClockCommand { get; }
+    public ICommand ExitCommand      { get; }
 
     public string RecordLabel  => _homeVm.IsRecording ? "Зупинити запис" : "Записати дзвінок";
     public bool   IsRecording  => _homeVm.IsRecording;
@@ -25,9 +26,10 @@ public sealed class TrayViewModel : ViewModelBase, IDisposable
         _windowManager = windowManager;
         _homeVm        = homeVm;
 
-        OpenCommand   = new RelayCommand(OpenVault);
-        RecordCommand = new RelayCommand(ToggleRecording);
-        ExitCommand   = new RelayCommand(() => Application.Current.Shutdown());
+        OpenCommand       = new RelayCommand(OpenVault);
+        RecordCommand     = new RelayCommand(ToggleRecording);
+        WorldClockCommand = new RelayCommand(_windowManager.ToggleWorldClock);
+        ExitCommand       = new RelayCommand(() => Application.Current.Shutdown());
 
         _homeVm.PropertyChanged += OnHomePropertyChanged;
     }

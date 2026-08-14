@@ -108,6 +108,8 @@
 
                 <MenuItem Command="{Binding OpenCommand}" Header="Відкрити Replixer" />
 
+                <MenuItem Command="{Binding WorldClockCommand}" Header="Світовий час" />
+
                 <Separator Style="{StaticResource TraySeparatorStyle}" />
 
                 <MenuItem Command="{Binding ExitCommand}" Header="Вийти" />

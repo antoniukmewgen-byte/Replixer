@@ -6,5 +6,6 @@
         void CloseCheatSheet();
         void ShowMainWindow();
         void ShowMissedCallReminder();
+        void ToggleWorldClock();
     }
 }
